@@ -1,0 +1,9 @@
+*.o
+*.d
+*.a
+*.iso
+*.iso
+iso/
+k/k
+roms/**
+

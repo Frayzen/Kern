@@ -27,6 +27,7 @@ TARGET	= k
 OBJS	= \
 	  crt0.o \
 	  k.o \
+	  serial.o \
 	  libvga.o \
 	  list.o \
 	  memory.o \

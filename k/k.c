@@ -21,6 +21,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include "serial.h"
 #include <k/kstd.h>
 
 #include "multiboot.h"
@@ -33,6 +34,9 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 
 	char star[4] = "|/-\\";
 	char *fb = (void *)0xb8000;
+
+    serial_init();
+    write("Hello World\n", 11);
 
 	for (unsigned i = 0; ; ) {
 		*fb = star[i++ % 4];

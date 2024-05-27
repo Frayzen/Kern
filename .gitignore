@@ -6,4 +6,5 @@
 iso/
 k/k
 roms/**
+compile_commands.json
 

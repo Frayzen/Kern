@@ -36,6 +36,6 @@ menuentry "k - $(get_make_var ROM_TITLE "$i")" {
 	multiboot /k /bin/$(get_make_var TARGET "$i")
 }
 EOF
-done > $base_dir/boot/grub/grub.cfg
+done >> $base_dir/boot/grub/grub.cfg
 
 $mkrescue -o $iso_filename $base_dir

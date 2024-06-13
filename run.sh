@@ -6,11 +6,11 @@ if [ $? -ne 0 ]; then
     echo "make failed"
     exit 1
 fi
-echo "CTRL+ALT+G to lose focus"
-# echo c | bochs -q -rc /dev/stdin
-# bochs -q
-# exit 0
+echo c | bochs -q -rc /dev/stdin
+bochs -q
+exit 0
 
+echo "CTRL+ALT+G to lose focus"
 i3 split h >/dev/null &
 wait $!
 kitty gdb ./k/k &

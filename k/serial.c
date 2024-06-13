@@ -18,6 +18,10 @@
 
 void serial_init(void)
 {
+    static int init = 0;
+    if (init)
+        return;
+    init = 1;
     outb(COM1 + IIR, 0x0); // Disable interupts
 
     // Set the DLAB value
@@ -40,14 +44,20 @@ char read(void)
     return inb(COM1 + RBR);
 }
 
+int writechar(const char buf)
+{
+    serial_init();
+    static const u8 emptyDataHoldingReg = 0x20;
+    while (!(inb(COM1 + LSR) & emptyDataHoldingReg))
+        continue;
+    outb(COM1 + THR, buf);
+    return 1;
+}
+
 int write(const char *buf, size_t count)
 {
+    serial_init();
     for (size_t i = 0; i < count; i++)
-    {
-        static const u8 emptyDataHoldingReg = 0x20;
-        while (!(inb(COM1 + LSR) & emptyDataHoldingReg))
-            continue;
-        outb(COM1 + THR, buf[i]); 
-    }
+        writechar(buf[i]);
     return count;
 }

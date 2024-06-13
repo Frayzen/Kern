@@ -24,25 +24,21 @@
 include ../config.mk
 
 TARGET	= k
-OBJS	= \
-	  crt0.o \
-	  k.o \
-	  serial.o \
-	  libvga.o \
-	  list.o \
-	  memory.o \
-	  panic.o \
-
-
+SRCS    = $(shell find . -name '*.c' -o -name '*.S')
+TMP     = $(SRCS:.S=.S.o)
+OBJS    = $(TMP:.c=.o)
 DEPS = $(OBJS:.o=.d)
 
 all: $(TARGET)
 
-$(TARGET): CPPFLAGS += -MMD -Iinclude -I ../libs/libc/include/
+$(TARGET): CPPFLAGS += -MMD -Iinclude -I ../libs/libc/include/ -I./
 $(TARGET): CFLAGS += $(K_EXTRA_CFLAGS)
 $(TARGET): LDFLAGS += -Wl,-Tk.lds
 $(TARGET): LDLIBS = -L../libs/libc -lc
 $(TARGET): $(OBJS)
+
+%.S.o: %.S
+	$(CC) $(CFLAGS) -c $< -o $@
 
 install: $(TARGET)
 	$(INSTALL) $(TARGET) $(INSTALL_ROOT)/$(TARGET)

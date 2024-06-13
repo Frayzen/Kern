@@ -24,6 +24,12 @@ get_make_var()
 }
 
 shift 2
+
+cat <<EOF > $base_dir/boot/grub/grub.cfg
+set default="0"
+set timeout=0
+EOF
+
 for i in $@; do
 	cat <<EOF
 menuentry "k - $(get_make_var ROM_TITLE "$i")" {

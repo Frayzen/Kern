@@ -81,7 +81,7 @@ void append_descriptor(unsigned int base, unsigned int limit,
 	descriptors[desc_nb++] = new_desc;
 }
 
-extern void gdtFlush(void *);
+extern void gdtFlush(void);
 
 void print_access(segment_access access_byte)
 {
@@ -139,22 +139,14 @@ void load_gdt()
 	print_gdt();
 	gdt_holder.limit = (sizeof(segment_desc) * desc_nb) - 1;
 	gdt_holder.base = (unsigned int)&descriptors;
-    println("GDT DESC");
-    print_uint(gdt_holder.limit, 2);
-    print_uint(gdt_holder.base, 3);
-    println("OK");
 	asm volatile("lgdt %0"
 		     : /* no output */
 		     : "m"(gdt_holder)
 		     : "memory");
-	/* gdtFlush(&gdt_holder); */
-	println("GDT pointer");
-    print_uint((unsigned int)&gdt_holder, 4);
-	println("GDT base");
-    print_uint(gdt_holder.base, 3);
-	println("GDT Size");
-    print_uint((unsigned int)gdt_holder.limit, 2);
-	while (1)
-		;
+    println("WAIT...");
+    read();
+    println("OK");
+	gdtFlush();
 	/* asm volatile("sti" :); */
+    println("GDT loaded");
 }

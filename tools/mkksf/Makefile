@@ -30,7 +30,7 @@ DEPS	= $(OBJS:.o=.d)
 all: $(TARGET)
 
 $(TARGET): CPPFLAGS = -MMD
-$(TARGET): CFLAGS = -Wall -Wextra -Werror -std=c99
+$(TARGET): CFLAGS = -Wall -Wextra -Werror -std=c99 -g
 $(TARGET): LDFLAGS =
 $(TARGET): $(OBJS)
 

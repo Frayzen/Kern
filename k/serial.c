@@ -22,26 +22,29 @@ void serial_init(void)
     if (init)
         return;
     init = 1;
-    outb(COM1 + IIR, 0x0); // Disable interupts
-
-    // Set the DLAB value
     static const u8 dlabMask = 0x80;
-    outb(COM1 + LCR, dlabMask);
-
-    // Set baudrate to 9600
-    outb(COM1 + DLH, 0x00);
-    outb(COM1 + DLL, 0x0C);
-
     static const u8 wordMask = 0x3; // 8 bits word length
+
+    outb(COM1 + DLH, 0x0); // Disable interupts
+    outb(COM1 + LCR, dlabMask); // Set the DLAB value
+    outb(COM1 + DLH, 0x00); // Set baudrate to 9600
+    outb(COM1 + DLL, 0x05);
     outb(COM1 + LCR, wordMask); // Also reset the DLAB value
+}
+
+static int received()
+{
+    return (inb(COM1 + LSR) & 1);
 }
 
 char read(void)
 {
-    static const u8 receivedMask = 0x1;
-    while (!(inb(COM1 + RBR) & receivedMask))
+    serial_init();
+    println("OK1");
+    while(!received())
         continue;
-    return inb(COM1 + RBR);
+    println("OK2");
+    return inb(COM1);
 }
 
 int writechar(const char buf)

@@ -4,7 +4,7 @@
 #include <stddef.h>
 #define print(String) write(String, sizeof(String))
 #define printchar(Char) writechar(Char)
-#define println(String) print(String "\n")
+#define println(String) print(String "\r\n")
 
 /**
  * @brief Write a string to the serial port

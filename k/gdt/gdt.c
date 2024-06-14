@@ -2,10 +2,10 @@
 #include "serial.h"
 
 #define BASE_LOW(Base) ((0x000000FF & Base))
-#define BASE_MID(Base) ((0x00000F00 & Base) >> 8)
-#define BASE_HIGH(Base) ((0x0000F000 & Base) >> 12)
+#define BASE_MID(Base) ((0x00000F00 & Base) >> 16)
+#define BASE_HIGH(Base) ((0x0000F000 & Base) >> 24)
 #define LIMIT_LOW(Limit) ((0x000000FF & Limit))
-#define LIMIT_HIGH(Limit) ((0x00000F00 & Limit) >> 8)
+#define LIMIT_HIGH(Limit) ((0x00000700 & Limit) >> 16)
 
 void print_hex(unsigned int i)
 {
@@ -69,6 +69,7 @@ static int desc_nb = 0;
 void append_descriptor(unsigned int base, unsigned int limit,
 		       segment_access access_byte, segment_flags flags)
 {
+    flags.limit_high = LIMIT_HIGH(limit);
 	segment_desc new_desc = {
 		.flags = flags,
 		.access_byte = access_byte,
@@ -76,7 +77,6 @@ void append_descriptor(unsigned int base, unsigned int limit,
 		.base_mid = BASE_MID(base),
 		.base_high = BASE_HIGH(base),
 		.limit_low = LIMIT_LOW(limit),
-		.limit_high = LIMIT_HIGH(limit),
 	};
 	descriptors[desc_nb++] = new_desc;
 }
@@ -101,17 +101,29 @@ void print_flags(segment_flags flags)
 
 void print_gdt(void)
 {
+    print("Size of a segment descriptor: ");
+    print_uint(sizeof(segment_desc), 1);
+    println("");
 	for (int i = 0; i < desc_nb; i++) {
-		print("Base: ");
+        println("===========================");
+		println("Base: ");
+        print("HIGH ");
 		print_uint(descriptors[i].base_high, 1);
+        print("  MID ");
 		print_uint(descriptors[i].base_mid, 1);
+        print("  LOW ");
 		print_uint(descriptors[i].base_low, 2);
-		print(", Limit: ");
-		print_uint(descriptors[i].limit_high, 1);
+        println();
+		println("Limit: ");
+        print("HIGH ");
+		print_uint(descriptors[i].flags.limit_high, 1);
+        print("  LOW ");
 		print_uint(descriptors[i].limit_low, 2);
-		print(", Access: ");
+        println();
+		println("Access: ");
 		print_access(descriptors[i].access_byte);
-		print(", Flags: ");
+        println();
+		println("Flags: ");
 		print_flags(descriptors[i].flags);
 		println();
 	}
@@ -124,16 +136,16 @@ void load_gdt()
 	// NULL DESCRIPTOR
 	append_descriptor(0, 0, (segment_access){ 0 }, (segment_flags){ 0 });
 	// KERNEL MODE CODE SEGMENT
-	append_descriptor(0, 0xFFFF,
+	append_descriptor(0, 0x7FFF,
 			  build_access(SEG_CODE_EX, 0, SEG_KERNEL_PRVLG, 1),
 			  build_flag(1, 0, 0, 0));
-	append_descriptor(0, 0xFFFFF,
+	append_descriptor(0, 0x7FFFF,
 			  build_access(SEG_DATA_RDWR, 1, SEG_KERNEL_PRVLG, 1),
 			  build_flag(1, 0, 0, 0));
-	append_descriptor(0, 0xFFFFF,
+	append_descriptor(0, 0x7FF,
 			  build_access(SEG_CODE_EX, 0, SEG_USER_PRVLG, 1),
 			  build_flag(1, 0, 0, 0));
-	append_descriptor(0, 0xFFFFF,
+	append_descriptor(0, 0x7FF,
 			  build_access(SEG_DATA_RDWR, 1, SEG_USER_PRVLG, 1),
 			  build_flag(1, 1, 0, 0));
 	print_gdt();

@@ -31,6 +31,7 @@ typedef struct {
 } __attribute__((packed)) segment_access;
 
 typedef struct {
+	unsigned int limit_high : 4;
 	int available : 1; //AVL
 	int segment_size : 1; // 64 bit code segment
 	int operation_size : 1; // (0=16 bits, 1=32bits)
@@ -41,9 +42,8 @@ typedef struct {
 	unsigned int limit_low : 16;
 	unsigned int base_low : 16;
 	unsigned int base_mid : 8;
-	segment_access access_byte;
-	unsigned int limit_high : 4;
-	segment_flags flags;
+	segment_access access_byte __attribute__((packed));
+	segment_flags flags __attribute__((packed));
 	unsigned int base_high : 8;
 } __attribute__((packed)) segment_desc;
 

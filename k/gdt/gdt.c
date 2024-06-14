@@ -1,11 +1,11 @@
 #include "gdt.h"
 #include "serial.h"
 
-#define BASE_LOW(Base) ((0x000000FF & Base))
-#define BASE_MID(Base) ((0x00000F00 & Base) >> 8)
-#define BASE_HIGH(Base) ((0x0000F000 & Base) >> 12)
-#define LIMIT_LOW(Limit) ((0x000000FF & Limit))
-#define LIMIT_HIGH(Limit) ((0x00000F00 & Limit) >> 8)
+#define BASE_LOW(Base) ((0xFFFF & Base))
+#define BASE_MID(Base) ((0xFF0000 & Base) >> 16)
+#define BASE_HIGH(Base) ((0xFF000000 & Base) >> 24)
+#define LIMIT_LOW(Limit) ((0x0000FFFF & Limit))
+#define LIMIT_HIGH(Limit) ((0x000F0000 & Limit) >> 16)
 
 void print_hex(unsigned int i)
 {
@@ -136,18 +136,18 @@ void load_gdt()
 	// NULL DESCRIPTOR
 	append_descriptor(0, 0, (segment_access){ 0 }, (segment_flags){ 0 });
 	// KERNEL MODE CODE SEGMENT
-	append_descriptor(0, 0xFFF,
-			  build_access(SEG_CODE_EX, 0, SEG_KERNEL_PRVLG, 1),
-			  build_flag(1, 0, 0, 0));
-	append_descriptor(0, 0xFFF,
+	append_descriptor(0, 0xFFFFF,
+			  build_access(SEG_CODE_EXRD, 1, SEG_KERNEL_PRVLG, 1),
+			  build_flag(0, 0, 1, 1));
+	append_descriptor(0, 0xFFFFF,
 			  build_access(SEG_DATA_RDWR, 1, SEG_KERNEL_PRVLG, 1),
-			  build_flag(1, 0, 0, 0));
-	append_descriptor(0, 0xFFF,
-			  build_access(SEG_CODE_EX, 0, SEG_USER_PRVLG, 1),
-			  build_flag(1, 0, 0, 0));
-	append_descriptor(0, 0xFFF,
+			  build_flag(0, 0, 1, 1));
+	append_descriptor(0, 0xFFFFF,
+			  build_access(SEG_CODE_EXRD, 1, SEG_USER_PRVLG, 1),
+			  build_flag(0, 0, 1, 1));
+	append_descriptor(0, 0xFFFFF,
 			  build_access(SEG_DATA_RDWR, 1, SEG_USER_PRVLG, 1),
-			  build_flag(1, 1, 0, 0));
+			  build_flag(0, 0, 1, 1));
 	print_gdt();
 	gdt_holder.limit = (sizeof(segment_desc) * desc_nb) - 1;
 	gdt_holder.base = (unsigned int)&descriptors;

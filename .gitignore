@@ -4,6 +4,7 @@
 *.iso
 *.iso
 iso/
+**/.cache
 k/k
 roms/**
 compile_commands.json

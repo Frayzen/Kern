@@ -10,7 +10,7 @@
 #define LIMIT_HIGH(Limit) ((0x000F0000 & Limit) >> 16)
 
 static int desc_nb = 0;
-static segment_desc descriptors[MAX_DESCRIPTORS];
+static segment_descriptor descriptors[MAX_DESCRIPTORS];
 gdt_descriptor gdt_holder = {};
 
 /**
@@ -48,7 +48,7 @@ void append_descriptor(unsigned int base, unsigned int limit,
 		       segment_access access_byte, segment_flags flags)
 {
 	flags.limit_high = LIMIT_HIGH(limit);
-	segment_desc new_desc = {
+	segment_descriptor new_desc = {
 		.flags = flags,
 		.access_byte = access_byte,
 		.base_low = BASE_LOW(base),
@@ -80,7 +80,7 @@ void print_flags(segment_flags flags)
 void print_gdt(void)
 {
 	print("Size of a segment descriptor: ");
-	print_uint(sizeof(segment_desc), 1);
+	print_uint(sizeof(segment_descriptor), 1);
 	println("");
 	for (int i = 0; i < desc_nb; i++) {
 		println("===========================");
@@ -117,7 +117,6 @@ void append_tss()
 
 void setup_gdt()
 {
-	asm volatile("cli" :);
 	println("Loading GDT...");
 	// NULL DESCRIPTOR
 	append_descriptor(0, 0, (segment_access){ 0 }, (segment_flags){ 0 });
@@ -136,14 +135,12 @@ void setup_gdt()
 			  build_flag(0, 0, 1, 1));
 	append_tss();
 	/* print_gdt(); */
-	gdt_holder.limit = (sizeof(segment_desc) * desc_nb) - 1;
+	gdt_holder.limit = (sizeof(segment_descriptor) * desc_nb) - 1;
 	gdt_holder.base = (unsigned int)&descriptors;
 	asm volatile("lgdt %0"
 		     : /* no output */
 		     : "m"(gdt_holder)
 		     : "memory");
-	read();
 	gdtFlush();
-	/* asm volatile("sti" :); */
 	println("GDT loaded\n");
 }

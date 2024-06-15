@@ -42,7 +42,7 @@ typedef struct {
 	segment_access access_byte __attribute__((packed));
 	segment_flags flags __attribute__((packed));
 	unsigned int base_high : 8;
-} __attribute__((packed)) segment_desc;
+} __attribute__((packed)) segment_descriptor;
 
 typedef struct {
 	unsigned int limit : 16;

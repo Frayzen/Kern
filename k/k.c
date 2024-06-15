@@ -22,6 +22,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "gdt/gdt.h"
+#include "interrupts/ints.h"
 #include <k/kstd.h>
 
 #include "multiboot.h"
@@ -35,7 +36,9 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	char star[4] = "|/-\\";
 	char *fb = (void *)0xb8000;
 
+	asm volatile("cli" :);
     setup_gdt();
+    setup_idt();
 
 	for (unsigned i = 0; ; )
 		*fb = star[i++ % 4];

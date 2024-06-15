@@ -73,10 +73,9 @@ void set_gates()
 void setup_idt(void)
 {
 	setup_pic();
-	println("Loading IDT...");
 	println("Setting up IDT...");
 	set_gates();
-	print_gate(gates[0]);
+	/* print_gate(gates[0]); */
 	idt_holder.limit = IDT_ENTRIES * sizeof(idt_descriptor) - 1;
 	idt_holder.base = (unsigned int)&gates;
 	asm volatile("lidt %0"

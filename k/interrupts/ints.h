@@ -26,7 +26,6 @@ typedef struct {
 } __attribute__((packed)) idt_descriptor;
 
 void setup_idt(void);
-void interrupt_handler(void);
 void setup_pic(void);
 
 #endif /* !INTS_H */

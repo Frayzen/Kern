@@ -2,8 +2,9 @@
 .extern interrupt_handler
 
 isr:
+    cli
     jmp .context_save
-.interrupt_handler:
+.isr_:
     cld    
     # C code following the sysV ABI requires DF to be clear on function entry
     call interrupt_handler
@@ -28,7 +29,7 @@ isr:
     # save stack pointer
     mov %esp, %eax
     push %eax
-    jmp .interrupt_handler
+    jmp .isr_
 
 .context_restore:
     # restore stack pointer

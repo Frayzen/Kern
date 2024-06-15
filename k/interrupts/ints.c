@@ -70,19 +70,10 @@ void set_gates()
 	    set_gate(i, isr, 0x8, gate);
 }
 
-void test()
-{
-	asm volatile("sti" :);
-    asm volatile("int $0x0");
-	int k = 1/0;
-    print_uint(k, 1);
-}
-
 void setup_idt(void)
 {
 	setup_pic();
 	println("Loading IDT...");
-	read();
 	println("Setting up IDT...");
 	set_gates();
 	print_gate(gates[0]);
@@ -93,12 +84,4 @@ void setup_idt(void)
 		     : "m"(idt_holder)
 		     : "memory");
 	println("IDT loaded");
-	read();
-    test();
-}
-
-void interrupt_handler(void)
-{
-	println("Interrupt handler called");
-	read();
 }

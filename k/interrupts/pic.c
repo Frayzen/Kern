@@ -1,5 +1,6 @@
 #include "ints.h"
 #include "io.h"
+#include "serial.h"
 
 #define MASTER_PIC_A 0x20
 #define MASTER_PIC_B 0x21
@@ -10,8 +11,9 @@
 
 void setup_pic(void)
 {
-	const unsigned int offset1 = 0x20;
-	const unsigned int offset2 = 0x28;
+    println("Setting up PIC...");
+	const unsigned int offset1 = 0x40;
+	const unsigned int offset2 = 0x50;
 
 	// ICW1
 	outb(MASTER_PIC_A, ICW1_INIT | ICW1_ICW4);
@@ -22,7 +24,7 @@ void setup_pic(void)
     outb(SLAVE_PIC_B, offset2);
 
 	// ICW3
-    outb(MASTER_PIC_B, 0x04); // Set the second pin as a slave
+    outb(MASTER_PIC_B, 0x02); // Set the second pin as a slave
     outb(SLAVE_PIC_B, 0x02); // Set the pin of the slave as IRQ2
 
     // ICW4
@@ -30,8 +32,10 @@ void setup_pic(void)
     outb(MASTER_PIC_B, 0x01);
     outb(SLAVE_PIC_B, 0x01);
 
-    // Mask all interrupts
+    // Unmask all interrupts
     outb(MASTER_PIC_B, 0x0);
     outb(SLAVE_PIC_B, 0x0);
+
+    println("PIC setup complete");
 }
 

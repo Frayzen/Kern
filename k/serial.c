@@ -40,10 +40,8 @@ static int received()
 char read(void)
 {
     serial_init();
-    println("OK1");
     while(!received())
         continue;
-    println("OK2");
     return inb(COM1);
 }
 
@@ -64,3 +62,23 @@ int write(const char *buf, size_t count)
         writechar(buf[i]);
     return count;
 }
+
+// TOOL FUNCTIONS
+
+void print_hex(unsigned int i)
+{
+	int i2 = i & 0xF;
+	if (i2 < 10)
+		printchar('0' + i2);
+	else
+		printchar('A' + i2 - 10);
+}
+
+// Printing functions using printchar only
+void print_uint(unsigned int val, int size)
+{
+	/* print("0x"); */
+	for (int i = size - 1; i >= 0; i--)
+		print_hex(val >> (4 * i));
+}
+

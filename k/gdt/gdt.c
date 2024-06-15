@@ -1,4 +1,6 @@
 #include "gdt.h"
+#include "consts.h"
+#include "gdt/tss.h"
 #include "serial.h"
 
 #define BASE_LOW(Base) ((0xFFFF & Base))
@@ -7,29 +9,9 @@
 #define LIMIT_LOW(Limit) ((0x0000FFFF & Limit))
 #define LIMIT_HIGH(Limit) ((0x000F0000 & Limit) >> 16)
 
-void print_hex(unsigned int i)
-{
-	int i2 = i & 0xF;
-	if (i2 < 10)
-		printchar('0' + i2);
-	else
-		printchar('A' + i2 - 10);
-}
-
-// Printing functions using printchar only
-void print_uint(unsigned int val, int size)
-{
-	/* print("0x"); */
-	for (int i = size - 1; i >= 0; i--)
-		print_hex(val >> (4 * i));
-}
-
-void testFn(unsigned int val, unsigned int size)
-{
-	print("ADDRESS 0x");
-	print_uint(val, size);
-	println("");
-}
+static int desc_nb = 0;
+static segment_desc descriptors[MAX_DESCRIPTORS];
+gdt_descriptor gdt_holder = {};
 
 /**
  * @brief Tool to create a build_flag
@@ -61,10 +43,6 @@ inline segment_access build_access(int seg_type, int desc_type, int privilege,
 				  .privilege = (privilege),
 				  .present = (present) });
 }
-
-segment_desc descriptors[MAX_DESCRIPTORS];
-gdt_descriptor gdt_holder = {};
-static int desc_nb = 0;
 
 void append_descriptor(unsigned int base, unsigned int limit,
 		       segment_access access_byte, segment_flags flags)
@@ -101,35 +79,43 @@ void print_flags(segment_flags flags)
 
 void print_gdt(void)
 {
-    print("Size of a segment descriptor: ");
-    print_uint(sizeof(segment_desc), 1);
-    println("");
+	print("Size of a segment descriptor: ");
+	print_uint(sizeof(segment_desc), 1);
+	println("");
 	for (int i = 0; i < desc_nb; i++) {
-        println("===========================");
+		println("===========================");
 		println("Base: ");
-        print("HIGH ");
+		print("HIGH ");
 		print_uint(descriptors[i].base_high, 1);
-        print("  MID ");
+		print("  MID ");
 		print_uint(descriptors[i].base_mid, 1);
-        print("  LOW ");
+		print("  LOW ");
 		print_uint(descriptors[i].base_low, 2);
-        println();
+		println();
 		println("Limit: ");
-        print("HIGH ");
+		print("HIGH ");
 		print_uint(descriptors[i].flags.limit_high, 1);
-        print("  LOW ");
+		print("  LOW ");
 		print_uint(descriptors[i].limit_low, 2);
-        println();
+		println();
 		println("Access: ");
 		print_access(descriptors[i].access_byte);
-        println();
+		println();
 		println("Flags: ");
 		print_flags(descriptors[i].flags);
 		println();
 	}
 }
 
-void load_gdt()
+void append_tss()
+{
+	tss_entry *tss = setup_tss();
+	append_descriptor((unsigned int)tss, sizeof(tss_entry) - 1,
+			  build_access(SEG_CODE_EXA, 0, 0, 1),
+			  (segment_flags){ 0 });
+}
+
+void setup_gdt()
 {
 	asm volatile("cli" :);
 	println("Loading GDT...");
@@ -148,17 +134,16 @@ void load_gdt()
 	append_descriptor(0, 0xFFFFF,
 			  build_access(SEG_DATA_RDWR, 1, SEG_USER_PRVLG, 1),
 			  build_flag(0, 0, 1, 1));
-	print_gdt();
+	append_tss();
+	/* print_gdt(); */
 	gdt_holder.limit = (sizeof(segment_desc) * desc_nb) - 1;
 	gdt_holder.base = (unsigned int)&descriptors;
 	asm volatile("lgdt %0"
 		     : /* no output */
 		     : "m"(gdt_holder)
 		     : "memory");
-    println("WAIT...");
-    read();
-    println("OK");
+	read();
 	gdtFlush();
 	/* asm volatile("sti" :); */
-    println("GDT loaded");
+	println("GDT loaded\n");
 }

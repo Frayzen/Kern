@@ -32,4 +32,16 @@ char read(void);
  */
 void serial_init(void);
 
+/**
+ * @brief Print a string to the serial property
+ * @param String: the string to print
+ */
+void print_uint(unsigned int val, int size);
+
+/**
+ * @brief Print a character to the serial property
+ * @param Char: the character to print
+ */
+void print_hex(unsigned int i);
+
 #endif /* !SERIAL_H */

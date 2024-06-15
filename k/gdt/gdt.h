@@ -20,22 +20,19 @@
 
 #define MAX_DESCRIPTORS 16
 
-#define SEG_USER_PRVLG 0x03
-#define SEG_KERNEL_PRVLG 0x0
-
 typedef struct {
-	int segment_type : 4; // ONE OF THE SEG_(CODE/DATA)_XXXX
-	int desc_type : 1; // (0 = system, 1 = code data)
-	int privilege : 2; // (ring of privilege)
-	int present : 1;
+	unsigned int segment_type : 4; // ONE OF THE SEG_(CODE/DATA)_XXXX
+	unsigned int desc_type : 1; // (0 = system, 1 = code data)
+	unsigned int privilege : 2; // (ring of privilege)
+	unsigned int present : 1;
 } __attribute__((packed)) segment_access;
 
 typedef struct {
 	unsigned int limit_high : 4;
-	int available : 1; //AVL
-	int segment_size : 1; // 64 bit code segment
-	int operation_size : 1; // (0=16 bits, 1=32bits)
-	int granularity : 1;
+	unsigned int available : 1; //AVL
+	unsigned int segment_size : 1; // 64 bit code segment
+	unsigned int operation_size : 1; // (0=16 bits, 1=32bits)
+	unsigned int granularity : 1;
 } __attribute__((packed)) segment_flags;
 
 typedef struct {
@@ -52,7 +49,7 @@ typedef struct {
     unsigned int base : 32;
 } __attribute__((packed)) gdt_descriptor;
 
-void load_gdt();
+void setup_gdt();
 void testFn(unsigned int val, unsigned int size);
 
 #endif /* !GDT_H */

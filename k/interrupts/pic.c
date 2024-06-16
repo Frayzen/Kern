@@ -42,7 +42,9 @@ void setup_pic(void)
 #define PIC_EOI 0x20 /* End-of-interrupt command code */
 void send_eoi(unsigned int irq)
 {
-	if (irq >= 8)
-		outb(SLAVE_PIC_B, PIC_EOI);
+	/* if (irq >= 8) */
+	/* 	outb(SLAVE_PIC_B, PIC_EOI); */
+    (void)irq;
+	outb(SLAVE_PIC_A, PIC_EOI);
 	outb(MASTER_PIC_A, PIC_EOI);
 }

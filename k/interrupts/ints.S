@@ -1,319 +1,86 @@
 .extern interrupt_handler
-
-.macro save_registers
-    # Save general purpose registers
-    push %eax
-    push %ebx
-    push %ecx
-    push %edx
-    push %esi
-    push %edi
-    push %ebp
-    # TODO save eip and cs
-    # save segment registers
-    push %ds
-    push %es
-    push %fs
-    push %gs
-    push %ss
-
-    # save stack pointer
-    mov %esp, %eax
-    push %eax
-.endm
-
-.macro restore_registers
-    # restore stack pointer
-    pop %eax
-    mov %eax, %esp
-
-    # restore segment registers
-    pop %ss
-    pop %gs
-    pop %fs
-    pop %es
-    pop %ds
-    # TODO: restore eip and cs
-    # restore general purpose registers
-    pop %ebp
-    pop %edi
-    pop %esi
-    pop %edx
-    pop %ecx
-    pop %ebx
-    pop %eax
-.endm
-
-.macro isr_entry arg
+.macro isr arg
     .global isr\arg
     isr\arg:
         cli
-        push $0x1234
-        save_registers
-        cld
-        push $0x\arg
-        push %esp
-        call interrupt_handler
-        add $4, %esp
-        pop %eax
-        restore_registers
-        pop %eax
-        iret
+        push $0
+        push $\arg
+        jmp isr_common
 .endm
 
-isr_entry 0
-isr_entry 1
-isr_entry 2
-isr_entry 3
-isr_entry 4
-isr_entry 5
-isr_entry 6
-isr_entry 7
-isr_entry 8
-isr_entry 9
-isr_entry 10
-isr_entry 11
-isr_entry 12
-isr_entry 13
-isr_entry 14
-isr_entry 15
-isr_entry 16
-isr_entry 17
-isr_entry 18
-isr_entry 19
-isr_entry 20
-isr_entry 21
-isr_entry 22
-isr_entry 23
-isr_entry 24
-isr_entry 25
-isr_entry 26
-isr_entry 27
-isr_entry 28
-isr_entry 29
-isr_entry 30
-isr_entry 31
-isr_entry 32
-isr_entry 33
-isr_entry 34
-isr_entry 35
-isr_entry 36
-isr_entry 37
-isr_entry 38
-isr_entry 39
-isr_entry 40
-isr_entry 41
-isr_entry 42
-isr_entry 43
-isr_entry 44
-isr_entry 45
-isr_entry 46
-isr_entry 47
-isr_entry 48
-isr_entry 49
-isr_entry 50
-isr_entry 51
-isr_entry 52
-isr_entry 53
-isr_entry 54
-isr_entry 55
-isr_entry 56
-isr_entry 57
-isr_entry 58
-isr_entry 59
-isr_entry 60
-isr_entry 61
-isr_entry 62
-isr_entry 63
-isr_entry 64
-isr_entry 65
-isr_entry 66
-isr_entry 67
-isr_entry 68
-isr_entry 69
-isr_entry 70
-isr_entry 71
-isr_entry 72
-isr_entry 73
-isr_entry 74
-isr_entry 75
-isr_entry 76
-isr_entry 77
-isr_entry 78
-isr_entry 79
-isr_entry 80
-isr_entry 81
-isr_entry 82
-isr_entry 83
-isr_entry 84
-isr_entry 85
-isr_entry 86
-isr_entry 87
-isr_entry 88
-isr_entry 89
-isr_entry 90
-isr_entry 91
-isr_entry 92
-isr_entry 93
-isr_entry 94
-isr_entry 95
-isr_entry 96
-isr_entry 97
-isr_entry 98
-isr_entry 99
-isr_entry 100
-isr_entry 101
-isr_entry 102
-isr_entry 103
-isr_entry 104
-isr_entry 105
-isr_entry 106
-isr_entry 107
-isr_entry 108
-isr_entry 109
-isr_entry 110
-isr_entry 111
-isr_entry 112
-isr_entry 113
-isr_entry 114
-isr_entry 115
-isr_entry 116
-isr_entry 117
-isr_entry 118
-isr_entry 119
-isr_entry 120
-isr_entry 121
-isr_entry 122
-isr_entry 123
-isr_entry 124
-isr_entry 125
-isr_entry 126
-isr_entry 127
-isr_entry 128
-isr_entry 129
-isr_entry 130
-isr_entry 131
-isr_entry 132
-isr_entry 133
-isr_entry 134
-isr_entry 135
-isr_entry 136
-isr_entry 137
-isr_entry 138
-isr_entry 139
-isr_entry 140
-isr_entry 141
-isr_entry 142
-isr_entry 143
-isr_entry 144
-isr_entry 145
-isr_entry 146
-isr_entry 147
-isr_entry 148
-isr_entry 149
-isr_entry 150
-isr_entry 151
-isr_entry 152
-isr_entry 153
-isr_entry 154
-isr_entry 155
-isr_entry 156
-isr_entry 157
-isr_entry 158
-isr_entry 159
-isr_entry 160
-isr_entry 161
-isr_entry 162
-isr_entry 163
-isr_entry 164
-isr_entry 165
-isr_entry 166
-isr_entry 167
-isr_entry 168
-isr_entry 169
-isr_entry 170
-isr_entry 171
-isr_entry 172
-isr_entry 173
-isr_entry 174
-isr_entry 175
-isr_entry 176
-isr_entry 177
-isr_entry 178
-isr_entry 179
-isr_entry 180
-isr_entry 181
-isr_entry 182
-isr_entry 183
-isr_entry 184
-isr_entry 185
-isr_entry 186
-isr_entry 187
-isr_entry 188
-isr_entry 189
-isr_entry 190
-isr_entry 191
-isr_entry 192
-isr_entry 193
-isr_entry 194
-isr_entry 195
-isr_entry 196
-isr_entry 197
-isr_entry 198
-isr_entry 199
-isr_entry 200
-isr_entry 201
-isr_entry 202
-isr_entry 203
-isr_entry 204
-isr_entry 205
-isr_entry 206
-isr_entry 207
-isr_entry 208
-isr_entry 209
-isr_entry 210
-isr_entry 211
-isr_entry 212
-isr_entry 213
-isr_entry 214
-isr_entry 215
-isr_entry 216
-isr_entry 217
-isr_entry 218
-isr_entry 219
-isr_entry 220
-isr_entry 221
-isr_entry 222
-isr_entry 223
-isr_entry 224
-isr_entry 225
-isr_entry 226
-isr_entry 227
-isr_entry 228
-isr_entry 229
-isr_entry 230
-isr_entry 231
-isr_entry 232
-isr_entry 233
-isr_entry 234
-isr_entry 235
-isr_entry 236
-isr_entry 237
-isr_entry 238
-isr_entry 239
-isr_entry 240
-isr_entry 241
-isr_entry 242
-isr_entry 243
-isr_entry 244
-isr_entry 245
-isr_entry 246
-isr_entry 247
-isr_entry 248
-isr_entry 249
-isr_entry 250
-isr_entry 251
-isr_entry 252
-isr_entry 253
-isr_entry 254
-isr_entry 255
+.macro isr_errcode arg
+    .global isr\arg
+    isr\arg:
+        cli
+        push $\arg
+        jmp isr_common
+.endm
+
+isr_common:
+    pusha
+    mov %ds, %eax
+    push %eax
+    mov %cr2, %eax
+    push %eax
+
+    mov $0x10, %eax
+    mov %eax, %ds
+    mov %eax, %es
+    mov %eax, %fs
+    mov %eax, %gs
+
+    push %esp
+    call interrupt_handler
+
+    add $8, %esp
+    pop %ebx
+    mov %ebx, %ds
+    mov %ebx, %es
+    mov %ebx, %fs
+    mov %ebx, %gs
+    popa
+    add $8, %esp
+    sti
+    iret
+
+
+.global isr_default
+isr_default:
+isr 230
+
+isr 0
+isr 1
+isr 2
+isr 3
+isr 4
+isr 5
+isr 6
+isr 7
+isr_errcode 8
+isr 9
+isr_errcode 10
+isr_errcode 11
+isr_errcode 12
+isr_errcode 13
+isr_errcode 14
+isr 15
+isr 16
+isr 17
+isr 18
+isr 19
+isr 20
+isr 21
+isr 22
+isr 23
+isr 24
+isr 25
+isr 26
+isr 27
+isr 28
+isr 29
+isr 30
+isr 31
+
+# IRQs
+isr 64
+isr 65

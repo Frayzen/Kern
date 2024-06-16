@@ -11,31 +11,38 @@
 
 void setup_pic(void)
 {
-    println("Setting up PIC...");
+	println("Setting up PIC...");
 	const unsigned int offset1 = 0x40;
 	const unsigned int offset2 = 0x50;
 
 	// ICW1
 	outb(MASTER_PIC_A, ICW1_INIT | ICW1_ICW4);
-    outb(MASTER_PIC_A, ICW1_INIT | ICW1_ICW4);
+	outb(SLAVE_PIC_A, ICW1_INIT | ICW1_ICW4);
 
 	// ICW2
-    outb(MASTER_PIC_B, offset1);
-    outb(SLAVE_PIC_B, offset2);
+	outb(MASTER_PIC_B, offset1);
+	outb(SLAVE_PIC_B, offset2);
 
 	// ICW3
-    outb(MASTER_PIC_B, 0x02); // Set the second pin as a slave
-    outb(SLAVE_PIC_B, 0x02); // Set the pin of the slave as IRQ2
+	outb(MASTER_PIC_B, 0x04); // Set the second pin as a slave
+	outb(SLAVE_PIC_B, 0x02); // Set the pin of the slave as IRQ2
 
-    // ICW4
-    // When no special mode of operation is required, the programmer can just clear every configuration bit
-    outb(MASTER_PIC_B, 0x01);
-    outb(SLAVE_PIC_B, 0x01);
+	// ICW4
+	// When no special mode of operation is required, the programmer can just clear every configuration bit
+	outb(MASTER_PIC_B, 0x01);
+	outb(SLAVE_PIC_B, 0x01);
 
-    // Unmask all interrupts
-    outb(MASTER_PIC_B, 0x0);
-    outb(SLAVE_PIC_B, 0x0);
+	// Unmask all interrupts
+	outb(MASTER_PIC_B, 0x0);
+	outb(SLAVE_PIC_B, 0x0);
 
-    println("PIC setup complete");
+	println("PIC setup complete");
 }
 
+#define PIC_EOI 0x20 /* End-of-interrupt command code */
+void send_eoi(unsigned int irq)
+{
+	if (irq >= 8)
+		outb(SLAVE_PIC_B, PIC_EOI);
+	outb(MASTER_PIC_A, PIC_EOI);
+}

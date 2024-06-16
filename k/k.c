@@ -47,7 +47,11 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	asm volatile("sti" :);
 
 	for (unsigned i = 0; ; )
+    {
+        /* int c = getkey(); */
+        /* printf("%d\n", c); */
 		*fb = star[i++ % 4];
+    }
 
 	for (;;)
 		asm volatile ("hlt");

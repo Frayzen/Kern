@@ -12,16 +12,14 @@
 void setup_pic(void)
 {
 	println("Setting up PIC...");
-	const unsigned int offset1 = 0x40;
-	const unsigned int offset2 = 0x50;
 
 	// ICW1
 	outb(MASTER_PIC_A, ICW1_INIT | ICW1_ICW4);
 	outb(SLAVE_PIC_A, ICW1_INIT | ICW1_ICW4);
 
 	// ICW2
-	outb(MASTER_PIC_B, offset1);
-	outb(SLAVE_PIC_B, offset2);
+	outb(MASTER_PIC_B, IRQ_MASTER_OFFSET);
+	outb(SLAVE_PIC_B, IRQ_SLAVE_OFFSET);
 
 	// ICW3
 	outb(MASTER_PIC_B, 0x04); // Set the second pin as a slave
@@ -42,9 +40,8 @@ void setup_pic(void)
 #define PIC_EOI 0x20 /* End-of-interrupt command code */
 void send_eoi(unsigned int irq)
 {
-	/* if (irq >= 8) */
-	/* 	outb(SLAVE_PIC_B, PIC_EOI); */
-    (void)irq;
-	outb(SLAVE_PIC_A, PIC_EOI);
+	(void)irq;
+	if (irq >= IRQ_SLAVE_OFFSET)
+		outb(0xA0, PIC_EOI);
 	outb(MASTER_PIC_A, PIC_EOI);
 }

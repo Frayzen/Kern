@@ -1,10 +1,24 @@
 #include "handler.h"
 #include "interrupts/ints.h"
+#include "interrupts/keyboard.h"
+#include "k/kstd.h"
 #include "serial.h"
 
-void interrupt_handler(stack *s)
+unsigned int syscall_handler(stack *s)
+{
+    println("Syscall");
+    switch (s->eax) {
+        case SYSCALL_GETKEY:
+            return get_last_key();
+        default:
+            return -1;
+    }
+}
+
+unsigned int interrupt_handler(stack *s)
 {
 	switch (s->int_no) {
+
 	case 0:
 		println("Divide error");
 		break;
@@ -15,8 +29,10 @@ void interrupt_handler(stack *s)
 		/* println("System clock"); */
 		break;
 	case 65:
-		println("Keyboard");
+        handle_keyboard();
 		break;
+    case 128: /* Custom Syscall */
+        return syscall_handler(s);
 	default:
 		print("Unknown interrupt (");
 		print_uint(s->int_no, 4);
@@ -24,5 +40,7 @@ void interrupt_handler(stack *s)
 		asm volatile("hlt");
 		break;
 	}
-	send_eoi(10);
+    if (s->int_no >= IRQ_MASTER_OFFSET && s->int_no <= IRQ_SLAVE_OFFSET)
+	    send_eoi(s->int_no);
+    return 0;
 }

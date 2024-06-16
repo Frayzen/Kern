@@ -8,6 +8,6 @@ typedef struct {
 	unsigned int eip, csm, eflags, useresp, ss : 32;
 } __attribute__((packed)) stack;
 
-void interrupt_handler(stack *s);
+unsigned int interrupt_handler(stack *s);
 
 #endif /* !HANDLER_H */

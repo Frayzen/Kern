@@ -81,6 +81,8 @@ isr 29
 isr 30
 isr 31
 
+isr 128;
+
 # IRQs
 isr 64
 isr 65

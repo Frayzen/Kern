@@ -47,6 +47,8 @@ extern void isr31(void);
 extern void isr64(void); // system clock
 extern void isr65(void); // keyboard
 
+extern void isr128(void); // syscalls
+
 /**
  * @brief Create a gate
  * @param[in] type: the type of the gate
@@ -140,6 +142,8 @@ void set_gates()
 
 	set_gate(64, isr64, 0x8, gate);
 	set_gate(65, isr65, 0x8, gate);
+
+	set_gate(128, isr128, 0x8, gate);
 }
 
 void setup_idt(void)

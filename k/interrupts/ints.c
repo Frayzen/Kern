@@ -1,5 +1,6 @@
 #include "ints.h"
 #include "consts.h"
+#include "interrupts/timer.h"
 #include "serial.h"
 
 #define OFFSET_LOW(Offset) ((0xFFFF & Offset))
@@ -149,6 +150,7 @@ void set_gates()
 void setup_idt(void)
 {
 	setup_pic();
+    setup_timer();
 	println("Setting up IDT...");
 	set_gates();
 	/* print_gate(gates[0]); */

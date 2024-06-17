@@ -16,6 +16,7 @@
         jmp isr_common
 .endm
 
+retval: .long 0
 isr_common:
     pusha
     mov %ds, %eax
@@ -31,6 +32,7 @@ isr_common:
 
     push %esp
     call interrupt_handler
+    mov %eax, retval
 
     add $8, %esp
     pop %ebx
@@ -41,6 +43,7 @@ isr_common:
     popa
     add $8, %esp
     sti
+    mov retval, %eax
     iret
 
 

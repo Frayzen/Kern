@@ -23,7 +23,9 @@
  */
 #include "gdt/gdt.h"
 #include "interrupts/ints.h"
+#include "interrupts/keyboard.h"
 #include "serial.h"
+#include "stdio.h"
 #include <k/kstd.h>
 
 #include "multiboot.h"
@@ -48,8 +50,9 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 
 	for (unsigned i = 0; ; )
     {
-        /* int c = getkey(); */
-        /* printf("%d\n", c); */
+        int c = get_last_key();
+        if (c != -1)
+            printf("KB %d\n", c);
 		*fb = star[i++ % 4];
     }
 

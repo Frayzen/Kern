@@ -26,7 +26,7 @@ unsigned int interrupt_handler(stack *s)
 		println("Page fault");
 		break;
 	case 64:
-		/* println("System clock"); */
+		println("System clock");
 		break;
 	case 65:
         handle_keyboard();

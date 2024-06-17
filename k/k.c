@@ -42,10 +42,6 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	asm volatile("cli" :);
     setup_gdt();
     setup_idt();
-    println("CALLING INTERRUPTS");
-    read();
-    /* asm volatile("int $0x0" :); */
-    println("DONE");
 	asm volatile("sti" :);
 
 	for (unsigned i = 0; ; )

@@ -142,5 +142,5 @@ void setup_gdt()
 		     : "m"(gdt_holder)
 		     : "memory");
 	gdtFlush();
-	println("GDT loaded\n");
+	println("GDT loaded");
 }

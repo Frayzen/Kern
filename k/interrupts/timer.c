@@ -7,9 +7,9 @@
 #define PIT_REG_COUNTER_2 0x42
 #define PIT_REG_CONTROL 0x43
 
-#define INTERNAL_FREQUENCY 1193180
-#define DESIRED_FREQUENCY 1000
-#define RELOAD_VALUE (INTERNAL_FREQUENCY / 1000)
+#define INTERNAL_FREQUENCY 1193182
+#define DESIRED_FREQUENCY 100
+#define RELOAD_VALUE (INTERNAL_FREQUENCY / DESIRED_FREQUENCY)
 
 unsigned int get_frequency(void)
 {
@@ -29,14 +29,11 @@ void set_pit_count(unsigned count)
 	// Set low byte
 	outb(PIT_REG_COUNTER_0, count & 0xFF); // Low byte
 	outb(PIT_REG_COUNTER_0, (count & 0xFF00) >> 8); // High byte
-	return;
 }
 
 void setup_timer(void)
 {
-	print_uint(get_frequency(), 2);
-	println();
-
+    println("Setting up timer...");
 	/*
      * Bits         Usage
      * 6 and 7      Select channel :
@@ -60,9 +57,22 @@ void setup_timer(void)
      *                 1 1 1 = Mode 3 (square wave generator, same as 011b)
      * 0            BCD/Binary mode: 0 = 16-bit binary, 1 = four-digit BCD
      */
-	outb(PIT_REG_CONTROL, 0b110000);
+	outb(PIT_REG_CONTROL, 0b110100);
 	set_pit_count(RELOAD_VALUE);
-	print_uint(get_frequency(), 2);
-	println();
-	println("OK");
+    println("Timer set up");
+}
+
+static unsigned long timer_counter = 0;
+
+// Should be called every 100 ticks
+void timer_interrupt(void)
+{
+    timer_counter++;
+    if (timer_counter % 100 == 0)
+        println("Tick");
+}
+
+unsigned long get_tick(void)
+{
+    return timer_counter;
 }

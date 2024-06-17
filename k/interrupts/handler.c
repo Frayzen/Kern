@@ -1,6 +1,7 @@
 #include "handler.h"
 #include "interrupts/ints.h"
 #include "interrupts/keyboard.h"
+#include "interrupts/timer.h"
 #include "k/kstd.h"
 #include "serial.h"
 
@@ -10,6 +11,8 @@ unsigned int syscall_handler(stack *s)
     switch (s->eax) {
         case SYSCALL_GETKEY:
             return get_last_key();
+        case SYSCALL_GETTICK:
+            return get_tick();
         default:
             return -1;
     }
@@ -26,7 +29,7 @@ unsigned int interrupt_handler(stack *s)
 		println("Page fault");
 		break;
 	case 64:
-		println("System clock");
+        timer_interrupt();
 		break;
 	case 65:
         handle_keyboard();

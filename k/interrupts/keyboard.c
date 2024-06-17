@@ -52,6 +52,7 @@ char get_last_key(void)
     if (keyboard_buffer_used == 0)
         return -1;
     int ret = keyboard_buffer[keyboard_buffer_pos++];
+    keyboard_buffer_pos %= KEYBOARD_BUFFER_SIZE;
     keyboard_buffer_used--;
     return ret;
 }

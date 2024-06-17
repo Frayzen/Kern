@@ -8,4 +8,4 @@ iso/
 k/k
 roms/**
 compile_commands.json
-
+IOR=off

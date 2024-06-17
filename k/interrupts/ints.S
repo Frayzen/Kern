@@ -1,56 +1,88 @@
-.global isr
 .extern interrupt_handler
+.macro isr arg
+    .global isr\arg
+    isr\arg:
+        cli
+        push $0
+        push $\arg
+        jmp isr_common
+.endm
 
-isr:
-    cli
-    jmp .context_save
-.isr_:
-    cld    
-    # C code following the sysV ABI requires DF to be clear on function entry
+.macro isr_errcode arg
+    .global isr\arg
+    isr\arg:
+        cli
+        push $\arg
+        jmp isr_common
+.endm
+
+isr_common:
+    pusha
+    mov %ds, %eax
+    push %eax
+    mov %cr2, %eax
+    push %eax
+
+    mov $0x10, %eax
+    mov %eax, %ds
+    mov %eax, %es
+    mov %eax, %fs
+    mov %eax, %gs
+
+    push %esp
     call interrupt_handler
-    jmp .context_restore
 
-.context_save:
-    # Save general purpose registers
-    push %eax
-    push %ebx
-    push %ecx
-    push %edx
-    push %esi
-    push %edi
-    push %ebp
-    # save segment registers
-    push %ds
-    push %es
-    push %fs
-    push %gs
-    push %ss
-
-    # save stack pointer
-    mov %esp, %eax
-    push %eax
-    jmp .isr_
-
-.context_restore:
-    # restore stack pointer
-    pop %eax
-    mov %eax, %esp
-
-    # restore segment registers
-    pop %ss
-    pop %gs
-    pop %fs
-    pop %es
-    pop %ds
-
-    # restore general purpose registers
-    pop %ebp
-    pop %edi
-    pop %esi
-    pop %edx
-    pop %ecx
+    add $8, %esp
     pop %ebx
-    pop %eax
-
+    mov %ebx, %ds
+    mov %ebx, %es
+    mov %ebx, %fs
+    mov %ebx, %gs
+    popa
+    add $8, %esp
+    sti
     iret
-    
+
+
+.global isr_default
+isr_default:
+isr 230
+
+isr 0
+isr 1
+isr 2
+isr 3
+isr 4
+isr 5
+isr 6
+isr 7
+isr_errcode 8
+isr 9
+isr_errcode 10
+isr_errcode 11
+isr_errcode 12
+isr_errcode 13
+isr_errcode 14
+isr 15
+isr 16
+isr 17
+isr 18
+isr 19
+isr 20
+isr 21
+isr 22
+isr 23
+isr 24
+isr 25
+isr 26
+isr 27
+isr 28
+isr 29
+isr 30
+isr 31
+
+isr 128;
+
+# IRQs
+isr 64
+isr 65

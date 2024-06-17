@@ -20,525 +20,1793 @@ Disassembly of section .text:
   1000f6:	c3                   	ret
 
 001000f7 <k_entry>:
-  1000f7:	8d 25 e0 26 10 00    	lea    0x1026e0,%esp
+  1000f7:	8d 25 a0 2e 10 00    	lea    0x102ea0,%esp
   1000fd:	53                   	push   %ebx
   1000fe:	50                   	push   %eax
-  1000ff:	e8 31 00 00 00       	call   100135 <k_main>
+  1000ff:	e8 53 06 00 00       	call   100757 <k_main>
   100104:	eb fe                	jmp    100104 <k_entry+0xd>
 
-00100106 <isr>:
-  100106:	eb 08                	jmp    100110 <.context_save>
+00100106 <isr1000>:
+  100106:	fa                   	cli
+  100107:	50                   	push   %eax
+  100108:	53                   	push   %ebx
+  100109:	51                   	push   %ecx
+  10010a:	52                   	push   %edx
+  10010b:	56                   	push   %esi
+  10010c:	57                   	push   %edi
+  10010d:	55                   	push   %ebp
+  10010e:	1e                   	push   %ds
+  10010f:	06                   	push   %es
+  100110:	0f a0                	push   %fs
+  100112:	0f a8                	push   %gs
+  100114:	16                   	push   %ss
+  100115:	89 e0                	mov    %esp,%eax
+  100117:	50                   	push   %eax
+  100118:	fc                   	cld
+  100119:	ff 35 00 10 00 00    	push   0x1000
+  10011f:	e8 85 0b 00 00       	call   100ca9 <interrupt_handler>
+  100124:	58                   	pop    %eax
+  100125:	58                   	pop    %eax
+  100126:	89 c4                	mov    %eax,%esp
+  100128:	17                   	pop    %ss
+  100129:	0f a9                	pop    %gs
+  10012b:	0f a1                	pop    %fs
+  10012d:	07                   	pop    %es
+  10012e:	1f                   	pop    %ds
+  10012f:	5d                   	pop    %ebp
+  100130:	5f                   	pop    %edi
+  100131:	5e                   	pop    %esi
+  100132:	5a                   	pop    %edx
+  100133:	59                   	pop    %ecx
+  100134:	5b                   	pop    %ebx
+  100135:	58                   	pop    %eax
+  100136:	cf                   	iret
 
-00100108 <.interrupt_handler>:
-  100108:	fc                   	cld
-  100109:	e8 d3 03 00 00       	call   1004e1 <interrupt_handler>
-  10010e:	eb 13                	jmp    100123 <.context_restore>
+00100137 <isr0>:
+  100137:	fa                   	cli
+  100138:	50                   	push   %eax
+  100139:	53                   	push   %ebx
+  10013a:	51                   	push   %ecx
+  10013b:	52                   	push   %edx
+  10013c:	56                   	push   %esi
+  10013d:	57                   	push   %edi
+  10013e:	55                   	push   %ebp
+  10013f:	1e                   	push   %ds
+  100140:	06                   	push   %es
+  100141:	0f a0                	push   %fs
+  100143:	0f a8                	push   %gs
+  100145:	16                   	push   %ss
+  100146:	89 e0                	mov    %esp,%eax
+  100148:	50                   	push   %eax
+  100149:	fc                   	cld
+  10014a:	ff 35 00 00 00 00    	push   0x0
+  100150:	e8 54 0b 00 00       	call   100ca9 <interrupt_handler>
+  100155:	58                   	pop    %eax
+  100156:	58                   	pop    %eax
+  100157:	89 c4                	mov    %eax,%esp
+  100159:	17                   	pop    %ss
+  10015a:	0f a9                	pop    %gs
+  10015c:	0f a1                	pop    %fs
+  10015e:	07                   	pop    %es
+  10015f:	1f                   	pop    %ds
+  100160:	5d                   	pop    %ebp
+  100161:	5f                   	pop    %edi
+  100162:	5e                   	pop    %esi
+  100163:	5a                   	pop    %edx
+  100164:	59                   	pop    %ecx
+  100165:	5b                   	pop    %ebx
+  100166:	58                   	pop    %eax
+  100167:	cf                   	iret
 
-00100110 <.context_save>:
-  100110:	50                   	push   %eax
-  100111:	53                   	push   %ebx
-  100112:	51                   	push   %ecx
-  100113:	52                   	push   %edx
-  100114:	56                   	push   %esi
-  100115:	57                   	push   %edi
-  100116:	55                   	push   %ebp
-  100117:	1e                   	push   %ds
-  100118:	06                   	push   %es
-  100119:	0f a0                	push   %fs
-  10011b:	0f a8                	push   %gs
-  10011d:	16                   	push   %ss
-  10011e:	89 e0                	mov    %esp,%eax
-  100120:	50                   	push   %eax
-  100121:	eb e5                	jmp    100108 <.interrupt_handler>
+00100168 <isr1>:
+  100168:	fa                   	cli
+  100169:	50                   	push   %eax
+  10016a:	53                   	push   %ebx
+  10016b:	51                   	push   %ecx
+  10016c:	52                   	push   %edx
+  10016d:	56                   	push   %esi
+  10016e:	57                   	push   %edi
+  10016f:	55                   	push   %ebp
+  100170:	1e                   	push   %ds
+  100171:	06                   	push   %es
+  100172:	0f a0                	push   %fs
+  100174:	0f a8                	push   %gs
+  100176:	16                   	push   %ss
+  100177:	89 e0                	mov    %esp,%eax
+  100179:	50                   	push   %eax
+  10017a:	fc                   	cld
+  10017b:	ff 35 01 00 00 00    	push   0x1
+  100181:	e8 23 0b 00 00       	call   100ca9 <interrupt_handler>
+  100186:	58                   	pop    %eax
+  100187:	58                   	pop    %eax
+  100188:	89 c4                	mov    %eax,%esp
+  10018a:	17                   	pop    %ss
+  10018b:	0f a9                	pop    %gs
+  10018d:	0f a1                	pop    %fs
+  10018f:	07                   	pop    %es
+  100190:	1f                   	pop    %ds
+  100191:	5d                   	pop    %ebp
+  100192:	5f                   	pop    %edi
+  100193:	5e                   	pop    %esi
+  100194:	5a                   	pop    %edx
+  100195:	59                   	pop    %ecx
+  100196:	5b                   	pop    %ebx
+  100197:	58                   	pop    %eax
+  100198:	cf                   	iret
 
-00100123 <.context_restore>:
-  100123:	58                   	pop    %eax
-  100124:	89 c4                	mov    %eax,%esp
-  100126:	17                   	pop    %ss
-  100127:	0f a9                	pop    %gs
-  100129:	0f a1                	pop    %fs
-  10012b:	07                   	pop    %es
-  10012c:	1f                   	pop    %ds
-  10012d:	5d                   	pop    %ebp
-  10012e:	5f                   	pop    %edi
-  10012f:	5e                   	pop    %esi
-  100130:	5a                   	pop    %edx
-  100131:	59                   	pop    %ecx
-  100132:	5b                   	pop    %ebx
-  100133:	58                   	pop    %eax
-  100134:	cf                   	iret
-
-00100135 <k_main>:
-  100135:	55                   	push   %ebp
-  100136:	89 e5                	mov    %esp,%ebp
-  100138:	83 ec 18             	sub    $0x18,%esp
-  10013b:	c7 45 f4 7c 2f 2d 5c 	movl   $0x5c2d2f7c,-0xc(%ebp)
-  100142:	fa                   	cli
-  100143:	e8 f2 00 00 00       	call   10023a <setup_gdt>
-  100148:	e8 13 03 00 00       	call   100460 <setup_idt>
-  10014d:	31 c0                	xor    %eax,%eax
-  10014f:	89 c2                	mov    %eax,%edx
-  100151:	83 e2 03             	and    $0x3,%edx
-  100154:	8a 54 15 f4          	mov    -0xc(%ebp,%edx,1),%dl
-  100158:	88 15 00 80 0b 00    	mov    %dl,0xb8000
-  10015e:	40                   	inc    %eax
-  10015f:	eb ee                	jmp    10014f <k_main+0x1a>
-
-00100161 <setup_tss>:
-  100161:	31 c0                	xor    %eax,%eax
-  100163:	a3 e4 26 10 00       	mov    %eax,0x1026e4
-  100168:	c7 05 e8 26 10 00 10 	movl   $0x10,0x1026e8
-  10016f:	00 00 00 
-  100172:	31 d2                	xor    %edx,%edx
-  100174:	89 15 ec 26 10 00    	mov    %edx,0x1026ec
-  10017a:	c7 05 f0 26 10 00 10 	movl   $0x10,0x1026f0
-  100181:	00 00 00 
-  100184:	31 c9                	xor    %ecx,%ecx
-  100186:	89 0d f4 26 10 00    	mov    %ecx,0x1026f4
-  10018c:	c7 05 f8 26 10 00 10 	movl   $0x10,0x1026f8
-  100193:	00 00 00 
-  100196:	b8 e0 26 10 00       	mov    $0x1026e0,%eax
-  10019b:	c3                   	ret
-
-0010019c <append_descriptor>:
-  10019c:	55                   	push   %ebp
-  10019d:	89 e5                	mov    %esp,%ebp
+00100199 <isr2>:
+  100199:	fa                   	cli
+  10019a:	50                   	push   %eax
+  10019b:	53                   	push   %ebx
+  10019c:	51                   	push   %ecx
+  10019d:	52                   	push   %edx
+  10019e:	56                   	push   %esi
   10019f:	57                   	push   %edi
-  1001a0:	56                   	push   %esi
-  1001a1:	53                   	push   %ebx
-  1001a2:	50                   	push   %eax
-  1001a3:	8b 5d 08             	mov    0x8(%ebp),%ebx
-  1001a6:	8b 75 0c             	mov    0xc(%ebp),%esi
-  1001a9:	c1 ee 10             	shr    $0x10,%esi
-  1001ac:	83 e6 0f             	and    $0xf,%esi
-  1001af:	31 c0                	xor    %eax,%eax
-  1001b1:	8a 65 10             	mov    0x10(%ebp),%ah
-  1001b4:	8a 55 14             	mov    0x14(%ebp),%dl
-  1001b7:	83 e2 f0             	and    $0xfffffff0,%edx
-  1001ba:	09 f2                	or     %esi,%edx
-  1001bc:	0f b6 d2             	movzbl %dl,%edx
-  1001bf:	c1 e2 10             	shl    $0x10,%edx
-  1001c2:	25 ff ff 00 ff       	and    $0xff00ffff,%eax
-  1001c7:	09 d0                	or     %edx,%eax
-  1001c9:	8b 0d 00 28 10 00    	mov    0x102800,%ecx
-  1001cf:	8d 51 01             	lea    0x1(%ecx),%edx
-  1001d2:	89 15 00 28 10 00    	mov    %edx,0x102800
-  1001d8:	89 df                	mov    %ebx,%edi
-  1001da:	c1 e7 10             	shl    $0x10,%edi
-  1001dd:	0f b7 55 0c          	movzwl 0xc(%ebp),%edx
-  1001e1:	09 fa                	or     %edi,%edx
-  1001e3:	89 55 f0             	mov    %edx,-0x10(%ebp)
-  1001e6:	89 df                	mov    %ebx,%edi
-  1001e8:	c1 ef 10             	shr    $0x10,%edi
-  1001eb:	89 fa                	mov    %edi,%edx
-  1001ed:	88 d0                	mov    %dl,%al
-  1001ef:	83 e6 0f             	and    $0xf,%esi
-  1001f2:	c1 e6 10             	shl    $0x10,%esi
-  1001f5:	25 ff ff f0 00       	and    $0xf0ffff,%eax
-  1001fa:	81 e3 00 00 00 ff    	and    $0xff000000,%ebx
-  100200:	09 f0                	or     %esi,%eax
-  100202:	09 d8                	or     %ebx,%eax
-  100204:	8b 5d f0             	mov    -0x10(%ebp),%ebx
-  100207:	89 1c cd 80 27 10 00 	mov    %ebx,0x102780(,%ecx,8)
-  10020e:	89 04 cd 84 27 10 00 	mov    %eax,0x102784(,%ecx,8)
-  100215:	5a                   	pop    %edx
-  100216:	5b                   	pop    %ebx
-  100217:	5e                   	pop    %esi
-  100218:	5f                   	pop    %edi
-  100219:	5d                   	pop    %ebp
-  10021a:	c3                   	ret
+  1001a0:	55                   	push   %ebp
+  1001a1:	1e                   	push   %ds
+  1001a2:	06                   	push   %es
+  1001a3:	0f a0                	push   %fs
+  1001a5:	0f a8                	push   %gs
+  1001a7:	16                   	push   %ss
+  1001a8:	89 e0                	mov    %esp,%eax
+  1001aa:	50                   	push   %eax
+  1001ab:	fc                   	cld
+  1001ac:	ff 35 02 00 00 00    	push   0x2
+  1001b2:	e8 f2 0a 00 00       	call   100ca9 <interrupt_handler>
+  1001b7:	58                   	pop    %eax
+  1001b8:	58                   	pop    %eax
+  1001b9:	89 c4                	mov    %eax,%esp
+  1001bb:	17                   	pop    %ss
+  1001bc:	0f a9                	pop    %gs
+  1001be:	0f a1                	pop    %fs
+  1001c0:	07                   	pop    %es
+  1001c1:	1f                   	pop    %ds
+  1001c2:	5d                   	pop    %ebp
+  1001c3:	5f                   	pop    %edi
+  1001c4:	5e                   	pop    %esi
+  1001c5:	5a                   	pop    %edx
+  1001c6:	59                   	pop    %ecx
+  1001c7:	5b                   	pop    %ebx
+  1001c8:	58                   	pop    %eax
+  1001c9:	cf                   	iret
 
-0010021b <append_tss>:
-  10021b:	55                   	push   %ebp
-  10021c:	89 e5                	mov    %esp,%ebp
-  10021e:	83 ec 08             	sub    $0x8,%esp
-  100221:	e8 3b ff ff ff       	call   100161 <setup_tss>
-  100226:	6a 00                	push   $0x0
-  100228:	6a 89                	push   $0xffffff89
-  10022a:	68 8b 00 00 00       	push   $0x8b
-  10022f:	50                   	push   %eax
-  100230:	e8 67 ff ff ff       	call   10019c <append_descriptor>
-  100235:	83 c4 10             	add    $0x10,%esp
-  100238:	c9                   	leave
-  100239:	c3                   	ret
+001001ca <isr3>:
+  1001ca:	fa                   	cli
+  1001cb:	50                   	push   %eax
+  1001cc:	53                   	push   %ebx
+  1001cd:	51                   	push   %ecx
+  1001ce:	52                   	push   %edx
+  1001cf:	56                   	push   %esi
+  1001d0:	57                   	push   %edi
+  1001d1:	55                   	push   %ebp
+  1001d2:	1e                   	push   %ds
+  1001d3:	06                   	push   %es
+  1001d4:	0f a0                	push   %fs
+  1001d6:	0f a8                	push   %gs
+  1001d8:	16                   	push   %ss
+  1001d9:	89 e0                	mov    %esp,%eax
+  1001db:	50                   	push   %eax
+  1001dc:	fc                   	cld
+  1001dd:	ff 35 03 00 00 00    	push   0x3
+  1001e3:	e8 c1 0a 00 00       	call   100ca9 <interrupt_handler>
+  1001e8:	58                   	pop    %eax
+  1001e9:	58                   	pop    %eax
+  1001ea:	89 c4                	mov    %eax,%esp
+  1001ec:	17                   	pop    %ss
+  1001ed:	0f a9                	pop    %gs
+  1001ef:	0f a1                	pop    %fs
+  1001f1:	07                   	pop    %es
+  1001f2:	1f                   	pop    %ds
+  1001f3:	5d                   	pop    %ebp
+  1001f4:	5f                   	pop    %edi
+  1001f5:	5e                   	pop    %esi
+  1001f6:	5a                   	pop    %edx
+  1001f7:	59                   	pop    %ecx
+  1001f8:	5b                   	pop    %ebx
+  1001f9:	58                   	pop    %eax
+  1001fa:	cf                   	iret
 
-0010023a <setup_gdt>:
-  10023a:	55                   	push   %ebp
-  10023b:	89 e5                	mov    %esp,%ebp
-  10023d:	83 ec 10             	sub    $0x10,%esp
-  100240:	6a 11                	push   $0x11
-  100242:	68 ff 05 10 00       	push   $0x1005ff
-  100247:	e8 33 03 00 00       	call   10057f <write>
-  10024c:	6a 00                	push   $0x0
-  10024e:	6a 00                	push   $0x0
-  100250:	6a 00                	push   $0x0
-  100252:	6a 00                	push   $0x0
-  100254:	e8 43 ff ff ff       	call   10019c <append_descriptor>
-  100259:	83 c4 20             	add    $0x20,%esp
-  10025c:	6a c0                	push   $0xffffffc0
-  10025e:	6a 9a                	push   $0xffffff9a
-  100260:	68 ff ff 0f 00       	push   $0xfffff
-  100265:	6a 00                	push   $0x0
-  100267:	e8 30 ff ff ff       	call   10019c <append_descriptor>
-  10026c:	6a c0                	push   $0xffffffc0
-  10026e:	6a 92                	push   $0xffffff92
-  100270:	68 ff ff 0f 00       	push   $0xfffff
-  100275:	6a 00                	push   $0x0
-  100277:	e8 20 ff ff ff       	call   10019c <append_descriptor>
-  10027c:	83 c4 20             	add    $0x20,%esp
-  10027f:	6a c0                	push   $0xffffffc0
-  100281:	6a fa                	push   $0xfffffffa
-  100283:	68 ff ff 0f 00       	push   $0xfffff
-  100288:	6a 00                	push   $0x0
-  10028a:	e8 0d ff ff ff       	call   10019c <append_descriptor>
-  10028f:	6a c0                	push   $0xffffffc0
-  100291:	6a f2                	push   $0xfffffff2
-  100293:	68 ff ff 0f 00       	push   $0xfffff
-  100298:	6a 00                	push   $0x0
-  10029a:	e8 fd fe ff ff       	call   10019c <append_descriptor>
-  10029f:	83 c4 20             	add    $0x20,%esp
-  1002a2:	e8 74 ff ff ff       	call   10021b <append_tss>
-  1002a7:	a1 00 28 10 00       	mov    0x102800,%eax
-  1002ac:	8d 04 c5 ff ff ff ff 	lea    -0x1(,%eax,8),%eax
-  1002b3:	66 a3 6c 27 10 00    	mov    %ax,0x10276c
-  1002b9:	b8 80 27 10 00       	mov    $0x102780,%eax
-  1002be:	66 a3 6e 27 10 00    	mov    %ax,0x10276e
-  1002c4:	c1 e8 10             	shr    $0x10,%eax
-  1002c7:	66 a3 70 27 10 00    	mov    %ax,0x102770
-  1002cd:	0f 01 15 6c 27 10 00 	lgdtl  0x10276c
-  1002d4:	e8 07 fe ff ff       	call   1000e0 <gdtFlush>
-  1002d9:	50                   	push   %eax
-  1002da:	50                   	push   %eax
-  1002db:	6a 0e                	push   $0xe
-  1002dd:	68 10 06 10 00       	push   $0x100610
-  1002e2:	e8 98 02 00 00       	call   10057f <write>
-  1002e7:	83 c4 10             	add    $0x10,%esp
-  1002ea:	c9                   	leave
-  1002eb:	c3                   	ret
+001001fb <isr4>:
+  1001fb:	fa                   	cli
+  1001fc:	50                   	push   %eax
+  1001fd:	53                   	push   %ebx
+  1001fe:	51                   	push   %ecx
+  1001ff:	52                   	push   %edx
+  100200:	56                   	push   %esi
+  100201:	57                   	push   %edi
+  100202:	55                   	push   %ebp
+  100203:	1e                   	push   %ds
+  100204:	06                   	push   %es
+  100205:	0f a0                	push   %fs
+  100207:	0f a8                	push   %gs
+  100209:	16                   	push   %ss
+  10020a:	89 e0                	mov    %esp,%eax
+  10020c:	50                   	push   %eax
+  10020d:	fc                   	cld
+  10020e:	ff 35 04 00 00 00    	push   0x4
+  100214:	e8 90 0a 00 00       	call   100ca9 <interrupt_handler>
+  100219:	58                   	pop    %eax
+  10021a:	58                   	pop    %eax
+  10021b:	89 c4                	mov    %eax,%esp
+  10021d:	17                   	pop    %ss
+  10021e:	0f a9                	pop    %gs
+  100220:	0f a1                	pop    %fs
+  100222:	07                   	pop    %es
+  100223:	1f                   	pop    %ds
+  100224:	5d                   	pop    %ebp
+  100225:	5f                   	pop    %edi
+  100226:	5e                   	pop    %esi
+  100227:	5a                   	pop    %edx
+  100228:	59                   	pop    %ecx
+  100229:	5b                   	pop    %ebx
+  10022a:	58                   	pop    %eax
+  10022b:	cf                   	iret
 
-001002ec <setup_pic>:
-  1002ec:	b0 11                	mov    $0x11,%al
-  1002ee:	ba 20 00 00 00       	mov    $0x20,%edx
-  1002f3:	ee                   	out    %al,(%dx)
-  1002f4:	ee                   	out    %al,(%dx)
-  1002f5:	b0 20                	mov    $0x20,%al
-  1002f7:	ba 21 00 00 00       	mov    $0x21,%edx
-  1002fc:	ee                   	out    %al,(%dx)
-  1002fd:	b0 28                	mov    $0x28,%al
-  1002ff:	ba a1 00 00 00       	mov    $0xa1,%edx
-  100304:	ee                   	out    %al,(%dx)
-  100305:	b0 04                	mov    $0x4,%al
-  100307:	ba 21 00 00 00       	mov    $0x21,%edx
-  10030c:	ee                   	out    %al,(%dx)
-  10030d:	b0 02                	mov    $0x2,%al
-  10030f:	ba a1 00 00 00       	mov    $0xa1,%edx
-  100314:	ee                   	out    %al,(%dx)
-  100315:	b0 01                	mov    $0x1,%al
-  100317:	ba 21 00 00 00       	mov    $0x21,%edx
-  10031c:	ee                   	out    %al,(%dx)
-  10031d:	ba a1 00 00 00       	mov    $0xa1,%edx
-  100322:	ee                   	out    %al,(%dx)
-  100323:	31 c0                	xor    %eax,%eax
-  100325:	ba 21 00 00 00       	mov    $0x21,%edx
-  10032a:	ee                   	out    %al,(%dx)
-  10032b:	ba a1 00 00 00       	mov    $0xa1,%edx
-  100330:	ee                   	out    %al,(%dx)
-  100331:	c3                   	ret
+0010022c <isr5>:
+  10022c:	fa                   	cli
+  10022d:	50                   	push   %eax
+  10022e:	53                   	push   %ebx
+  10022f:	51                   	push   %ecx
+  100230:	52                   	push   %edx
+  100231:	56                   	push   %esi
+  100232:	57                   	push   %edi
+  100233:	55                   	push   %ebp
+  100234:	1e                   	push   %ds
+  100235:	06                   	push   %es
+  100236:	0f a0                	push   %fs
+  100238:	0f a8                	push   %gs
+  10023a:	16                   	push   %ss
+  10023b:	89 e0                	mov    %esp,%eax
+  10023d:	50                   	push   %eax
+  10023e:	fc                   	cld
+  10023f:	ff 35 05 00 00 00    	push   0x5
+  100245:	e8 5f 0a 00 00       	call   100ca9 <interrupt_handler>
+  10024a:	58                   	pop    %eax
+  10024b:	58                   	pop    %eax
+  10024c:	89 c4                	mov    %eax,%esp
+  10024e:	17                   	pop    %ss
+  10024f:	0f a9                	pop    %gs
+  100251:	0f a1                	pop    %fs
+  100253:	07                   	pop    %es
+  100254:	1f                   	pop    %ds
+  100255:	5d                   	pop    %ebp
+  100256:	5f                   	pop    %edi
+  100257:	5e                   	pop    %esi
+  100258:	5a                   	pop    %edx
+  100259:	59                   	pop    %ecx
+  10025a:	5b                   	pop    %ebx
+  10025b:	58                   	pop    %eax
+  10025c:	cf                   	iret
 
-00100332 <set_gate>:
-  100332:	55                   	push   %ebp
-  100333:	89 e5                	mov    %esp,%ebp
-  100335:	56                   	push   %esi
-  100336:	53                   	push   %ebx
-  100337:	8b 5d 08             	mov    0x8(%ebp),%ebx
-  10033a:	8b 55 0c             	mov    0xc(%ebp),%edx
-  10033d:	31 c0                	xor    %eax,%eax
-  10033f:	8a 65 14             	mov    0x14(%ebp),%ah
-  100342:	0f b7 75 10          	movzwl 0x10(%ebp),%esi
-  100346:	c1 e6 10             	shl    $0x10,%esi
-  100349:	0f b7 ca             	movzwl %dx,%ecx
-  10034c:	09 f1                	or     %esi,%ecx
-  10034e:	66 31 d2             	xor    %dx,%dx
-  100351:	0f b7 c0             	movzwl %ax,%eax
-  100354:	09 d0                	or     %edx,%eax
-  100356:	89 0c dd 20 28 10 00 	mov    %ecx,0x102820(,%ebx,8)
-  10035d:	89 04 dd 24 28 10 00 	mov    %eax,0x102824(,%ebx,8)
-  100364:	5b                   	pop    %ebx
-  100365:	5e                   	pop    %esi
-  100366:	5d                   	pop    %ebp
-  100367:	c3                   	ret
+0010025d <isr6>:
+  10025d:	fa                   	cli
+  10025e:	50                   	push   %eax
+  10025f:	53                   	push   %ebx
+  100260:	51                   	push   %ecx
+  100261:	52                   	push   %edx
+  100262:	56                   	push   %esi
+  100263:	57                   	push   %edi
+  100264:	55                   	push   %ebp
+  100265:	1e                   	push   %ds
+  100266:	06                   	push   %es
+  100267:	0f a0                	push   %fs
+  100269:	0f a8                	push   %gs
+  10026b:	16                   	push   %ss
+  10026c:	89 e0                	mov    %esp,%eax
+  10026e:	50                   	push   %eax
+  10026f:	fc                   	cld
+  100270:	ff 35 06 00 00 00    	push   0x6
+  100276:	e8 2e 0a 00 00       	call   100ca9 <interrupt_handler>
+  10027b:	58                   	pop    %eax
+  10027c:	58                   	pop    %eax
+  10027d:	89 c4                	mov    %eax,%esp
+  10027f:	17                   	pop    %ss
+  100280:	0f a9                	pop    %gs
+  100282:	0f a1                	pop    %fs
+  100284:	07                   	pop    %es
+  100285:	1f                   	pop    %ds
+  100286:	5d                   	pop    %ebp
+  100287:	5f                   	pop    %edi
+  100288:	5e                   	pop    %esi
+  100289:	5a                   	pop    %edx
+  10028a:	59                   	pop    %ecx
+  10028b:	5b                   	pop    %ebx
+  10028c:	58                   	pop    %eax
+  10028d:	cf                   	iret
 
-00100368 <print_gate>:
-  100368:	55                   	push   %ebp
-  100369:	89 e5                	mov    %esp,%ebp
-  10036b:	56                   	push   %esi
-  10036c:	53                   	push   %ebx
-  10036d:	8b 75 08             	mov    0x8(%ebp),%esi
-  100370:	8b 5d 0c             	mov    0xc(%ebp),%ebx
-  100373:	50                   	push   %eax
-  100374:	50                   	push   %eax
-  100375:	6a 09                	push   $0x9
-  100377:	68 1e 06 10 00       	push   $0x10061e
-  10037c:	e8 fe 01 00 00       	call   10057f <write>
-  100381:	5a                   	pop    %edx
-  100382:	59                   	pop    %ecx
-  100383:	6a 04                	push   $0x4
-  100385:	89 d8                	mov    %ebx,%eax
-  100387:	c1 e8 10             	shr    $0x10,%eax
-  10038a:	50                   	push   %eax
-  10038b:	e8 40 02 00 00       	call   1005d0 <print_uint>
-  100390:	58                   	pop    %eax
-  100391:	5a                   	pop    %edx
-  100392:	6a 04                	push   $0x4
-  100394:	0f b7 c6             	movzwl %si,%eax
-  100397:	50                   	push   %eax
-  100398:	e8 33 02 00 00       	call   1005d0 <print_uint>
-  10039d:	59                   	pop    %ecx
-  10039e:	58                   	pop    %eax
-  10039f:	6a 0d                	push   $0xd
-  1003a1:	68 27 06 10 00       	push   $0x100627
-  1003a6:	e8 d4 01 00 00       	call   10057f <write>
-  1003ab:	58                   	pop    %eax
-  1003ac:	5a                   	pop    %edx
-  1003ad:	6a 04                	push   $0x4
-  1003af:	c1 ee 10             	shr    $0x10,%esi
-  1003b2:	56                   	push   %esi
-  1003b3:	e8 18 02 00 00       	call   1005d0 <print_uint>
-  1003b8:	59                   	pop    %ecx
-  1003b9:	5e                   	pop    %esi
-  1003ba:	6a 09                	push   $0x9
-  1003bc:	68 34 06 10 00       	push   $0x100634
-  1003c1:	e8 b9 01 00 00       	call   10057f <write>
-  1003c6:	58                   	pop    %eax
-  1003c7:	5a                   	pop    %edx
-  1003c8:	6a 01                	push   $0x1
-  1003ca:	89 d8                	mov    %ebx,%eax
-  1003cc:	c1 e8 08             	shr    $0x8,%eax
-  1003cf:	83 e0 1f             	and    $0x1f,%eax
-  1003d2:	50                   	push   %eax
-  1003d3:	e8 f8 01 00 00       	call   1005d0 <print_uint>
-  1003d8:	59                   	pop    %ecx
-  1003d9:	5e                   	pop    %esi
-  1003da:	6a 0e                	push   $0xe
-  1003dc:	68 3d 06 10 00       	push   $0x10063d
-  1003e1:	e8 99 01 00 00       	call   10057f <write>
-  1003e6:	58                   	pop    %eax
-  1003e7:	5a                   	pop    %edx
-  1003e8:	6a 02                	push   $0x2
-  1003ea:	89 d8                	mov    %ebx,%eax
-  1003ec:	c1 e8 0d             	shr    $0xd,%eax
-  1003ef:	83 e0 03             	and    $0x3,%eax
-  1003f2:	50                   	push   %eax
-  1003f3:	e8 d8 01 00 00       	call   1005d0 <print_uint>
-  1003f8:	59                   	pop    %ecx
-  1003f9:	5e                   	pop    %esi
-  1003fa:	6a 0c                	push   $0xc
-  1003fc:	68 4b 06 10 00       	push   $0x10064b
-  100401:	e8 79 01 00 00       	call   10057f <write>
-  100406:	58                   	pop    %eax
-  100407:	5a                   	pop    %edx
-  100408:	6a 01                	push   $0x1
-  10040a:	c1 eb 0f             	shr    $0xf,%ebx
-  10040d:	83 e3 01             	and    $0x1,%ebx
-  100410:	53                   	push   %ebx
-  100411:	e8 ba 01 00 00       	call   1005d0 <print_uint>
-  100416:	83 c4 10             	add    $0x10,%esp
-  100419:	c7 45 0c 03 00 00 00 	movl   $0x3,0xc(%ebp)
-  100420:	c7 45 08 1b 06 10 00 	movl   $0x10061b,0x8(%ebp)
-  100427:	8d 65 f8             	lea    -0x8(%ebp),%esp
-  10042a:	5b                   	pop    %ebx
-  10042b:	5e                   	pop    %esi
-  10042c:	5d                   	pop    %ebp
-  10042d:	e9 4d 01 00 00       	jmp    10057f <write>
+0010028e <isr7>:
+  10028e:	fa                   	cli
+  10028f:	50                   	push   %eax
+  100290:	53                   	push   %ebx
+  100291:	51                   	push   %ecx
+  100292:	52                   	push   %edx
+  100293:	56                   	push   %esi
+  100294:	57                   	push   %edi
+  100295:	55                   	push   %ebp
+  100296:	1e                   	push   %ds
+  100297:	06                   	push   %es
+  100298:	0f a0                	push   %fs
+  10029a:	0f a8                	push   %gs
+  10029c:	16                   	push   %ss
+  10029d:	89 e0                	mov    %esp,%eax
+  10029f:	50                   	push   %eax
+  1002a0:	fc                   	cld
+  1002a1:	ff 35 07 00 00 00    	push   0x7
+  1002a7:	e8 fd 09 00 00       	call   100ca9 <interrupt_handler>
+  1002ac:	58                   	pop    %eax
+  1002ad:	58                   	pop    %eax
+  1002ae:	89 c4                	mov    %eax,%esp
+  1002b0:	17                   	pop    %ss
+  1002b1:	0f a9                	pop    %gs
+  1002b3:	0f a1                	pop    %fs
+  1002b5:	07                   	pop    %es
+  1002b6:	1f                   	pop    %ds
+  1002b7:	5d                   	pop    %ebp
+  1002b8:	5f                   	pop    %edi
+  1002b9:	5e                   	pop    %esi
+  1002ba:	5a                   	pop    %edx
+  1002bb:	59                   	pop    %ecx
+  1002bc:	5b                   	pop    %ebx
+  1002bd:	58                   	pop    %eax
+  1002be:	cf                   	iret
 
-00100432 <set_gates>:
-  100432:	55                   	push   %ebp
-  100433:	89 e5                	mov    %esp,%ebp
-  100435:	56                   	push   %esi
-  100436:	53                   	push   %ebx
-  100437:	be 8e ff ff ff       	mov    $0xffffff8e,%esi
-  10043c:	bb 00 01 00 00       	mov    $0x100,%ebx
-  100441:	56                   	push   %esi
-  100442:	6a 08                	push   $0x8
-  100444:	68 06 01 10 00       	push   $0x100106
-  100449:	6a 01                	push   $0x1
-  10044b:	e8 e2 fe ff ff       	call   100332 <set_gate>
-  100450:	83 c4 10             	add    $0x10,%esp
-  100453:	4b                   	dec    %ebx
-  100454:	75 eb                	jne    100441 <set_gates+0xf>
-  100456:	8d 65 f8             	lea    -0x8(%ebp),%esp
-  100459:	5b                   	pop    %ebx
-  10045a:	5e                   	pop    %esi
-  10045b:	5d                   	pop    %ebp
-  10045c:	c3                   	ret
+001002bf <isr8>:
+  1002bf:	fa                   	cli
+  1002c0:	50                   	push   %eax
+  1002c1:	53                   	push   %ebx
+  1002c2:	51                   	push   %ecx
+  1002c3:	52                   	push   %edx
+  1002c4:	56                   	push   %esi
+  1002c5:	57                   	push   %edi
+  1002c6:	55                   	push   %ebp
+  1002c7:	1e                   	push   %ds
+  1002c8:	06                   	push   %es
+  1002c9:	0f a0                	push   %fs
+  1002cb:	0f a8                	push   %gs
+  1002cd:	16                   	push   %ss
+  1002ce:	89 e0                	mov    %esp,%eax
+  1002d0:	50                   	push   %eax
+  1002d1:	fc                   	cld
+  1002d2:	ff 35 08 00 00 00    	push   0x8
+  1002d8:	e8 cc 09 00 00       	call   100ca9 <interrupt_handler>
+  1002dd:	58                   	pop    %eax
+  1002de:	58                   	pop    %eax
+  1002df:	89 c4                	mov    %eax,%esp
+  1002e1:	17                   	pop    %ss
+  1002e2:	0f a9                	pop    %gs
+  1002e4:	0f a1                	pop    %fs
+  1002e6:	07                   	pop    %es
+  1002e7:	1f                   	pop    %ds
+  1002e8:	5d                   	pop    %ebp
+  1002e9:	5f                   	pop    %edi
+  1002ea:	5e                   	pop    %esi
+  1002eb:	5a                   	pop    %edx
+  1002ec:	59                   	pop    %ecx
+  1002ed:	5b                   	pop    %ebx
+  1002ee:	58                   	pop    %eax
+  1002ef:	cf                   	iret
 
-0010045d <test>:
-  10045d:	fb                   	sti
-  10045e:	0f 0b                	ud2
+001002f0 <isr9>:
+  1002f0:	fa                   	cli
+  1002f1:	50                   	push   %eax
+  1002f2:	53                   	push   %ebx
+  1002f3:	51                   	push   %ecx
+  1002f4:	52                   	push   %edx
+  1002f5:	56                   	push   %esi
+  1002f6:	57                   	push   %edi
+  1002f7:	55                   	push   %ebp
+  1002f8:	1e                   	push   %ds
+  1002f9:	06                   	push   %es
+  1002fa:	0f a0                	push   %fs
+  1002fc:	0f a8                	push   %gs
+  1002fe:	16                   	push   %ss
+  1002ff:	89 e0                	mov    %esp,%eax
+  100301:	50                   	push   %eax
+  100302:	fc                   	cld
+  100303:	ff 35 09 00 00 00    	push   0x9
+  100309:	e8 9b 09 00 00       	call   100ca9 <interrupt_handler>
+  10030e:	58                   	pop    %eax
+  10030f:	58                   	pop    %eax
+  100310:	89 c4                	mov    %eax,%esp
+  100312:	17                   	pop    %ss
+  100313:	0f a9                	pop    %gs
+  100315:	0f a1                	pop    %fs
+  100317:	07                   	pop    %es
+  100318:	1f                   	pop    %ds
+  100319:	5d                   	pop    %ebp
+  10031a:	5f                   	pop    %edi
+  10031b:	5e                   	pop    %esi
+  10031c:	5a                   	pop    %edx
+  10031d:	59                   	pop    %ecx
+  10031e:	5b                   	pop    %ebx
+  10031f:	58                   	pop    %eax
+  100320:	cf                   	iret
 
-00100460 <setup_idt>:
-  100460:	55                   	push   %ebp
-  100461:	89 e5                	mov    %esp,%ebp
-  100463:	53                   	push   %ebx
-  100464:	50                   	push   %eax
-  100465:	e8 82 fe ff ff       	call   1002ec <setup_pic>
-  10046a:	52                   	push   %edx
-  10046b:	52                   	push   %edx
-  10046c:	6a 11                	push   $0x11
-  10046e:	68 57 06 10 00       	push   $0x100657
-  100473:	e8 07 01 00 00       	call   10057f <write>
-  100478:	e8 bd 00 00 00       	call   10053a <read>
-  10047d:	59                   	pop    %ecx
-  10047e:	5b                   	pop    %ebx
-  10047f:	6a 14                	push   $0x14
-  100481:	68 68 06 10 00       	push   $0x100668
-  100486:	e8 f4 00 00 00       	call   10057f <write>
-  10048b:	e8 a2 ff ff ff       	call   100432 <set_gates>
-  100490:	58                   	pop    %eax
-  100491:	5a                   	pop    %edx
-  100492:	bb 20 28 10 00       	mov    $0x102820,%ebx
-  100497:	ff 35 24 28 10 00    	push   0x102824
-  10049d:	ff 35 20 28 10 00    	push   0x102820
-  1004a3:	e8 c0 fe ff ff       	call   100368 <print_gate>
-  1004a8:	66 c7 05 04 28 10 00 	movw   $0x5ff,0x102804
-  1004af:	ff 05 
-  1004b1:	66 89 1d 06 28 10 00 	mov    %bx,0x102806
-  1004b8:	c1 eb 10             	shr    $0x10,%ebx
-  1004bb:	66 89 1d 08 28 10 00 	mov    %bx,0x102808
-  1004c2:	0f 01 1d 04 28 10 00 	lidtl  0x102804
-  1004c9:	59                   	pop    %ecx
-  1004ca:	5b                   	pop    %ebx
-  1004cb:	6a 0d                	push   $0xd
-  1004cd:	68 7c 06 10 00       	push   $0x10067c
-  1004d2:	e8 a8 00 00 00       	call   10057f <write>
-  1004d7:	e8 5e 00 00 00       	call   10053a <read>
-  1004dc:	e8 7c ff ff ff       	call   10045d <test>
+00100321 <isr10>:
+  100321:	fa                   	cli
+  100322:	50                   	push   %eax
+  100323:	53                   	push   %ebx
+  100324:	51                   	push   %ecx
+  100325:	52                   	push   %edx
+  100326:	56                   	push   %esi
+  100327:	57                   	push   %edi
+  100328:	55                   	push   %ebp
+  100329:	1e                   	push   %ds
+  10032a:	06                   	push   %es
+  10032b:	0f a0                	push   %fs
+  10032d:	0f a8                	push   %gs
+  10032f:	16                   	push   %ss
+  100330:	89 e0                	mov    %esp,%eax
+  100332:	50                   	push   %eax
+  100333:	fc                   	cld
+  100334:	ff 35 10 00 00 00    	push   0x10
+  10033a:	e8 6a 09 00 00       	call   100ca9 <interrupt_handler>
+  10033f:	58                   	pop    %eax
+  100340:	58                   	pop    %eax
+  100341:	89 c4                	mov    %eax,%esp
+  100343:	17                   	pop    %ss
+  100344:	0f a9                	pop    %gs
+  100346:	0f a1                	pop    %fs
+  100348:	07                   	pop    %es
+  100349:	1f                   	pop    %ds
+  10034a:	5d                   	pop    %ebp
+  10034b:	5f                   	pop    %edi
+  10034c:	5e                   	pop    %esi
+  10034d:	5a                   	pop    %edx
+  10034e:	59                   	pop    %ecx
+  10034f:	5b                   	pop    %ebx
+  100350:	58                   	pop    %eax
+  100351:	cf                   	iret
 
-001004e1 <interrupt_handler>:
+00100352 <isr11>:
+  100352:	fa                   	cli
+  100353:	50                   	push   %eax
+  100354:	53                   	push   %ebx
+  100355:	51                   	push   %ecx
+  100356:	52                   	push   %edx
+  100357:	56                   	push   %esi
+  100358:	57                   	push   %edi
+  100359:	55                   	push   %ebp
+  10035a:	1e                   	push   %ds
+  10035b:	06                   	push   %es
+  10035c:	0f a0                	push   %fs
+  10035e:	0f a8                	push   %gs
+  100360:	16                   	push   %ss
+  100361:	89 e0                	mov    %esp,%eax
+  100363:	50                   	push   %eax
+  100364:	fc                   	cld
+  100365:	ff 35 11 00 00 00    	push   0x11
+  10036b:	e8 39 09 00 00       	call   100ca9 <interrupt_handler>
+  100370:	58                   	pop    %eax
+  100371:	58                   	pop    %eax
+  100372:	89 c4                	mov    %eax,%esp
+  100374:	17                   	pop    %ss
+  100375:	0f a9                	pop    %gs
+  100377:	0f a1                	pop    %fs
+  100379:	07                   	pop    %es
+  10037a:	1f                   	pop    %ds
+  10037b:	5d                   	pop    %ebp
+  10037c:	5f                   	pop    %edi
+  10037d:	5e                   	pop    %esi
+  10037e:	5a                   	pop    %edx
+  10037f:	59                   	pop    %ecx
+  100380:	5b                   	pop    %ebx
+  100381:	58                   	pop    %eax
+  100382:	cf                   	iret
+
+00100383 <isr12>:
+  100383:	fa                   	cli
+  100384:	50                   	push   %eax
+  100385:	53                   	push   %ebx
+  100386:	51                   	push   %ecx
+  100387:	52                   	push   %edx
+  100388:	56                   	push   %esi
+  100389:	57                   	push   %edi
+  10038a:	55                   	push   %ebp
+  10038b:	1e                   	push   %ds
+  10038c:	06                   	push   %es
+  10038d:	0f a0                	push   %fs
+  10038f:	0f a8                	push   %gs
+  100391:	16                   	push   %ss
+  100392:	89 e0                	mov    %esp,%eax
+  100394:	50                   	push   %eax
+  100395:	fc                   	cld
+  100396:	ff 35 12 00 00 00    	push   0x12
+  10039c:	e8 08 09 00 00       	call   100ca9 <interrupt_handler>
+  1003a1:	58                   	pop    %eax
+  1003a2:	58                   	pop    %eax
+  1003a3:	89 c4                	mov    %eax,%esp
+  1003a5:	17                   	pop    %ss
+  1003a6:	0f a9                	pop    %gs
+  1003a8:	0f a1                	pop    %fs
+  1003aa:	07                   	pop    %es
+  1003ab:	1f                   	pop    %ds
+  1003ac:	5d                   	pop    %ebp
+  1003ad:	5f                   	pop    %edi
+  1003ae:	5e                   	pop    %esi
+  1003af:	5a                   	pop    %edx
+  1003b0:	59                   	pop    %ecx
+  1003b1:	5b                   	pop    %ebx
+  1003b2:	58                   	pop    %eax
+  1003b3:	cf                   	iret
+
+001003b4 <isr13>:
+  1003b4:	fa                   	cli
+  1003b5:	50                   	push   %eax
+  1003b6:	53                   	push   %ebx
+  1003b7:	51                   	push   %ecx
+  1003b8:	52                   	push   %edx
+  1003b9:	56                   	push   %esi
+  1003ba:	57                   	push   %edi
+  1003bb:	55                   	push   %ebp
+  1003bc:	1e                   	push   %ds
+  1003bd:	06                   	push   %es
+  1003be:	0f a0                	push   %fs
+  1003c0:	0f a8                	push   %gs
+  1003c2:	16                   	push   %ss
+  1003c3:	89 e0                	mov    %esp,%eax
+  1003c5:	50                   	push   %eax
+  1003c6:	fc                   	cld
+  1003c7:	ff 35 13 00 00 00    	push   0x13
+  1003cd:	e8 d7 08 00 00       	call   100ca9 <interrupt_handler>
+  1003d2:	58                   	pop    %eax
+  1003d3:	58                   	pop    %eax
+  1003d4:	89 c4                	mov    %eax,%esp
+  1003d6:	17                   	pop    %ss
+  1003d7:	0f a9                	pop    %gs
+  1003d9:	0f a1                	pop    %fs
+  1003db:	07                   	pop    %es
+  1003dc:	1f                   	pop    %ds
+  1003dd:	5d                   	pop    %ebp
+  1003de:	5f                   	pop    %edi
+  1003df:	5e                   	pop    %esi
+  1003e0:	5a                   	pop    %edx
+  1003e1:	59                   	pop    %ecx
+  1003e2:	5b                   	pop    %ebx
+  1003e3:	58                   	pop    %eax
+  1003e4:	cf                   	iret
+
+001003e5 <isr14>:
+  1003e5:	fa                   	cli
+  1003e6:	50                   	push   %eax
+  1003e7:	53                   	push   %ebx
+  1003e8:	51                   	push   %ecx
+  1003e9:	52                   	push   %edx
+  1003ea:	56                   	push   %esi
+  1003eb:	57                   	push   %edi
+  1003ec:	55                   	push   %ebp
+  1003ed:	1e                   	push   %ds
+  1003ee:	06                   	push   %es
+  1003ef:	0f a0                	push   %fs
+  1003f1:	0f a8                	push   %gs
+  1003f3:	16                   	push   %ss
+  1003f4:	89 e0                	mov    %esp,%eax
+  1003f6:	50                   	push   %eax
+  1003f7:	fc                   	cld
+  1003f8:	ff 35 14 00 00 00    	push   0x14
+  1003fe:	e8 a6 08 00 00       	call   100ca9 <interrupt_handler>
+  100403:	58                   	pop    %eax
+  100404:	58                   	pop    %eax
+  100405:	89 c4                	mov    %eax,%esp
+  100407:	17                   	pop    %ss
+  100408:	0f a9                	pop    %gs
+  10040a:	0f a1                	pop    %fs
+  10040c:	07                   	pop    %es
+  10040d:	1f                   	pop    %ds
+  10040e:	5d                   	pop    %ebp
+  10040f:	5f                   	pop    %edi
+  100410:	5e                   	pop    %esi
+  100411:	5a                   	pop    %edx
+  100412:	59                   	pop    %ecx
+  100413:	5b                   	pop    %ebx
+  100414:	58                   	pop    %eax
+  100415:	cf                   	iret
+
+00100416 <isr15>:
+  100416:	fa                   	cli
+  100417:	50                   	push   %eax
+  100418:	53                   	push   %ebx
+  100419:	51                   	push   %ecx
+  10041a:	52                   	push   %edx
+  10041b:	56                   	push   %esi
+  10041c:	57                   	push   %edi
+  10041d:	55                   	push   %ebp
+  10041e:	1e                   	push   %ds
+  10041f:	06                   	push   %es
+  100420:	0f a0                	push   %fs
+  100422:	0f a8                	push   %gs
+  100424:	16                   	push   %ss
+  100425:	89 e0                	mov    %esp,%eax
+  100427:	50                   	push   %eax
+  100428:	fc                   	cld
+  100429:	ff 35 15 00 00 00    	push   0x15
+  10042f:	e8 75 08 00 00       	call   100ca9 <interrupt_handler>
+  100434:	58                   	pop    %eax
+  100435:	58                   	pop    %eax
+  100436:	89 c4                	mov    %eax,%esp
+  100438:	17                   	pop    %ss
+  100439:	0f a9                	pop    %gs
+  10043b:	0f a1                	pop    %fs
+  10043d:	07                   	pop    %es
+  10043e:	1f                   	pop    %ds
+  10043f:	5d                   	pop    %ebp
+  100440:	5f                   	pop    %edi
+  100441:	5e                   	pop    %esi
+  100442:	5a                   	pop    %edx
+  100443:	59                   	pop    %ecx
+  100444:	5b                   	pop    %ebx
+  100445:	58                   	pop    %eax
+  100446:	cf                   	iret
+
+00100447 <isr16>:
+  100447:	fa                   	cli
+  100448:	50                   	push   %eax
+  100449:	53                   	push   %ebx
+  10044a:	51                   	push   %ecx
+  10044b:	52                   	push   %edx
+  10044c:	56                   	push   %esi
+  10044d:	57                   	push   %edi
+  10044e:	55                   	push   %ebp
+  10044f:	1e                   	push   %ds
+  100450:	06                   	push   %es
+  100451:	0f a0                	push   %fs
+  100453:	0f a8                	push   %gs
+  100455:	16                   	push   %ss
+  100456:	89 e0                	mov    %esp,%eax
+  100458:	50                   	push   %eax
+  100459:	fc                   	cld
+  10045a:	ff 35 16 00 00 00    	push   0x16
+  100460:	e8 44 08 00 00       	call   100ca9 <interrupt_handler>
+  100465:	58                   	pop    %eax
+  100466:	58                   	pop    %eax
+  100467:	89 c4                	mov    %eax,%esp
+  100469:	17                   	pop    %ss
+  10046a:	0f a9                	pop    %gs
+  10046c:	0f a1                	pop    %fs
+  10046e:	07                   	pop    %es
+  10046f:	1f                   	pop    %ds
+  100470:	5d                   	pop    %ebp
+  100471:	5f                   	pop    %edi
+  100472:	5e                   	pop    %esi
+  100473:	5a                   	pop    %edx
+  100474:	59                   	pop    %ecx
+  100475:	5b                   	pop    %ebx
+  100476:	58                   	pop    %eax
+  100477:	cf                   	iret
+
+00100478 <isr17>:
+  100478:	fa                   	cli
+  100479:	50                   	push   %eax
+  10047a:	53                   	push   %ebx
+  10047b:	51                   	push   %ecx
+  10047c:	52                   	push   %edx
+  10047d:	56                   	push   %esi
+  10047e:	57                   	push   %edi
+  10047f:	55                   	push   %ebp
+  100480:	1e                   	push   %ds
+  100481:	06                   	push   %es
+  100482:	0f a0                	push   %fs
+  100484:	0f a8                	push   %gs
+  100486:	16                   	push   %ss
+  100487:	89 e0                	mov    %esp,%eax
+  100489:	50                   	push   %eax
+  10048a:	fc                   	cld
+  10048b:	ff 35 17 00 00 00    	push   0x17
+  100491:	e8 13 08 00 00       	call   100ca9 <interrupt_handler>
+  100496:	58                   	pop    %eax
+  100497:	58                   	pop    %eax
+  100498:	89 c4                	mov    %eax,%esp
+  10049a:	17                   	pop    %ss
+  10049b:	0f a9                	pop    %gs
+  10049d:	0f a1                	pop    %fs
+  10049f:	07                   	pop    %es
+  1004a0:	1f                   	pop    %ds
+  1004a1:	5d                   	pop    %ebp
+  1004a2:	5f                   	pop    %edi
+  1004a3:	5e                   	pop    %esi
+  1004a4:	5a                   	pop    %edx
+  1004a5:	59                   	pop    %ecx
+  1004a6:	5b                   	pop    %ebx
+  1004a7:	58                   	pop    %eax
+  1004a8:	cf                   	iret
+
+001004a9 <isr18>:
+  1004a9:	fa                   	cli
+  1004aa:	50                   	push   %eax
+  1004ab:	53                   	push   %ebx
+  1004ac:	51                   	push   %ecx
+  1004ad:	52                   	push   %edx
+  1004ae:	56                   	push   %esi
+  1004af:	57                   	push   %edi
+  1004b0:	55                   	push   %ebp
+  1004b1:	1e                   	push   %ds
+  1004b2:	06                   	push   %es
+  1004b3:	0f a0                	push   %fs
+  1004b5:	0f a8                	push   %gs
+  1004b7:	16                   	push   %ss
+  1004b8:	89 e0                	mov    %esp,%eax
+  1004ba:	50                   	push   %eax
+  1004bb:	fc                   	cld
+  1004bc:	ff 35 18 00 00 00    	push   0x18
+  1004c2:	e8 e2 07 00 00       	call   100ca9 <interrupt_handler>
+  1004c7:	58                   	pop    %eax
+  1004c8:	58                   	pop    %eax
+  1004c9:	89 c4                	mov    %eax,%esp
+  1004cb:	17                   	pop    %ss
+  1004cc:	0f a9                	pop    %gs
+  1004ce:	0f a1                	pop    %fs
+  1004d0:	07                   	pop    %es
+  1004d1:	1f                   	pop    %ds
+  1004d2:	5d                   	pop    %ebp
+  1004d3:	5f                   	pop    %edi
+  1004d4:	5e                   	pop    %esi
+  1004d5:	5a                   	pop    %edx
+  1004d6:	59                   	pop    %ecx
+  1004d7:	5b                   	pop    %ebx
+  1004d8:	58                   	pop    %eax
+  1004d9:	cf                   	iret
+
+001004da <isr19>:
+  1004da:	fa                   	cli
+  1004db:	50                   	push   %eax
+  1004dc:	53                   	push   %ebx
+  1004dd:	51                   	push   %ecx
+  1004de:	52                   	push   %edx
+  1004df:	56                   	push   %esi
+  1004e0:	57                   	push   %edi
   1004e1:	55                   	push   %ebp
-  1004e2:	89 e5                	mov    %esp,%ebp
-  1004e4:	83 ec 10             	sub    $0x10,%esp
-  1004e7:	6a 1b                	push   $0x1b
-  1004e9:	68 89 06 10 00       	push   $0x100689
-  1004ee:	e8 8c 00 00 00       	call   10057f <write>
-  1004f3:	83 c4 10             	add    $0x10,%esp
-  1004f6:	c9                   	leave
-  1004f7:	e9 3e 00 00 00       	jmp    10053a <read>
+  1004e2:	1e                   	push   %ds
+  1004e3:	06                   	push   %es
+  1004e4:	0f a0                	push   %fs
+  1004e6:	0f a8                	push   %gs
+  1004e8:	16                   	push   %ss
+  1004e9:	89 e0                	mov    %esp,%eax
+  1004eb:	50                   	push   %eax
+  1004ec:	fc                   	cld
+  1004ed:	ff 35 19 00 00 00    	push   0x19
+  1004f3:	e8 b1 07 00 00       	call   100ca9 <interrupt_handler>
+  1004f8:	58                   	pop    %eax
+  1004f9:	58                   	pop    %eax
+  1004fa:	89 c4                	mov    %eax,%esp
+  1004fc:	17                   	pop    %ss
+  1004fd:	0f a9                	pop    %gs
+  1004ff:	0f a1                	pop    %fs
+  100501:	07                   	pop    %es
+  100502:	1f                   	pop    %ds
+  100503:	5d                   	pop    %ebp
+  100504:	5f                   	pop    %edi
+  100505:	5e                   	pop    %esi
+  100506:	5a                   	pop    %edx
+  100507:	59                   	pop    %ecx
+  100508:	5b                   	pop    %ebx
+  100509:	58                   	pop    %eax
+  10050a:	cf                   	iret
 
-001004fc <serial_init>:
-  1004fc:	83 3d 20 30 10 00 00 	cmpl   $0x0,0x103020
-  100503:	75 34                	jne    100539 <serial_init+0x3d>
-  100505:	c7 05 20 30 10 00 01 	movl   $0x1,0x103020
-  10050c:	00 00 00 
-  10050f:	31 c9                	xor    %ecx,%ecx
-  100511:	88 c8                	mov    %cl,%al
-  100513:	ba f9 03 00 00       	mov    $0x3f9,%edx
-  100518:	ee                   	out    %al,(%dx)
-  100519:	b0 80                	mov    $0x80,%al
-  10051b:	ba fb 03 00 00       	mov    $0x3fb,%edx
-  100520:	ee                   	out    %al,(%dx)
-  100521:	88 c8                	mov    %cl,%al
-  100523:	ba f9 03 00 00       	mov    $0x3f9,%edx
-  100528:	ee                   	out    %al,(%dx)
-  100529:	b0 05                	mov    $0x5,%al
-  10052b:	ba f8 03 00 00       	mov    $0x3f8,%edx
-  100530:	ee                   	out    %al,(%dx)
-  100531:	b0 03                	mov    $0x3,%al
-  100533:	ba fb 03 00 00       	mov    $0x3fb,%edx
-  100538:	ee                   	out    %al,(%dx)
-  100539:	c3                   	ret
+0010050b <isr20>:
+  10050b:	fa                   	cli
+  10050c:	50                   	push   %eax
+  10050d:	53                   	push   %ebx
+  10050e:	51                   	push   %ecx
+  10050f:	52                   	push   %edx
+  100510:	56                   	push   %esi
+  100511:	57                   	push   %edi
+  100512:	55                   	push   %ebp
+  100513:	1e                   	push   %ds
+  100514:	06                   	push   %es
+  100515:	0f a0                	push   %fs
+  100517:	0f a8                	push   %gs
+  100519:	16                   	push   %ss
+  10051a:	89 e0                	mov    %esp,%eax
+  10051c:	50                   	push   %eax
+  10051d:	fc                   	cld
+  10051e:	ff 35 20 00 00 00    	push   0x20
+  100524:	e8 80 07 00 00       	call   100ca9 <interrupt_handler>
+  100529:	58                   	pop    %eax
+  10052a:	58                   	pop    %eax
+  10052b:	89 c4                	mov    %eax,%esp
+  10052d:	17                   	pop    %ss
+  10052e:	0f a9                	pop    %gs
+  100530:	0f a1                	pop    %fs
+  100532:	07                   	pop    %es
+  100533:	1f                   	pop    %ds
+  100534:	5d                   	pop    %ebp
+  100535:	5f                   	pop    %edi
+  100536:	5e                   	pop    %esi
+  100537:	5a                   	pop    %edx
+  100538:	59                   	pop    %ecx
+  100539:	5b                   	pop    %ebx
+  10053a:	58                   	pop    %eax
+  10053b:	cf                   	iret
 
-0010053a <read>:
-  10053a:	55                   	push   %ebp
-  10053b:	89 e5                	mov    %esp,%ebp
-  10053d:	83 ec 08             	sub    $0x8,%esp
-  100540:	e8 b7 ff ff ff       	call   1004fc <serial_init>
-  100545:	ba fd 03 00 00       	mov    $0x3fd,%edx
-  10054a:	ec                   	in     (%dx),%al
-  10054b:	a8 01                	test   $0x1,%al
-  10054d:	74 fb                	je     10054a <read+0x10>
-  10054f:	ba f8 03 00 00       	mov    $0x3f8,%edx
-  100554:	ec                   	in     (%dx),%al
-  100555:	c9                   	leave
-  100556:	c3                   	ret
+0010053c <isr21>:
+  10053c:	fa                   	cli
+  10053d:	50                   	push   %eax
+  10053e:	53                   	push   %ebx
+  10053f:	51                   	push   %ecx
+  100540:	52                   	push   %edx
+  100541:	56                   	push   %esi
+  100542:	57                   	push   %edi
+  100543:	55                   	push   %ebp
+  100544:	1e                   	push   %ds
+  100545:	06                   	push   %es
+  100546:	0f a0                	push   %fs
+  100548:	0f a8                	push   %gs
+  10054a:	16                   	push   %ss
+  10054b:	89 e0                	mov    %esp,%eax
+  10054d:	50                   	push   %eax
+  10054e:	fc                   	cld
+  10054f:	ff 35 21 00 00 00    	push   0x21
+  100555:	e8 4f 07 00 00       	call   100ca9 <interrupt_handler>
+  10055a:	58                   	pop    %eax
+  10055b:	58                   	pop    %eax
+  10055c:	89 c4                	mov    %eax,%esp
+  10055e:	17                   	pop    %ss
+  10055f:	0f a9                	pop    %gs
+  100561:	0f a1                	pop    %fs
+  100563:	07                   	pop    %es
+  100564:	1f                   	pop    %ds
+  100565:	5d                   	pop    %ebp
+  100566:	5f                   	pop    %edi
+  100567:	5e                   	pop    %esi
+  100568:	5a                   	pop    %edx
+  100569:	59                   	pop    %ecx
+  10056a:	5b                   	pop    %ebx
+  10056b:	58                   	pop    %eax
+  10056c:	cf                   	iret
 
-00100557 <writechar>:
-  100557:	55                   	push   %ebp
-  100558:	89 e5                	mov    %esp,%ebp
-  10055a:	53                   	push   %ebx
-  10055b:	51                   	push   %ecx
-  10055c:	8a 5d 08             	mov    0x8(%ebp),%bl
-  10055f:	e8 98 ff ff ff       	call   1004fc <serial_init>
-  100564:	ba fd 03 00 00       	mov    $0x3fd,%edx
-  100569:	ec                   	in     (%dx),%al
-  10056a:	a8 20                	test   $0x20,%al
-  10056c:	74 fb                	je     100569 <writechar+0x12>
-  10056e:	ba f8 03 00 00       	mov    $0x3f8,%edx
-  100573:	88 d8                	mov    %bl,%al
-  100575:	ee                   	out    %al,(%dx)
-  100576:	b8 01 00 00 00       	mov    $0x1,%eax
-  10057b:	5a                   	pop    %edx
-  10057c:	5b                   	pop    %ebx
-  10057d:	5d                   	pop    %ebp
-  10057e:	c3                   	ret
+0010056d <isr22>:
+  10056d:	fa                   	cli
+  10056e:	50                   	push   %eax
+  10056f:	53                   	push   %ebx
+  100570:	51                   	push   %ecx
+  100571:	52                   	push   %edx
+  100572:	56                   	push   %esi
+  100573:	57                   	push   %edi
+  100574:	55                   	push   %ebp
+  100575:	1e                   	push   %ds
+  100576:	06                   	push   %es
+  100577:	0f a0                	push   %fs
+  100579:	0f a8                	push   %gs
+  10057b:	16                   	push   %ss
+  10057c:	89 e0                	mov    %esp,%eax
+  10057e:	50                   	push   %eax
+  10057f:	fc                   	cld
+  100580:	ff 35 22 00 00 00    	push   0x22
+  100586:	e8 1e 07 00 00       	call   100ca9 <interrupt_handler>
+  10058b:	58                   	pop    %eax
+  10058c:	58                   	pop    %eax
+  10058d:	89 c4                	mov    %eax,%esp
+  10058f:	17                   	pop    %ss
+  100590:	0f a9                	pop    %gs
+  100592:	0f a1                	pop    %fs
+  100594:	07                   	pop    %es
+  100595:	1f                   	pop    %ds
+  100596:	5d                   	pop    %ebp
+  100597:	5f                   	pop    %edi
+  100598:	5e                   	pop    %esi
+  100599:	5a                   	pop    %edx
+  10059a:	59                   	pop    %ecx
+  10059b:	5b                   	pop    %ebx
+  10059c:	58                   	pop    %eax
+  10059d:	cf                   	iret
 
-0010057f <write>:
-  10057f:	55                   	push   %ebp
-  100580:	89 e5                	mov    %esp,%ebp
-  100582:	56                   	push   %esi
-  100583:	53                   	push   %ebx
-  100584:	e8 73 ff ff ff       	call   1004fc <serial_init>
-  100589:	8b 5d 08             	mov    0x8(%ebp),%ebx
-  10058c:	8b 75 0c             	mov    0xc(%ebp),%esi
-  10058f:	01 de                	add    %ebx,%esi
-  100591:	39 f3                	cmp    %esi,%ebx
-  100593:	74 12                	je     1005a7 <write+0x28>
-  100595:	83 ec 0c             	sub    $0xc,%esp
-  100598:	0f be 03             	movsbl (%ebx),%eax
-  10059b:	50                   	push   %eax
-  10059c:	e8 b6 ff ff ff       	call   100557 <writechar>
-  1005a1:	43                   	inc    %ebx
-  1005a2:	83 c4 10             	add    $0x10,%esp
-  1005a5:	eb ea                	jmp    100591 <write+0x12>
-  1005a7:	8b 45 0c             	mov    0xc(%ebp),%eax
-  1005aa:	8d 65 f8             	lea    -0x8(%ebp),%esp
-  1005ad:	5b                   	pop    %ebx
-  1005ae:	5e                   	pop    %esi
-  1005af:	5d                   	pop    %ebp
-  1005b0:	c3                   	ret
+0010059e <isr23>:
+  10059e:	fa                   	cli
+  10059f:	50                   	push   %eax
+  1005a0:	53                   	push   %ebx
+  1005a1:	51                   	push   %ecx
+  1005a2:	52                   	push   %edx
+  1005a3:	56                   	push   %esi
+  1005a4:	57                   	push   %edi
+  1005a5:	55                   	push   %ebp
+  1005a6:	1e                   	push   %ds
+  1005a7:	06                   	push   %es
+  1005a8:	0f a0                	push   %fs
+  1005aa:	0f a8                	push   %gs
+  1005ac:	16                   	push   %ss
+  1005ad:	89 e0                	mov    %esp,%eax
+  1005af:	50                   	push   %eax
+  1005b0:	fc                   	cld
+  1005b1:	ff 35 23 00 00 00    	push   0x23
+  1005b7:	e8 ed 06 00 00       	call   100ca9 <interrupt_handler>
+  1005bc:	58                   	pop    %eax
+  1005bd:	58                   	pop    %eax
+  1005be:	89 c4                	mov    %eax,%esp
+  1005c0:	17                   	pop    %ss
+  1005c1:	0f a9                	pop    %gs
+  1005c3:	0f a1                	pop    %fs
+  1005c5:	07                   	pop    %es
+  1005c6:	1f                   	pop    %ds
+  1005c7:	5d                   	pop    %ebp
+  1005c8:	5f                   	pop    %edi
+  1005c9:	5e                   	pop    %esi
+  1005ca:	5a                   	pop    %edx
+  1005cb:	59                   	pop    %ecx
+  1005cc:	5b                   	pop    %ebx
+  1005cd:	58                   	pop    %eax
+  1005ce:	cf                   	iret
 
-001005b1 <print_hex>:
-  1005b1:	55                   	push   %ebp
-  1005b2:	89 e5                	mov    %esp,%ebp
-  1005b4:	8b 45 08             	mov    0x8(%ebp),%eax
-  1005b7:	83 e0 0f             	and    $0xf,%eax
-  1005ba:	83 f8 09             	cmp    $0x9,%eax
-  1005bd:	77 05                	ja     1005c4 <print_hex+0x13>
-  1005bf:	83 c0 30             	add    $0x30,%eax
-  1005c2:	eb 03                	jmp    1005c7 <print_hex+0x16>
-  1005c4:	83 c0 37             	add    $0x37,%eax
-  1005c7:	89 45 08             	mov    %eax,0x8(%ebp)
-  1005ca:	5d                   	pop    %ebp
-  1005cb:	e9 87 ff ff ff       	jmp    100557 <writechar>
+001005cf <isr24>:
+  1005cf:	fa                   	cli
+  1005d0:	50                   	push   %eax
+  1005d1:	53                   	push   %ebx
+  1005d2:	51                   	push   %ecx
+  1005d3:	52                   	push   %edx
+  1005d4:	56                   	push   %esi
+  1005d5:	57                   	push   %edi
+  1005d6:	55                   	push   %ebp
+  1005d7:	1e                   	push   %ds
+  1005d8:	06                   	push   %es
+  1005d9:	0f a0                	push   %fs
+  1005db:	0f a8                	push   %gs
+  1005dd:	16                   	push   %ss
+  1005de:	89 e0                	mov    %esp,%eax
+  1005e0:	50                   	push   %eax
+  1005e1:	fc                   	cld
+  1005e2:	ff 35 24 00 00 00    	push   0x24
+  1005e8:	e8 bc 06 00 00       	call   100ca9 <interrupt_handler>
+  1005ed:	58                   	pop    %eax
+  1005ee:	58                   	pop    %eax
+  1005ef:	89 c4                	mov    %eax,%esp
+  1005f1:	17                   	pop    %ss
+  1005f2:	0f a9                	pop    %gs
+  1005f4:	0f a1                	pop    %fs
+  1005f6:	07                   	pop    %es
+  1005f7:	1f                   	pop    %ds
+  1005f8:	5d                   	pop    %ebp
+  1005f9:	5f                   	pop    %edi
+  1005fa:	5e                   	pop    %esi
+  1005fb:	5a                   	pop    %edx
+  1005fc:	59                   	pop    %ecx
+  1005fd:	5b                   	pop    %ebx
+  1005fe:	58                   	pop    %eax
+  1005ff:	cf                   	iret
 
-001005d0 <print_uint>:
-  1005d0:	55                   	push   %ebp
-  1005d1:	89 e5                	mov    %esp,%ebp
-  1005d3:	53                   	push   %ebx
-  1005d4:	50                   	push   %eax
-  1005d5:	8b 45 0c             	mov    0xc(%ebp),%eax
-  1005d8:	8d 58 ff             	lea    -0x1(%eax),%ebx
-  1005db:	85 db                	test   %ebx,%ebx
-  1005dd:	78 1b                	js     1005fa <print_uint+0x2a>
-  1005df:	83 ec 0c             	sub    $0xc,%esp
-  1005e2:	8d 0c 9d 00 00 00 00 	lea    0x0(,%ebx,4),%ecx
-  1005e9:	8b 45 08             	mov    0x8(%ebp),%eax
-  1005ec:	d3 e8                	shr    %cl,%eax
-  1005ee:	50                   	push   %eax
-  1005ef:	e8 bd ff ff ff       	call   1005b1 <print_hex>
-  1005f4:	4b                   	dec    %ebx
-  1005f5:	83 c4 10             	add    $0x10,%esp
-  1005f8:	eb e1                	jmp    1005db <print_uint+0xb>
-  1005fa:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-  1005fd:	c9                   	leave
-  1005fe:	c3                   	ret
+00100600 <isr25>:
+  100600:	fa                   	cli
+  100601:	50                   	push   %eax
+  100602:	53                   	push   %ebx
+  100603:	51                   	push   %ecx
+  100604:	52                   	push   %edx
+  100605:	56                   	push   %esi
+  100606:	57                   	push   %edi
+  100607:	55                   	push   %ebp
+  100608:	1e                   	push   %ds
+  100609:	06                   	push   %es
+  10060a:	0f a0                	push   %fs
+  10060c:	0f a8                	push   %gs
+  10060e:	16                   	push   %ss
+  10060f:	89 e0                	mov    %esp,%eax
+  100611:	50                   	push   %eax
+  100612:	fc                   	cld
+  100613:	ff 35 25 00 00 00    	push   0x25
+  100619:	e8 8b 06 00 00       	call   100ca9 <interrupt_handler>
+  10061e:	58                   	pop    %eax
+  10061f:	58                   	pop    %eax
+  100620:	89 c4                	mov    %eax,%esp
+  100622:	17                   	pop    %ss
+  100623:	0f a9                	pop    %gs
+  100625:	0f a1                	pop    %fs
+  100627:	07                   	pop    %es
+  100628:	1f                   	pop    %ds
+  100629:	5d                   	pop    %ebp
+  10062a:	5f                   	pop    %edi
+  10062b:	5e                   	pop    %esi
+  10062c:	5a                   	pop    %edx
+  10062d:	59                   	pop    %ecx
+  10062e:	5b                   	pop    %ebx
+  10062f:	58                   	pop    %eax
+  100630:	cf                   	iret
+
+00100631 <isr26>:
+  100631:	fa                   	cli
+  100632:	50                   	push   %eax
+  100633:	53                   	push   %ebx
+  100634:	51                   	push   %ecx
+  100635:	52                   	push   %edx
+  100636:	56                   	push   %esi
+  100637:	57                   	push   %edi
+  100638:	55                   	push   %ebp
+  100639:	1e                   	push   %ds
+  10063a:	06                   	push   %es
+  10063b:	0f a0                	push   %fs
+  10063d:	0f a8                	push   %gs
+  10063f:	16                   	push   %ss
+  100640:	89 e0                	mov    %esp,%eax
+  100642:	50                   	push   %eax
+  100643:	fc                   	cld
+  100644:	ff 35 26 00 00 00    	push   0x26
+  10064a:	e8 5a 06 00 00       	call   100ca9 <interrupt_handler>
+  10064f:	58                   	pop    %eax
+  100650:	58                   	pop    %eax
+  100651:	89 c4                	mov    %eax,%esp
+  100653:	17                   	pop    %ss
+  100654:	0f a9                	pop    %gs
+  100656:	0f a1                	pop    %fs
+  100658:	07                   	pop    %es
+  100659:	1f                   	pop    %ds
+  10065a:	5d                   	pop    %ebp
+  10065b:	5f                   	pop    %edi
+  10065c:	5e                   	pop    %esi
+  10065d:	5a                   	pop    %edx
+  10065e:	59                   	pop    %ecx
+  10065f:	5b                   	pop    %ebx
+  100660:	58                   	pop    %eax
+  100661:	cf                   	iret
+
+00100662 <isr27>:
+  100662:	fa                   	cli
+  100663:	50                   	push   %eax
+  100664:	53                   	push   %ebx
+  100665:	51                   	push   %ecx
+  100666:	52                   	push   %edx
+  100667:	56                   	push   %esi
+  100668:	57                   	push   %edi
+  100669:	55                   	push   %ebp
+  10066a:	1e                   	push   %ds
+  10066b:	06                   	push   %es
+  10066c:	0f a0                	push   %fs
+  10066e:	0f a8                	push   %gs
+  100670:	16                   	push   %ss
+  100671:	89 e0                	mov    %esp,%eax
+  100673:	50                   	push   %eax
+  100674:	fc                   	cld
+  100675:	ff 35 27 00 00 00    	push   0x27
+  10067b:	e8 29 06 00 00       	call   100ca9 <interrupt_handler>
+  100680:	58                   	pop    %eax
+  100681:	58                   	pop    %eax
+  100682:	89 c4                	mov    %eax,%esp
+  100684:	17                   	pop    %ss
+  100685:	0f a9                	pop    %gs
+  100687:	0f a1                	pop    %fs
+  100689:	07                   	pop    %es
+  10068a:	1f                   	pop    %ds
+  10068b:	5d                   	pop    %ebp
+  10068c:	5f                   	pop    %edi
+  10068d:	5e                   	pop    %esi
+  10068e:	5a                   	pop    %edx
+  10068f:	59                   	pop    %ecx
+  100690:	5b                   	pop    %ebx
+  100691:	58                   	pop    %eax
+  100692:	cf                   	iret
+
+00100693 <isr28>:
+  100693:	fa                   	cli
+  100694:	50                   	push   %eax
+  100695:	53                   	push   %ebx
+  100696:	51                   	push   %ecx
+  100697:	52                   	push   %edx
+  100698:	56                   	push   %esi
+  100699:	57                   	push   %edi
+  10069a:	55                   	push   %ebp
+  10069b:	1e                   	push   %ds
+  10069c:	06                   	push   %es
+  10069d:	0f a0                	push   %fs
+  10069f:	0f a8                	push   %gs
+  1006a1:	16                   	push   %ss
+  1006a2:	89 e0                	mov    %esp,%eax
+  1006a4:	50                   	push   %eax
+  1006a5:	fc                   	cld
+  1006a6:	ff 35 28 00 00 00    	push   0x28
+  1006ac:	e8 f8 05 00 00       	call   100ca9 <interrupt_handler>
+  1006b1:	58                   	pop    %eax
+  1006b2:	58                   	pop    %eax
+  1006b3:	89 c4                	mov    %eax,%esp
+  1006b5:	17                   	pop    %ss
+  1006b6:	0f a9                	pop    %gs
+  1006b8:	0f a1                	pop    %fs
+  1006ba:	07                   	pop    %es
+  1006bb:	1f                   	pop    %ds
+  1006bc:	5d                   	pop    %ebp
+  1006bd:	5f                   	pop    %edi
+  1006be:	5e                   	pop    %esi
+  1006bf:	5a                   	pop    %edx
+  1006c0:	59                   	pop    %ecx
+  1006c1:	5b                   	pop    %ebx
+  1006c2:	58                   	pop    %eax
+  1006c3:	cf                   	iret
+
+001006c4 <isr29>:
+  1006c4:	fa                   	cli
+  1006c5:	50                   	push   %eax
+  1006c6:	53                   	push   %ebx
+  1006c7:	51                   	push   %ecx
+  1006c8:	52                   	push   %edx
+  1006c9:	56                   	push   %esi
+  1006ca:	57                   	push   %edi
+  1006cb:	55                   	push   %ebp
+  1006cc:	1e                   	push   %ds
+  1006cd:	06                   	push   %es
+  1006ce:	0f a0                	push   %fs
+  1006d0:	0f a8                	push   %gs
+  1006d2:	16                   	push   %ss
+  1006d3:	89 e0                	mov    %esp,%eax
+  1006d5:	50                   	push   %eax
+  1006d6:	fc                   	cld
+  1006d7:	ff 35 29 00 00 00    	push   0x29
+  1006dd:	e8 c7 05 00 00       	call   100ca9 <interrupt_handler>
+  1006e2:	58                   	pop    %eax
+  1006e3:	58                   	pop    %eax
+  1006e4:	89 c4                	mov    %eax,%esp
+  1006e6:	17                   	pop    %ss
+  1006e7:	0f a9                	pop    %gs
+  1006e9:	0f a1                	pop    %fs
+  1006eb:	07                   	pop    %es
+  1006ec:	1f                   	pop    %ds
+  1006ed:	5d                   	pop    %ebp
+  1006ee:	5f                   	pop    %edi
+  1006ef:	5e                   	pop    %esi
+  1006f0:	5a                   	pop    %edx
+  1006f1:	59                   	pop    %ecx
+  1006f2:	5b                   	pop    %ebx
+  1006f3:	58                   	pop    %eax
+  1006f4:	cf                   	iret
+
+001006f5 <isr30>:
+  1006f5:	fa                   	cli
+  1006f6:	50                   	push   %eax
+  1006f7:	53                   	push   %ebx
+  1006f8:	51                   	push   %ecx
+  1006f9:	52                   	push   %edx
+  1006fa:	56                   	push   %esi
+  1006fb:	57                   	push   %edi
+  1006fc:	55                   	push   %ebp
+  1006fd:	1e                   	push   %ds
+  1006fe:	06                   	push   %es
+  1006ff:	0f a0                	push   %fs
+  100701:	0f a8                	push   %gs
+  100703:	16                   	push   %ss
+  100704:	89 e0                	mov    %esp,%eax
+  100706:	50                   	push   %eax
+  100707:	fc                   	cld
+  100708:	ff 35 30 00 00 00    	push   0x30
+  10070e:	e8 96 05 00 00       	call   100ca9 <interrupt_handler>
+  100713:	58                   	pop    %eax
+  100714:	58                   	pop    %eax
+  100715:	89 c4                	mov    %eax,%esp
+  100717:	17                   	pop    %ss
+  100718:	0f a9                	pop    %gs
+  10071a:	0f a1                	pop    %fs
+  10071c:	07                   	pop    %es
+  10071d:	1f                   	pop    %ds
+  10071e:	5d                   	pop    %ebp
+  10071f:	5f                   	pop    %edi
+  100720:	5e                   	pop    %esi
+  100721:	5a                   	pop    %edx
+  100722:	59                   	pop    %ecx
+  100723:	5b                   	pop    %ebx
+  100724:	58                   	pop    %eax
+  100725:	cf                   	iret
+
+00100726 <isr31>:
+  100726:	fa                   	cli
+  100727:	50                   	push   %eax
+  100728:	53                   	push   %ebx
+  100729:	51                   	push   %ecx
+  10072a:	52                   	push   %edx
+  10072b:	56                   	push   %esi
+  10072c:	57                   	push   %edi
+  10072d:	55                   	push   %ebp
+  10072e:	1e                   	push   %ds
+  10072f:	06                   	push   %es
+  100730:	0f a0                	push   %fs
+  100732:	0f a8                	push   %gs
+  100734:	16                   	push   %ss
+  100735:	89 e0                	mov    %esp,%eax
+  100737:	50                   	push   %eax
+  100738:	fc                   	cld
+  100739:	ff 35 31 00 00 00    	push   0x31
+  10073f:	e8 65 05 00 00       	call   100ca9 <interrupt_handler>
+  100744:	58                   	pop    %eax
+  100745:	58                   	pop    %eax
+  100746:	89 c4                	mov    %eax,%esp
+  100748:	17                   	pop    %ss
+  100749:	0f a9                	pop    %gs
+  10074b:	0f a1                	pop    %fs
+  10074d:	07                   	pop    %es
+  10074e:	1f                   	pop    %ds
+  10074f:	5d                   	pop    %ebp
+  100750:	5f                   	pop    %edi
+  100751:	5e                   	pop    %esi
+  100752:	5a                   	pop    %edx
+  100753:	59                   	pop    %ecx
+  100754:	5b                   	pop    %ebx
+  100755:	58                   	pop    %eax
+  100756:	cf                   	iret
+
+00100757 <k_main>:
+  100757:	55                   	push   %ebp
+  100758:	89 e5                	mov    %esp,%ebp
+  10075a:	83 ec 18             	sub    $0x18,%esp
+  10075d:	c7 45 f4 7c 2f 2d 5c 	movl   $0x5c2d2f7c,-0xc(%ebp)
+  100764:	fa                   	cli
+  100765:	e8 18 01 00 00       	call   100882 <setup_gdt>
+  10076a:	e8 e5 04 00 00       	call   100c54 <setup_idt>
+  10076f:	50                   	push   %eax
+  100770:	50                   	push   %eax
+  100771:	6a 15                	push   $0x15
+  100773:	68 d0 0d 10 00       	push   $0x100dd0
+  100778:	e8 d3 05 00 00       	call   100d50 <write>
+  10077d:	cd 00                	int    $0x0
+  10077f:	cd 02                	int    $0x2
+  100781:	cd 04                	int    $0x4
+  100783:	5a                   	pop    %edx
+  100784:	59                   	pop    %ecx
+  100785:	6a 07                	push   $0x7
+  100787:	68 e5 0d 10 00       	push   $0x100de5
+  10078c:	e8 bf 05 00 00       	call   100d50 <write>
+  100791:	fb                   	sti
+  100792:	83 c4 10             	add    $0x10,%esp
+  100795:	31 c0                	xor    %eax,%eax
+  100797:	89 c2                	mov    %eax,%edx
+  100799:	83 e2 03             	and    $0x3,%edx
+  10079c:	8a 54 15 f4          	mov    -0xc(%ebp,%edx,1),%dl
+  1007a0:	88 15 00 80 0b 00    	mov    %dl,0xb8000
+  1007a6:	40                   	inc    %eax
+  1007a7:	eb ee                	jmp    100797 <k_main+0x40>
+
+001007a9 <setup_tss>:
+  1007a9:	31 c0                	xor    %eax,%eax
+  1007ab:	a3 a4 2e 10 00       	mov    %eax,0x102ea4
+  1007b0:	c7 05 a8 2e 10 00 10 	movl   $0x10,0x102ea8
+  1007b7:	00 00 00 
+  1007ba:	31 d2                	xor    %edx,%edx
+  1007bc:	89 15 ac 2e 10 00    	mov    %edx,0x102eac
+  1007c2:	c7 05 b0 2e 10 00 10 	movl   $0x10,0x102eb0
+  1007c9:	00 00 00 
+  1007cc:	31 c9                	xor    %ecx,%ecx
+  1007ce:	89 0d b4 2e 10 00    	mov    %ecx,0x102eb4
+  1007d4:	c7 05 b8 2e 10 00 10 	movl   $0x10,0x102eb8
+  1007db:	00 00 00 
+  1007de:	b8 a0 2e 10 00       	mov    $0x102ea0,%eax
+  1007e3:	c3                   	ret
+
+001007e4 <append_descriptor>:
+  1007e4:	55                   	push   %ebp
+  1007e5:	89 e5                	mov    %esp,%ebp
+  1007e7:	57                   	push   %edi
+  1007e8:	56                   	push   %esi
+  1007e9:	53                   	push   %ebx
+  1007ea:	50                   	push   %eax
+  1007eb:	8b 5d 08             	mov    0x8(%ebp),%ebx
+  1007ee:	8b 75 0c             	mov    0xc(%ebp),%esi
+  1007f1:	c1 ee 10             	shr    $0x10,%esi
+  1007f4:	83 e6 0f             	and    $0xf,%esi
+  1007f7:	31 c0                	xor    %eax,%eax
+  1007f9:	8a 65 10             	mov    0x10(%ebp),%ah
+  1007fc:	8a 55 14             	mov    0x14(%ebp),%dl
+  1007ff:	83 e2 f0             	and    $0xfffffff0,%edx
+  100802:	09 f2                	or     %esi,%edx
+  100804:	0f b6 d2             	movzbl %dl,%edx
+  100807:	c1 e2 10             	shl    $0x10,%edx
+  10080a:	25 ff ff 00 ff       	and    $0xff00ffff,%eax
+  10080f:	09 d0                	or     %edx,%eax
+  100811:	8b 0d c0 2f 10 00    	mov    0x102fc0,%ecx
+  100817:	8d 51 01             	lea    0x1(%ecx),%edx
+  10081a:	89 15 c0 2f 10 00    	mov    %edx,0x102fc0
+  100820:	89 df                	mov    %ebx,%edi
+  100822:	c1 e7 10             	shl    $0x10,%edi
+  100825:	0f b7 55 0c          	movzwl 0xc(%ebp),%edx
+  100829:	09 fa                	or     %edi,%edx
+  10082b:	89 55 f0             	mov    %edx,-0x10(%ebp)
+  10082e:	89 df                	mov    %ebx,%edi
+  100830:	c1 ef 10             	shr    $0x10,%edi
+  100833:	89 fa                	mov    %edi,%edx
+  100835:	88 d0                	mov    %dl,%al
+  100837:	83 e6 0f             	and    $0xf,%esi
+  10083a:	c1 e6 10             	shl    $0x10,%esi
+  10083d:	25 ff ff f0 00       	and    $0xf0ffff,%eax
+  100842:	81 e3 00 00 00 ff    	and    $0xff000000,%ebx
+  100848:	09 f0                	or     %esi,%eax
+  10084a:	09 d8                	or     %ebx,%eax
+  10084c:	8b 5d f0             	mov    -0x10(%ebp),%ebx
+  10084f:	89 1c cd 40 2f 10 00 	mov    %ebx,0x102f40(,%ecx,8)
+  100856:	89 04 cd 44 2f 10 00 	mov    %eax,0x102f44(,%ecx,8)
+  10085d:	5a                   	pop    %edx
+  10085e:	5b                   	pop    %ebx
+  10085f:	5e                   	pop    %esi
+  100860:	5f                   	pop    %edi
+  100861:	5d                   	pop    %ebp
+  100862:	c3                   	ret
+
+00100863 <append_tss>:
+  100863:	55                   	push   %ebp
+  100864:	89 e5                	mov    %esp,%ebp
+  100866:	83 ec 08             	sub    $0x8,%esp
+  100869:	e8 3b ff ff ff       	call   1007a9 <setup_tss>
+  10086e:	6a 00                	push   $0x0
+  100870:	6a 89                	push   $0xffffff89
+  100872:	68 8b 00 00 00       	push   $0x8b
+  100877:	50                   	push   %eax
+  100878:	e8 67 ff ff ff       	call   1007e4 <append_descriptor>
+  10087d:	83 c4 10             	add    $0x10,%esp
+  100880:	c9                   	leave
+  100881:	c3                   	ret
+
+00100882 <setup_gdt>:
+  100882:	55                   	push   %ebp
+  100883:	89 e5                	mov    %esp,%ebp
+  100885:	83 ec 10             	sub    $0x10,%esp
+  100888:	6a 14                	push   $0x14
+  10088a:	68 ec 0d 10 00       	push   $0x100dec
+  10088f:	e8 bc 04 00 00       	call   100d50 <write>
+  100894:	6a 00                	push   $0x0
+  100896:	6a 00                	push   $0x0
+  100898:	6a 00                	push   $0x0
+  10089a:	6a 00                	push   $0x0
+  10089c:	e8 43 ff ff ff       	call   1007e4 <append_descriptor>
+  1008a1:	83 c4 20             	add    $0x20,%esp
+  1008a4:	6a c0                	push   $0xffffffc0
+  1008a6:	6a 9a                	push   $0xffffff9a
+  1008a8:	68 ff ff 0f 00       	push   $0xfffff
+  1008ad:	6a 00                	push   $0x0
+  1008af:	e8 30 ff ff ff       	call   1007e4 <append_descriptor>
+  1008b4:	6a c0                	push   $0xffffffc0
+  1008b6:	6a 92                	push   $0xffffff92
+  1008b8:	68 ff ff 0f 00       	push   $0xfffff
+  1008bd:	6a 00                	push   $0x0
+  1008bf:	e8 20 ff ff ff       	call   1007e4 <append_descriptor>
+  1008c4:	83 c4 20             	add    $0x20,%esp
+  1008c7:	6a c0                	push   $0xffffffc0
+  1008c9:	6a fa                	push   $0xfffffffa
+  1008cb:	68 ff ff 0f 00       	push   $0xfffff
+  1008d0:	6a 00                	push   $0x0
+  1008d2:	e8 0d ff ff ff       	call   1007e4 <append_descriptor>
+  1008d7:	6a c0                	push   $0xffffffc0
+  1008d9:	6a f2                	push   $0xfffffff2
+  1008db:	68 ff ff 0f 00       	push   $0xfffff
+  1008e0:	6a 00                	push   $0x0
+  1008e2:	e8 fd fe ff ff       	call   1007e4 <append_descriptor>
+  1008e7:	83 c4 20             	add    $0x20,%esp
+  1008ea:	e8 74 ff ff ff       	call   100863 <append_tss>
+  1008ef:	a1 c0 2f 10 00       	mov    0x102fc0,%eax
+  1008f4:	8d 04 c5 ff ff ff ff 	lea    -0x1(,%eax,8),%eax
+  1008fb:	66 a3 2c 2f 10 00    	mov    %ax,0x102f2c
+  100901:	b8 40 2f 10 00       	mov    $0x102f40,%eax
+  100906:	66 a3 2e 2f 10 00    	mov    %ax,0x102f2e
+  10090c:	c1 e8 10             	shr    $0x10,%eax
+  10090f:	66 a3 30 2f 10 00    	mov    %ax,0x102f30
+  100915:	0f 01 15 2c 2f 10 00 	lgdtl  0x102f2c
+  10091c:	e8 bf f7 ff ff       	call   1000e0 <gdtFlush>
+  100921:	50                   	push   %eax
+  100922:	50                   	push   %eax
+  100923:	6a 0e                	push   $0xe
+  100925:	68 00 0e 10 00       	push   $0x100e00
+  10092a:	e8 21 04 00 00       	call   100d50 <write>
+  10092f:	83 c4 10             	add    $0x10,%esp
+  100932:	c9                   	leave
+  100933:	c3                   	ret
+
+00100934 <setup_pic>:
+  100934:	55                   	push   %ebp
+  100935:	89 e5                	mov    %esp,%ebp
+  100937:	83 ec 10             	sub    $0x10,%esp
+  10093a:	6a 14                	push   $0x14
+  10093c:	68 0e 0e 10 00       	push   $0x100e0e
+  100941:	e8 0a 04 00 00       	call   100d50 <write>
+  100946:	b0 11                	mov    $0x11,%al
+  100948:	ba 20 00 00 00       	mov    $0x20,%edx
+  10094d:	ee                   	out    %al,(%dx)
+  10094e:	ba a0 00 00 00       	mov    $0xa0,%edx
+  100953:	ee                   	out    %al,(%dx)
+  100954:	b0 40                	mov    $0x40,%al
+  100956:	ba 21 00 00 00       	mov    $0x21,%edx
+  10095b:	ee                   	out    %al,(%dx)
+  10095c:	b0 50                	mov    $0x50,%al
+  10095e:	ba a1 00 00 00       	mov    $0xa1,%edx
+  100963:	ee                   	out    %al,(%dx)
+  100964:	b0 04                	mov    $0x4,%al
+  100966:	ba 21 00 00 00       	mov    $0x21,%edx
+  10096b:	ee                   	out    %al,(%dx)
+  10096c:	b0 02                	mov    $0x2,%al
+  10096e:	ba a1 00 00 00       	mov    $0xa1,%edx
+  100973:	ee                   	out    %al,(%dx)
+  100974:	b0 01                	mov    $0x1,%al
+  100976:	ba 21 00 00 00       	mov    $0x21,%edx
+  10097b:	ee                   	out    %al,(%dx)
+  10097c:	ba a1 00 00 00       	mov    $0xa1,%edx
+  100981:	ee                   	out    %al,(%dx)
+  100982:	31 c0                	xor    %eax,%eax
+  100984:	ba 21 00 00 00       	mov    $0x21,%edx
+  100989:	ee                   	out    %al,(%dx)
+  10098a:	ba a1 00 00 00       	mov    $0xa1,%edx
+  10098f:	ee                   	out    %al,(%dx)
+  100990:	58                   	pop    %eax
+  100991:	5a                   	pop    %edx
+  100992:	6a 15                	push   $0x15
+  100994:	68 22 0e 10 00       	push   $0x100e22
+  100999:	e8 b2 03 00 00       	call   100d50 <write>
+  10099e:	83 c4 10             	add    $0x10,%esp
+  1009a1:	c9                   	leave
+  1009a2:	c3                   	ret
+
+001009a3 <send_eoi>:
+  1009a3:	55                   	push   %ebp
+  1009a4:	89 e5                	mov    %esp,%ebp
+  1009a6:	83 7d 08 07          	cmpl   $0x7,0x8(%ebp)
+  1009aa:	76 08                	jbe    1009b4 <send_eoi+0x11>
+  1009ac:	b0 20                	mov    $0x20,%al
+  1009ae:	ba a1 00 00 00       	mov    $0xa1,%edx
+  1009b3:	ee                   	out    %al,(%dx)
+  1009b4:	b0 20                	mov    $0x20,%al
+  1009b6:	ba 20 00 00 00       	mov    $0x20,%edx
+  1009bb:	ee                   	out    %al,(%dx)
+  1009bc:	5d                   	pop    %ebp
+  1009bd:	c3                   	ret
+
+001009be <set_gate>:
+  1009be:	55                   	push   %ebp
+  1009bf:	89 e5                	mov    %esp,%ebp
+  1009c1:	56                   	push   %esi
+  1009c2:	53                   	push   %ebx
+  1009c3:	8b 5d 08             	mov    0x8(%ebp),%ebx
+  1009c6:	8b 55 0c             	mov    0xc(%ebp),%edx
+  1009c9:	31 c0                	xor    %eax,%eax
+  1009cb:	8a 65 14             	mov    0x14(%ebp),%ah
+  1009ce:	0f b7 75 10          	movzwl 0x10(%ebp),%esi
+  1009d2:	c1 e6 10             	shl    $0x10,%esi
+  1009d5:	0f b7 ca             	movzwl %dx,%ecx
+  1009d8:	09 f1                	or     %esi,%ecx
+  1009da:	66 31 d2             	xor    %dx,%dx
+  1009dd:	0f b7 c0             	movzwl %ax,%eax
+  1009e0:	09 d0                	or     %edx,%eax
+  1009e2:	89 0c dd e0 2f 10 00 	mov    %ecx,0x102fe0(,%ebx,8)
+  1009e9:	89 04 dd e4 2f 10 00 	mov    %eax,0x102fe4(,%ebx,8)
+  1009f0:	5b                   	pop    %ebx
+  1009f1:	5e                   	pop    %esi
+  1009f2:	5d                   	pop    %ebp
+  1009f3:	c3                   	ret
+
+001009f4 <set_gates>:
+  1009f4:	55                   	push   %ebp
+  1009f5:	89 e5                	mov    %esp,%ebp
+  1009f7:	56                   	push   %esi
+  1009f8:	53                   	push   %ebx
+  1009f9:	be 8e ff ff ff       	mov    $0xffffff8e,%esi
+  1009fe:	6a 8e                	push   $0xffffff8e
+  100a00:	6a 08                	push   $0x8
+  100a02:	68 37 01 10 00       	push   $0x100137
+  100a07:	6a 00                	push   $0x0
+  100a09:	e8 b0 ff ff ff       	call   1009be <set_gate>
+  100a0e:	6a 8e                	push   $0xffffff8e
+  100a10:	6a 08                	push   $0x8
+  100a12:	68 68 01 10 00       	push   $0x100168
+  100a17:	6a 01                	push   $0x1
+  100a19:	e8 a0 ff ff ff       	call   1009be <set_gate>
+  100a1e:	83 c4 20             	add    $0x20,%esp
+  100a21:	6a 8e                	push   $0xffffff8e
+  100a23:	6a 08                	push   $0x8
+  100a25:	68 99 01 10 00       	push   $0x100199
+  100a2a:	6a 02                	push   $0x2
+  100a2c:	e8 8d ff ff ff       	call   1009be <set_gate>
+  100a31:	6a 8e                	push   $0xffffff8e
+  100a33:	6a 08                	push   $0x8
+  100a35:	68 ca 01 10 00       	push   $0x1001ca
+  100a3a:	6a 03                	push   $0x3
+  100a3c:	e8 7d ff ff ff       	call   1009be <set_gate>
+  100a41:	83 c4 20             	add    $0x20,%esp
+  100a44:	6a 8e                	push   $0xffffff8e
+  100a46:	6a 08                	push   $0x8
+  100a48:	68 fb 01 10 00       	push   $0x1001fb
+  100a4d:	6a 04                	push   $0x4
+  100a4f:	e8 6a ff ff ff       	call   1009be <set_gate>
+  100a54:	6a 8e                	push   $0xffffff8e
+  100a56:	6a 08                	push   $0x8
+  100a58:	68 2c 02 10 00       	push   $0x10022c
+  100a5d:	6a 05                	push   $0x5
+  100a5f:	e8 5a ff ff ff       	call   1009be <set_gate>
+  100a64:	83 c4 20             	add    $0x20,%esp
+  100a67:	6a 8e                	push   $0xffffff8e
+  100a69:	6a 08                	push   $0x8
+  100a6b:	68 5d 02 10 00       	push   $0x10025d
+  100a70:	6a 06                	push   $0x6
+  100a72:	e8 47 ff ff ff       	call   1009be <set_gate>
+  100a77:	6a 8e                	push   $0xffffff8e
+  100a79:	6a 08                	push   $0x8
+  100a7b:	68 8e 02 10 00       	push   $0x10028e
+  100a80:	6a 07                	push   $0x7
+  100a82:	e8 37 ff ff ff       	call   1009be <set_gate>
+  100a87:	83 c4 20             	add    $0x20,%esp
+  100a8a:	6a 8e                	push   $0xffffff8e
+  100a8c:	6a 08                	push   $0x8
+  100a8e:	68 bf 02 10 00       	push   $0x1002bf
+  100a93:	6a 08                	push   $0x8
+  100a95:	e8 24 ff ff ff       	call   1009be <set_gate>
+  100a9a:	6a 8e                	push   $0xffffff8e
+  100a9c:	6a 08                	push   $0x8
+  100a9e:	68 f0 02 10 00       	push   $0x1002f0
+  100aa3:	6a 09                	push   $0x9
+  100aa5:	e8 14 ff ff ff       	call   1009be <set_gate>
+  100aaa:	83 c4 20             	add    $0x20,%esp
+  100aad:	6a 8e                	push   $0xffffff8e
+  100aaf:	6a 08                	push   $0x8
+  100ab1:	68 21 03 10 00       	push   $0x100321
+  100ab6:	6a 0a                	push   $0xa
+  100ab8:	e8 01 ff ff ff       	call   1009be <set_gate>
+  100abd:	6a 8e                	push   $0xffffff8e
+  100abf:	6a 08                	push   $0x8
+  100ac1:	68 52 03 10 00       	push   $0x100352
+  100ac6:	6a 0b                	push   $0xb
+  100ac8:	e8 f1 fe ff ff       	call   1009be <set_gate>
+  100acd:	83 c4 20             	add    $0x20,%esp
+  100ad0:	6a 8e                	push   $0xffffff8e
+  100ad2:	6a 08                	push   $0x8
+  100ad4:	68 83 03 10 00       	push   $0x100383
+  100ad9:	6a 0c                	push   $0xc
+  100adb:	e8 de fe ff ff       	call   1009be <set_gate>
+  100ae0:	6a 8e                	push   $0xffffff8e
+  100ae2:	6a 08                	push   $0x8
+  100ae4:	68 b4 03 10 00       	push   $0x1003b4
+  100ae9:	6a 0d                	push   $0xd
+  100aeb:	e8 ce fe ff ff       	call   1009be <set_gate>
+  100af0:	83 c4 20             	add    $0x20,%esp
+  100af3:	6a 8e                	push   $0xffffff8e
+  100af5:	6a 08                	push   $0x8
+  100af7:	68 e5 03 10 00       	push   $0x1003e5
+  100afc:	6a 0e                	push   $0xe
+  100afe:	e8 bb fe ff ff       	call   1009be <set_gate>
+  100b03:	6a 8e                	push   $0xffffff8e
+  100b05:	6a 08                	push   $0x8
+  100b07:	68 16 04 10 00       	push   $0x100416
+  100b0c:	6a 0f                	push   $0xf
+  100b0e:	e8 ab fe ff ff       	call   1009be <set_gate>
+  100b13:	83 c4 20             	add    $0x20,%esp
+  100b16:	6a 8e                	push   $0xffffff8e
+  100b18:	6a 08                	push   $0x8
+  100b1a:	68 47 04 10 00       	push   $0x100447
+  100b1f:	6a 10                	push   $0x10
+  100b21:	e8 98 fe ff ff       	call   1009be <set_gate>
+  100b26:	6a 8e                	push   $0xffffff8e
+  100b28:	6a 08                	push   $0x8
+  100b2a:	68 78 04 10 00       	push   $0x100478
+  100b2f:	6a 11                	push   $0x11
+  100b31:	e8 88 fe ff ff       	call   1009be <set_gate>
+  100b36:	83 c4 20             	add    $0x20,%esp
+  100b39:	6a 8e                	push   $0xffffff8e
+  100b3b:	6a 08                	push   $0x8
+  100b3d:	68 a9 04 10 00       	push   $0x1004a9
+  100b42:	6a 12                	push   $0x12
+  100b44:	e8 75 fe ff ff       	call   1009be <set_gate>
+  100b49:	6a 8e                	push   $0xffffff8e
+  100b4b:	6a 08                	push   $0x8
+  100b4d:	68 da 04 10 00       	push   $0x1004da
+  100b52:	6a 13                	push   $0x13
+  100b54:	e8 65 fe ff ff       	call   1009be <set_gate>
+  100b59:	83 c4 20             	add    $0x20,%esp
+  100b5c:	6a 8e                	push   $0xffffff8e
+  100b5e:	6a 08                	push   $0x8
+  100b60:	68 0b 05 10 00       	push   $0x10050b
+  100b65:	6a 14                	push   $0x14
+  100b67:	e8 52 fe ff ff       	call   1009be <set_gate>
+  100b6c:	6a 8e                	push   $0xffffff8e
+  100b6e:	6a 08                	push   $0x8
+  100b70:	68 3c 05 10 00       	push   $0x10053c
+  100b75:	6a 15                	push   $0x15
+  100b77:	e8 42 fe ff ff       	call   1009be <set_gate>
+  100b7c:	83 c4 20             	add    $0x20,%esp
+  100b7f:	6a 8e                	push   $0xffffff8e
+  100b81:	6a 08                	push   $0x8
+  100b83:	68 6d 05 10 00       	push   $0x10056d
+  100b88:	6a 16                	push   $0x16
+  100b8a:	e8 2f fe ff ff       	call   1009be <set_gate>
+  100b8f:	6a 8e                	push   $0xffffff8e
+  100b91:	6a 08                	push   $0x8
+  100b93:	68 9e 05 10 00       	push   $0x10059e
+  100b98:	6a 17                	push   $0x17
+  100b9a:	e8 1f fe ff ff       	call   1009be <set_gate>
+  100b9f:	83 c4 20             	add    $0x20,%esp
+  100ba2:	6a 8e                	push   $0xffffff8e
+  100ba4:	6a 08                	push   $0x8
+  100ba6:	68 cf 05 10 00       	push   $0x1005cf
+  100bab:	6a 18                	push   $0x18
+  100bad:	e8 0c fe ff ff       	call   1009be <set_gate>
+  100bb2:	6a 8e                	push   $0xffffff8e
+  100bb4:	6a 08                	push   $0x8
+  100bb6:	68 00 06 10 00       	push   $0x100600
+  100bbb:	6a 19                	push   $0x19
+  100bbd:	e8 fc fd ff ff       	call   1009be <set_gate>
+  100bc2:	83 c4 20             	add    $0x20,%esp
+  100bc5:	6a 8e                	push   $0xffffff8e
+  100bc7:	6a 08                	push   $0x8
+  100bc9:	68 31 06 10 00       	push   $0x100631
+  100bce:	6a 1a                	push   $0x1a
+  100bd0:	e8 e9 fd ff ff       	call   1009be <set_gate>
+  100bd5:	6a 8e                	push   $0xffffff8e
+  100bd7:	6a 08                	push   $0x8
+  100bd9:	68 62 06 10 00       	push   $0x100662
+  100bde:	6a 1b                	push   $0x1b
+  100be0:	e8 d9 fd ff ff       	call   1009be <set_gate>
+  100be5:	83 c4 20             	add    $0x20,%esp
+  100be8:	6a 8e                	push   $0xffffff8e
+  100bea:	6a 08                	push   $0x8
+  100bec:	68 93 06 10 00       	push   $0x100693
+  100bf1:	6a 1c                	push   $0x1c
+  100bf3:	e8 c6 fd ff ff       	call   1009be <set_gate>
+  100bf8:	6a 8e                	push   $0xffffff8e
+  100bfa:	6a 08                	push   $0x8
+  100bfc:	68 c4 06 10 00       	push   $0x1006c4
+  100c01:	6a 1d                	push   $0x1d
+  100c03:	e8 b6 fd ff ff       	call   1009be <set_gate>
+  100c08:	83 c4 20             	add    $0x20,%esp
+  100c0b:	6a 8e                	push   $0xffffff8e
+  100c0d:	6a 08                	push   $0x8
+  100c0f:	68 f5 06 10 00       	push   $0x1006f5
+  100c14:	6a 1e                	push   $0x1e
+  100c16:	e8 a3 fd ff ff       	call   1009be <set_gate>
+  100c1b:	6a 8e                	push   $0xffffff8e
+  100c1d:	6a 08                	push   $0x8
+  100c1f:	68 26 07 10 00       	push   $0x100726
+  100c24:	6a 1f                	push   $0x1f
+  100c26:	e8 93 fd ff ff       	call   1009be <set_gate>
+  100c2b:	83 c4 20             	add    $0x20,%esp
+  100c2e:	bb 20 00 00 00       	mov    $0x20,%ebx
+  100c33:	56                   	push   %esi
+  100c34:	6a 08                	push   $0x8
+  100c36:	68 06 01 10 00       	push   $0x100106
+  100c3b:	53                   	push   %ebx
+  100c3c:	e8 7d fd ff ff       	call   1009be <set_gate>
+  100c41:	43                   	inc    %ebx
+  100c42:	83 c4 10             	add    $0x10,%esp
+  100c45:	81 fb 00 01 00 00    	cmp    $0x100,%ebx
+  100c4b:	75 e6                	jne    100c33 <set_gates+0x23f>
+  100c4d:	8d 65 f8             	lea    -0x8(%ebp),%esp
+  100c50:	5b                   	pop    %ebx
+  100c51:	5e                   	pop    %esi
+  100c52:	5d                   	pop    %ebp
+  100c53:	c3                   	ret
+
+00100c54 <setup_idt>:
+  100c54:	55                   	push   %ebp
+  100c55:	89 e5                	mov    %esp,%ebp
+  100c57:	83 ec 08             	sub    $0x8,%esp
+  100c5a:	e8 d5 fc ff ff       	call   100934 <setup_pic>
+  100c5f:	52                   	push   %edx
+  100c60:	52                   	push   %edx
+  100c61:	6a 14                	push   $0x14
+  100c63:	68 37 0e 10 00       	push   $0x100e37
+  100c68:	e8 e3 00 00 00       	call   100d50 <write>
+  100c6d:	e8 82 fd ff ff       	call   1009f4 <set_gates>
+  100c72:	66 c7 05 c4 2f 10 00 	movw   $0x5ff,0x102fc4
+  100c79:	ff 05 
+  100c7b:	b8 e0 2f 10 00       	mov    $0x102fe0,%eax
+  100c80:	66 a3 c6 2f 10 00    	mov    %ax,0x102fc6
+  100c86:	c1 e8 10             	shr    $0x10,%eax
+  100c89:	66 a3 c8 2f 10 00    	mov    %ax,0x102fc8
+  100c8f:	0f 01 1d c4 2f 10 00 	lidtl  0x102fc4
+  100c96:	59                   	pop    %ecx
+  100c97:	58                   	pop    %eax
+  100c98:	6a 0d                	push   $0xd
+  100c9a:	68 4b 0e 10 00       	push   $0x100e4b
+  100c9f:	e8 ac 00 00 00       	call   100d50 <write>
+  100ca4:	83 c4 10             	add    $0x10,%esp
+  100ca7:	c9                   	leave
+  100ca8:	c3                   	ret
+
+00100ca9 <interrupt_handler>:
+  100ca9:	55                   	push   %ebp
+  100caa:	89 e5                	mov    %esp,%ebp
+  100cac:	53                   	push   %ebx
+  100cad:	83 ec 0c             	sub    $0xc,%esp
+  100cb0:	8b 5d 08             	mov    0x8(%ebp),%ebx
+  100cb3:	6a 1d                	push   $0x1d
+  100cb5:	68 58 0e 10 00       	push   $0x100e58
+  100cba:	e8 91 00 00 00       	call   100d50 <write>
+  100cbf:	58                   	pop    %eax
+  100cc0:	5a                   	pop    %edx
+  100cc1:	6a 08                	push   $0x8
+  100cc3:	53                   	push   %ebx
+  100cc4:	e8 d8 00 00 00       	call   100da1 <print_uint>
+  100cc9:	59                   	pop    %ecx
+  100cca:	5b                   	pop    %ebx
+  100ccb:	6a 03                	push   $0x3
+  100ccd:	68 0b 0e 10 00       	push   $0x100e0b
+  100cd2:	e8 79 00 00 00       	call   100d50 <write>
+  100cd7:	83 c4 10             	add    $0x10,%esp
+  100cda:	c7 45 08 0a 00 00 00 	movl   $0xa,0x8(%ebp)
+  100ce1:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+  100ce4:	c9                   	leave
+  100ce5:	e9 b9 fc ff ff       	jmp    1009a3 <send_eoi>
+
+00100cea <serial_init>:
+  100cea:	83 3d e0 37 10 00 00 	cmpl   $0x0,0x1037e0
+  100cf1:	75 34                	jne    100d27 <serial_init+0x3d>
+  100cf3:	c7 05 e0 37 10 00 01 	movl   $0x1,0x1037e0
+  100cfa:	00 00 00 
+  100cfd:	31 c9                	xor    %ecx,%ecx
+  100cff:	88 c8                	mov    %cl,%al
+  100d01:	ba f9 03 00 00       	mov    $0x3f9,%edx
+  100d06:	ee                   	out    %al,(%dx)
+  100d07:	b0 80                	mov    $0x80,%al
+  100d09:	ba fb 03 00 00       	mov    $0x3fb,%edx
+  100d0e:	ee                   	out    %al,(%dx)
+  100d0f:	88 c8                	mov    %cl,%al
+  100d11:	ba f9 03 00 00       	mov    $0x3f9,%edx
+  100d16:	ee                   	out    %al,(%dx)
+  100d17:	b0 05                	mov    $0x5,%al
+  100d19:	ba f8 03 00 00       	mov    $0x3f8,%edx
+  100d1e:	ee                   	out    %al,(%dx)
+  100d1f:	b0 03                	mov    $0x3,%al
+  100d21:	ba fb 03 00 00       	mov    $0x3fb,%edx
+  100d26:	ee                   	out    %al,(%dx)
+  100d27:	c3                   	ret
+
+00100d28 <writechar>:
+  100d28:	55                   	push   %ebp
+  100d29:	89 e5                	mov    %esp,%ebp
+  100d2b:	53                   	push   %ebx
+  100d2c:	51                   	push   %ecx
+  100d2d:	8a 5d 08             	mov    0x8(%ebp),%bl
+  100d30:	e8 b5 ff ff ff       	call   100cea <serial_init>
+  100d35:	ba fd 03 00 00       	mov    $0x3fd,%edx
+  100d3a:	ec                   	in     (%dx),%al
+  100d3b:	a8 20                	test   $0x20,%al
+  100d3d:	74 fb                	je     100d3a <writechar+0x12>
+  100d3f:	ba f8 03 00 00       	mov    $0x3f8,%edx
+  100d44:	88 d8                	mov    %bl,%al
+  100d46:	ee                   	out    %al,(%dx)
+  100d47:	b8 01 00 00 00       	mov    $0x1,%eax
+  100d4c:	5a                   	pop    %edx
+  100d4d:	5b                   	pop    %ebx
+  100d4e:	5d                   	pop    %ebp
+  100d4f:	c3                   	ret
+
+00100d50 <write>:
+  100d50:	55                   	push   %ebp
+  100d51:	89 e5                	mov    %esp,%ebp
+  100d53:	56                   	push   %esi
+  100d54:	53                   	push   %ebx
+  100d55:	e8 90 ff ff ff       	call   100cea <serial_init>
+  100d5a:	8b 5d 08             	mov    0x8(%ebp),%ebx
+  100d5d:	8b 75 0c             	mov    0xc(%ebp),%esi
+  100d60:	01 de                	add    %ebx,%esi
+  100d62:	39 f3                	cmp    %esi,%ebx
+  100d64:	74 12                	je     100d78 <write+0x28>
+  100d66:	83 ec 0c             	sub    $0xc,%esp
+  100d69:	0f be 03             	movsbl (%ebx),%eax
+  100d6c:	50                   	push   %eax
+  100d6d:	e8 b6 ff ff ff       	call   100d28 <writechar>
+  100d72:	43                   	inc    %ebx
+  100d73:	83 c4 10             	add    $0x10,%esp
+  100d76:	eb ea                	jmp    100d62 <write+0x12>
+  100d78:	8b 45 0c             	mov    0xc(%ebp),%eax
+  100d7b:	8d 65 f8             	lea    -0x8(%ebp),%esp
+  100d7e:	5b                   	pop    %ebx
+  100d7f:	5e                   	pop    %esi
+  100d80:	5d                   	pop    %ebp
+  100d81:	c3                   	ret
+
+00100d82 <print_hex>:
+  100d82:	55                   	push   %ebp
+  100d83:	89 e5                	mov    %esp,%ebp
+  100d85:	8b 45 08             	mov    0x8(%ebp),%eax
+  100d88:	83 e0 0f             	and    $0xf,%eax
+  100d8b:	83 f8 09             	cmp    $0x9,%eax
+  100d8e:	77 05                	ja     100d95 <print_hex+0x13>
+  100d90:	83 c0 30             	add    $0x30,%eax
+  100d93:	eb 03                	jmp    100d98 <print_hex+0x16>
+  100d95:	83 c0 37             	add    $0x37,%eax
+  100d98:	89 45 08             	mov    %eax,0x8(%ebp)
+  100d9b:	5d                   	pop    %ebp
+  100d9c:	e9 87 ff ff ff       	jmp    100d28 <writechar>
+
+00100da1 <print_uint>:
+  100da1:	55                   	push   %ebp
+  100da2:	89 e5                	mov    %esp,%ebp
+  100da4:	53                   	push   %ebx
+  100da5:	50                   	push   %eax
+  100da6:	8b 45 0c             	mov    0xc(%ebp),%eax
+  100da9:	8d 58 ff             	lea    -0x1(%eax),%ebx
+  100dac:	85 db                	test   %ebx,%ebx
+  100dae:	78 1b                	js     100dcb <print_uint+0x2a>
+  100db0:	83 ec 0c             	sub    $0xc,%esp
+  100db3:	8d 0c 9d 00 00 00 00 	lea    0x0(,%ebx,4),%ecx
+  100dba:	8b 45 08             	mov    0x8(%ebp),%eax
+  100dbd:	d3 e8                	shr    %cl,%eax
+  100dbf:	50                   	push   %eax
+  100dc0:	e8 bd ff ff ff       	call   100d82 <print_hex>
+  100dc5:	4b                   	dec    %ebx
+  100dc6:	83 c4 10             	add    $0x10,%esp
+  100dc9:	eb e1                	jmp    100dac <print_uint+0xb>
+  100dcb:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+  100dce:	c9                   	leave
+  100dcf:	c3                   	ret

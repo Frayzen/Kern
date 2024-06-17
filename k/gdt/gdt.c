@@ -117,7 +117,7 @@ void append_tss()
 
 void setup_gdt()
 {
-	println("Loading GDT...");
+	println("Setting up GDT...");
 	// NULL DESCRIPTOR
 	append_descriptor(0, 0, (segment_access){ 0 }, (segment_flags){ 0 });
 	// KERNEL MODE CODE SEGMENT

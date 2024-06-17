@@ -23,6 +23,7 @@
  */
 #include "gdt/gdt.h"
 #include "interrupts/ints.h"
+#include "serial.h"
 #include <k/kstd.h>
 
 #include "multiboot.h"
@@ -39,11 +40,18 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	asm volatile("cli" :);
     setup_gdt();
     setup_idt();
-    /* asm volatile("int $0xE" :); */
+    println("CALLING INTERRUPTS");
+    read();
+    /* asm volatile("int $0x0" :); */
+    println("DONE");
 	asm volatile("sti" :);
 
 	for (unsigned i = 0; ; )
+    {
+        /* int c = getkey(); */
+        /* printf("%d\n", c); */
 		*fb = star[i++ % 4];
+    }
 
 	for (;;)
 		asm volatile ("hlt");

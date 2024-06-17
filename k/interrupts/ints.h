@@ -5,6 +5,9 @@
 #define GATE_TYPE_INT 0xE
 #define GATE_TYPE_TRAP 0xF
 
+#define IRQ_MASTER_OFFSET 0x40
+#define IRQ_SLAVE_OFFSET 0x50
+
 typedef struct {
     unsigned int type : 5; // one of the GATE_TYPE_XXX
 	unsigned int privilege : 2; // (ring of privilege)
@@ -27,5 +30,6 @@ typedef struct {
 
 void setup_idt(void);
 void setup_pic(void);
+void send_eoi(unsigned int irq);
 
 #endif /* !INTS_H */

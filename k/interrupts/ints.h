@@ -6,7 +6,8 @@
 #define GATE_TYPE_TRAP 0xF
 
 #define IRQ_MASTER_OFFSET 0x40
-#define IRQ_SLAVE_OFFSET 0x50
+#define IRQ_SLAVE_OFFSET 0x48
+#define IRQ_LIMIT 0x10
 
 typedef struct {
     unsigned int type : 5; // one of the GATE_TYPE_XXX

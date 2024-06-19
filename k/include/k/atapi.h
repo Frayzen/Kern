@@ -69,7 +69,7 @@
 # define PACKET_DATA_TRANSMIT 2
 # define PACKET_COMMAND_COMPLETE 3
 
-struct SCSI_packet {
+typedef struct {
 	u8 op_code;
 	u8 flags_lo;
 	u8 lba_hi;
@@ -82,6 +82,6 @@ struct SCSI_packet {
 	u8 transfer_length_lo;
 	u8 flags_hi;
 	u8 control;
-} __packed;
+} __attribute__((packed)) SCSI_packet;
 
 #endif /* !ATAPI_H_ */

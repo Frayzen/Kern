@@ -1,5 +1,6 @@
 #include "ints.h"
 #include "consts.h"
+#include "interrupts/handler.h"
 #include "interrupts/timer.h"
 #include "serial.h"
 
@@ -47,6 +48,8 @@ extern void isr31(void);
 
 extern void isr64(void); // system clock
 extern void isr65(void); // keyboard
+extern void isr78(void); // primary disk
+extern void isr79(void); // secondary disk
 
 extern void isr128(void); // syscalls
 
@@ -141,8 +144,10 @@ void set_gates()
     set_gate(30, isr30, 0x8, gate);
     set_gate(31, isr31, 0x8, gate);
 
-	set_gate(64, isr64, 0x8, gate);
-	set_gate(65, isr65, 0x8, gate);
+	set_gate(IRQ0, isr64, 0x8, gate);
+	set_gate(IRQ1, isr65, 0x8, gate);
+	set_gate(IRQ14, isr78, 0x8, gate);
+	set_gate(IRQ15, isr79, 0x8, gate);
 
 	set_gate(128, isr128, 0x8, gate);
 }

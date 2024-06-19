@@ -84,8 +84,23 @@ isr 29
 isr 30
 isr 31
 
-isr 128;
-
 # IRQs
 isr 64
 isr 65
+isr 66
+isr 67
+isr 68
+isr 69
+isr 70
+isr 71
+isr 72
+isr 73
+isr 74
+isr 75
+isr 76
+isr 77
+isr 78
+isr 79
+
+# syscalls
+isr 128

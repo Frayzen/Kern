@@ -18,5 +18,5 @@ kitty gdb ./k/k &
 sleep 0.5
 i3 split v >/dev/null &
 wait $!
-qemu-system-i386 -cdrom k.iso -serial stdio -s -S
+qemu-system-i386 -drive id=cdrom,if=ide,media=cdrom,readonly=on,file=k.iso -enable-kvm -serial stdio -s -S
 wait

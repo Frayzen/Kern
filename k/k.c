@@ -21,15 +21,14 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include "disk/atapi.h"
 #include "gdt/gdt.h"
 #include "interrupts/ints.h"
 #include "interrupts/keyboard.h"
-#include "serial.h"
 #include "stdio.h"
 #include <k/kstd.h>
 
 #include "multiboot.h"
-
 
 void k_main(unsigned long magic, multiboot_info_t *info)
 {
@@ -42,6 +41,7 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	asm volatile("cli" :);
     setup_gdt();
     setup_idt();
+    atapi_init();
 	asm volatile("sti" :);
 
 	for (unsigned i = 0; ; )

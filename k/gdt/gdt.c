@@ -1,4 +1,5 @@
 #include "gdt.h"
+#include "k/compiler.h"
 #include "serial.h"
 
 // DATA SEGMENT
@@ -126,7 +127,7 @@ void setup_gdt()
 {
 	println("Setting up GDT...");
 	gdt_descriptor gdt_holder;
-	gdt_holder.limit = sizeof(descriptors) - 1;
+    gdt_holder.limit = sizeof(descriptors) - 1;
 	gdt_holder.base = (unsigned int)&descriptors;
 	asm volatile("lgdt %0"
 		     : /* no output */
@@ -141,7 +142,7 @@ void print_gdt(void)
 	print("Size of a segment descriptor: ");
 	print_uint(sizeof(segment_descriptor), 1);
 	println("");
-	for (unsigned int i = 0; i < DESC_NB; i++) {
+	for (int i = 0; i < DESC_NB; i++) {
 		println("===========================");
 		println("Base: ");
 		print("HIGH ");

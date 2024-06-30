@@ -3,13 +3,14 @@
 #include "gdt/tss.h"
 #include "serial.h"
 
-#define BASE_LOW(Base) ((0xFFFF & Base))
-#define BASE_MID(Base) ((0xFF0000 & Base) >> 16)
-#define BASE_HIGH(Base) ((0xFF000000 & Base) >> 24)
-#define LIMIT_LOW(Limit) ((0x0000FFFF & Limit))
-#define LIMIT_HIGH(Limit) ((0x000F0000 & Limit) >> 16)
+#define BASE_LOW(Base) ((0xFFFF & (Base)))
+#define BASE_MID(Base) ((0xFF0000 & (Base)) >> 16)
+#define BASE_HIGH(Base) ((0xFF000000 & (Base)) >> 24)
+#define LIMIT_LOW(Limit) ((0x0000FFFF & (Limit)))
+#define LIMIT_HIGH(Limit) ((0x000F0000 & (Limit)) >> 16)
 
 static int desc_nb = 0;
+// TODO const struct gdt = {};
 static segment_descriptor descriptors[MAX_DESCRIPTORS];
 gdt_descriptor gdt_holder = {};
 

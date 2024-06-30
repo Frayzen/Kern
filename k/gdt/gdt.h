@@ -1,6 +1,10 @@
 #ifndef GDT_H
 #define GDT_H
 
+// TODO mettre dans le .c
+
+// TODO to masks
+#include "k/compiler.h"
 #define SEG_DATA_RD 0x00 // Read-Only
 #define SEG_DATA_RDA 0x01 // Read-Only, accessed
 #define SEG_DATA_RDWR 0x02 // Read/Write
@@ -18,6 +22,7 @@
 #define SEG_CODE_EXRDC 0x0E // Execute/Read, conforming
 #define SEG_CODE_EXRDCA 0x0F // Execute/Read, conforming, accessed
 
+// TODO useless, restrict
 #define MAX_DESCRIPTORS 16
 
 typedef struct {
@@ -25,7 +30,7 @@ typedef struct {
 	unsigned int desc_type : 1; // (0 = system, 1 = code data)
 	unsigned int privilege : 2; // (ring of privilege)
 	unsigned int present : 1;
-} __attribute__((packed)) segment_access;
+} __packed segment_access;
 
 typedef struct {
 	unsigned int limit_high : 4;
@@ -33,7 +38,7 @@ typedef struct {
 	unsigned int segment_size : 1; // 64 bit code segment
 	unsigned int operation_size : 1; // (0=16 bits, 1=32bits)
 	unsigned int granularity : 1;
-} __attribute__((packed)) segment_flags;
+} __packed segment_flags;
 
 typedef struct {
 	unsigned int limit_low : 16;
@@ -42,12 +47,12 @@ typedef struct {
 	segment_access access_byte __attribute__((packed));
 	segment_flags flags __attribute__((packed));
 	unsigned int base_high : 8;
-} __attribute__((packed)) segment_descriptor;
+} __packed segment_descriptor;
 
 typedef struct {
 	unsigned int limit : 16;
     unsigned int base : 32;
-} __attribute__((packed)) gdt_descriptor;
+} __packed gdt_descriptor;
 
 void setup_gdt();
 void testFn(unsigned int val, unsigned int size);

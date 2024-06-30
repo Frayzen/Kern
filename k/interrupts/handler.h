@@ -1,6 +1,7 @@
 #ifndef HANDLER_H
 #define HANDLER_H
 
+#include "k/compiler.h"
 #define IRQ0 64
 #define IRQ1 65
 #define IRQ2 66
@@ -23,7 +24,7 @@ typedef struct {
 	unsigned int ebp, esp, ebx, edx, ecx, eax : 32;
 	unsigned int int_no, err_code : 32;
 	unsigned int eip, csm, eflags, useresp, ss : 32;
-} __attribute__((packed)) stack;
+} __packed stack;
 
 unsigned int interrupt_handler(stack *s);
 

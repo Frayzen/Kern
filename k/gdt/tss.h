@@ -1,6 +1,7 @@
 #ifndef TSS_H
 #define TSS_H
 
+#include "k/compiler.h"
 typedef struct {
     unsigned int prev_task : 32;
     unsigned int esp0 : 32;
@@ -37,7 +38,7 @@ typedef struct {
     unsigned int gs_err : 32;
     unsigned int ldt_err : 32;
     unsigned int iomap_base : 32;
-} __attribute__((packed)) tss_entry;
+} __packed tss_entry;
 
 
 

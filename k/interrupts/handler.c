@@ -31,11 +31,11 @@ void handle_irq(unsigned int irq)
 		break;
     case IRQ14:
         println("Primary ATAPI device requires attention");
-        disk_update(PRIMARY_REG);
+        /* disk_update(PRIMARY_REG); */
         break;
     case IRQ15:
         println("Secondary ATAPI device requires attention");
-        disk_update(SECONDARY_REG);
+        /* disk_update(SECONDARY_REG); */
         break;
 	default:
 		print("Unhandled IRQ");

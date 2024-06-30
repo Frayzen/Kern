@@ -142,7 +142,7 @@ void print_gdt(void)
 	print("Size of a segment descriptor: ");
 	print_uint(sizeof(segment_descriptor), 1);
 	println("");
-	for (int i = 0; i < DESC_NB; i++) {
+	for (unsigned int i = 0; i < DESC_NB; i++) {
 		println("===========================");
 		println("Base: ");
 		print("HIGH ");

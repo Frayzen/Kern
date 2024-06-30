@@ -1,5 +1,4 @@
 #include "ints.h"
-#include "consts.h"
 #include "interrupts/handler.h"
 #include "interrupts/timer.h"
 #include "serial.h"
@@ -105,9 +104,10 @@ void print_gate(gate_descriptor gate_desc)
 	println("");
 }
 
+#define KERNEL_PRVLG 0x0
 void set_gates()
 {
-	gate_flags gate = create_flags(GATE_TYPE_INT, SEG_KERNEL_PRVLG);
+	gate_flags gate = create_flags(GATE_TYPE_INT, KERNEL_PRVLG);
 
 	for (int i = 0; i < IDT_ENTRIES; i++)
 		set_gate(i, isr_default, i, gate);

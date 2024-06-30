@@ -1,81 +1,139 @@
 #include "gdt.h"
-#include "consts.h"
-#include "gdt/tss.h"
 #include "serial.h"
 
-#define BASE_LOW(Base) ((0xFFFF & (Base)))
-#define BASE_MID(Base) ((0xFF0000 & (Base)) >> 16)
-#define BASE_HIGH(Base) ((0xFF000000 & (Base)) >> 24)
-#define LIMIT_LOW(Limit) ((0x0000FFFF & (Limit)))
-#define LIMIT_HIGH(Limit) ((0x000F0000 & (Limit)) >> 16)
+// DATA SEGMENT
+#define SEG_DATA 0x0
+#define SEG_DATA_WR 0x2
 
-static int desc_nb = 0;
-// TODO const struct gdt = {};
-static segment_descriptor descriptors[MAX_DESCRIPTORS];
-gdt_descriptor gdt_holder = {};
+// CODE SEGMENT
+#define SEG_CODE 0x8
+#define SEG_ACCESS 0x1
+#define SEG_CODE_RD 0x2
 
-/**
- * @brief Tool to create a build_flag
- * @param[in] available: available for system software
- * @param[in] seg_size: 64-bit code segment
- * @param[in] op_size: default operation size (0 = 16-bit segment, 1 = 32-bit segment)
- * @param[in] granularity: is granularity enable
- */
-inline segment_flags build_flag(int available, int seg_size, int op_size,
-				int granularity)
-{
-	return ((segment_flags){ .available = (available),
-				 .segment_size = (seg_size),
-				 .operation_size = (op_size),
-				 .granularity = (granularity) });
-}
-/**
- * @brief Tool to create a build_access
- * @param[in] seg_type: the read/write access. one of the SEG_(CODE/DATA)_XXX
- * @param[in] desc_type: 0 if system or 1 for code and data
- * @param[in] privilege: the ring privilege
- * @param[in] present: is the segment present
- */
-inline segment_access build_access(int seg_type, int desc_type, int privilege,
-				   int present)
-{
-	return ((segment_access){ .segment_type = (seg_type),
-				  .desc_type = (desc_type),
-				  .privilege = (privilege),
-				  .present = (present) });
-}
+#define KERNEL_PRVLG 0x0
+#define USER_PRVLG 0x3
 
-void append_descriptor(unsigned int base, unsigned int limit,
-		       segment_access access_byte, segment_flags flags)
-{
-	flags.limit_high = LIMIT_HIGH(limit);
-	segment_descriptor new_desc = {
-		.flags = flags,
-		.access_byte = access_byte,
-		.base_low = BASE_LOW(base),
-		.base_mid = BASE_MID(base),
-		.base_high = BASE_HIGH(base),
-		.limit_low = LIMIT_LOW(limit),
-	};
-	descriptors[desc_nb++] = new_desc;
-}
+typedef struct {
+	unsigned int limit_low : 16;
+	unsigned int base_low : 16;
+	unsigned int base_mid : 8;
+	unsigned int segment_type : 4; // ONE OF THE SEG_(CODE/DATA)_XXXX
+	unsigned int desc_type : 1; // (0 = system, 1 = code data)
+	unsigned int privilege : 2; // (ring of privilege)
+	unsigned int present : 1;
+	unsigned int limit_high : 4;
+	unsigned int available : 1; //AVL
+	unsigned int segment_size : 1; // 64 bit code segment
+	unsigned int operation_size : 1; // (0=16 bits, 1=32bits)
+	unsigned int granularity : 1;
+	unsigned int base_high : 8;
+} __packed segment_descriptor;
+
+typedef struct {
+	unsigned int limit : 16;
+	unsigned int base : 32;
+} __packed gdt_descriptor;
+
+#define NULL_DESC 0
+#define KERNEL_CODE_DESC 1
+#define KERNEL_DATA_DESC 2
+#define USER_CODE_DESC 3
+#define USER_DATA_DESC 4
+
+#define DESC_NB (sizeof(descriptors) / sizeof(segment_descriptor))
+
+static segment_descriptor descriptors[] = {
+    [NULL_DESC] = {
+        .limit_low = 0,
+        .base_low = 0,
+        .base_mid = 0,
+        .segment_type = SEG_DATA,
+        .desc_type = 0,
+        .privilege = 0,
+        .present = 0,
+        .limit_high = 0,
+        .available = 0,
+        .segment_size = 0,
+        .operation_size = 0,
+        .granularity = 0,
+        .base_high = 0,
+    },
+    [KERNEL_CODE_DESC] = {
+        .base_low = 0,
+        .base_mid = 0,
+        .segment_type = SEG_CODE | SEG_CODE_RD,
+        .desc_type = 1,
+        .privilege = KERNEL_PRVLG,
+        .present = 1,
+        .limit_low = 0xFFFF,
+        .limit_high = 0xF,
+        .available = 0,
+        .segment_size = 0,
+        .operation_size = 1,
+        .granularity = 1,
+        .base_high = 0,
+    },
+    [KERNEL_DATA_DESC] = {
+        .base_low = 0,
+        .base_mid = 0,
+        .segment_type = SEG_DATA | SEG_DATA_WR,
+        .desc_type = 1,
+        .privilege = KERNEL_PRVLG,
+        .present = 1,
+        .limit_low = 0xFFFF,
+        .limit_high = 0xF,
+        .available = 0,
+        .segment_size = 0,
+        .operation_size = 1,
+        .granularity = 1,
+        .base_high = 0,
+    },
+    [USER_CODE_DESC] = {
+        .base_low = 0,
+        .base_mid = 0,
+        .segment_type = SEG_CODE | SEG_CODE_RD,
+        .desc_type = 1,
+        .privilege = USER_PRVLG,
+        .present = 1,
+        .limit_low = 0xFFFF,
+        .limit_high = 0xF,
+        .available = 0,
+        .segment_size = 0,
+        .operation_size = 1,
+        .granularity = 1,
+        .base_high = 0,
+    },
+    [USER_DATA_DESC] = {
+        .base_low = 0,
+        .base_mid = 0,
+        .segment_type = SEG_DATA | SEG_DATA_WR,
+        .desc_type = 1,
+        .privilege = USER_PRVLG,
+        .present = 1,
+        .limit_low = 0xFFFF,
+        .limit_high = 0xF,
+        .available = 0,
+        .segment_size = 0,
+        .operation_size = 1,
+        .granularity = 1,
+        .base_high = 0,
+    },
+};
 
 extern void gdtFlush(void);
 
-void print_access(segment_access access_byte)
+void setup_gdt()
 {
-	print_uint(access_byte.present, 1);
-	print_uint(access_byte.segment_type, 1);
-	print_uint(access_byte.desc_type, 1);
-	print_uint(access_byte.privilege, 1);
-}
-
-void print_flags(segment_flags flags)
-{
-	print_uint(flags.available, 1);
-	print_uint(flags.segment_size, 1);
-	print_uint(flags.operation_size, 1);
-	print_uint(flags.granularity, 1);
+	println("Setting up GDT...");
+	gdt_descriptor gdt_holder;
+	gdt_holder.limit = sizeof(descriptors) - 1;
+	gdt_holder.base = (unsigned int)&descriptors;
+	asm volatile("lgdt %0"
+		     : /* no output */
+		     : "m"(gdt_holder)
+		     : "memory");
+	gdtFlush();
+	println("GDT loaded");
 }
 
 void print_gdt(void)
@@ -83,7 +141,7 @@ void print_gdt(void)
 	print("Size of a segment descriptor: ");
 	print_uint(sizeof(segment_descriptor), 1);
 	println("");
-	for (int i = 0; i < desc_nb; i++) {
+	for (unsigned int i = 0; i < DESC_NB; i++) {
 		println("===========================");
 		println("Base: ");
 		print("HIGH ");
@@ -95,53 +153,7 @@ void print_gdt(void)
 		println();
 		println("Limit: ");
 		print("HIGH ");
-		print_uint(descriptors[i].flags.limit_high, 1);
-		print("  LOW ");
 		print_uint(descriptors[i].limit_low, 2);
 		println();
-		println("Access: ");
-		print_access(descriptors[i].access_byte);
-		println();
-		println("Flags: ");
-		print_flags(descriptors[i].flags);
-		println();
 	}
-}
-
-void append_tss()
-{
-	tss_entry *tss = setup_tss();
-	append_descriptor((unsigned int)tss, sizeof(tss_entry) - 1,
-			  build_access(SEG_CODE_EXA, 0, 0, 1),
-			  (segment_flags){ 0 });
-}
-
-void setup_gdt()
-{
-	println("Setting up GDT...");
-	// NULL DESCRIPTOR
-	append_descriptor(0, 0, (segment_access){ 0 }, (segment_flags){ 0 });
-	// KERNEL MODE CODE SEGMENT
-	append_descriptor(0, 0xFFFFF,
-			  build_access(SEG_CODE_EXRD, 1, SEG_KERNEL_PRVLG, 1),
-			  build_flag(0, 0, 1, 1));
-	append_descriptor(0, 0xFFFFF,
-			  build_access(SEG_DATA_RDWR, 1, SEG_KERNEL_PRVLG, 1),
-			  build_flag(0, 0, 1, 1));
-	append_descriptor(0, 0xFFFFF,
-			  build_access(SEG_CODE_EXRD, 1, SEG_USER_PRVLG, 1),
-			  build_flag(0, 0, 1, 1));
-	append_descriptor(0, 0xFFFFF,
-			  build_access(SEG_DATA_RDWR, 1, SEG_USER_PRVLG, 1),
-			  build_flag(0, 0, 1, 1));
-	append_tss();
-	/* print_gdt(); */
-	gdt_holder.limit = (sizeof(segment_descriptor) * desc_nb) - 1;
-	gdt_holder.base = (unsigned int)&descriptors;
-	asm volatile("lgdt %0"
-		     : /* no output */
-		     : "m"(gdt_holder)
-		     : "memory");
-	gdtFlush();
-	println("GDT loaded");
 }

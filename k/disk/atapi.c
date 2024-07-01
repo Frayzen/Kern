@@ -1,5 +1,4 @@
 #include "atapi.h"
-#include "disk/test.h"
 #include "io.h"
 #include "k/atapi.h"
 #include "k/types.h"

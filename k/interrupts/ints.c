@@ -27,24 +27,6 @@ ISR_LIST
 #define OFFSET_LOW(Fn) (0xFFFF & (FN_PTR(Fn)))
 #define OFFSET_HIGH(Fn) ((0xFFFF0000 & (FN_PTR(Fn))) >> 16)
 
-static idt_descriptor idt_holder;
-
-void print_gate(gate_descriptor gate_desc)
-{
-	print("Offset: ");
-	print_uint(gate_desc.offset_high, 4);
-	print_uint(gate_desc.offset_low, 4);
-	print("  Selector: ");
-	print_uint(gate_desc.selector, 4);
-	print("  Type: ");
-	print_uint(gate_desc.type, 1);
-	print("  Privilege: ");
-	print_uint(gate_desc.privilege, 2);
-	print("  Present: ");
-	print_uint(gate_desc.present, 1);
-	println("");
-}
-
 void setup_idt(void)
 {
 	setup_pic();
@@ -63,11 +45,12 @@ void setup_idt(void)
 		ISR_LIST
 #undef X
 	};
-	print_gate(gates[0]);
 	println();
 	print_uint(sizeof(gates), 4);
-	idt_holder.limit = sizeof(gates) - 1;
-	idt_holder.base = (unsigned int)&gates;
+	idt_descriptor idt_holder = {
+		.limit = sizeof(gates) - 1,
+		.base = (unsigned int)&gates
+	};
 	asm volatile("lidt %0"
 		     : /* no output */
 		     : "m"(idt_holder)

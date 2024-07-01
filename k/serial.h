@@ -1,6 +1,10 @@
 #ifndef SERIAL_H
 #define SERIAL_H
 
+#define IRQ_MASTER_OFFSET 0x40
+#define IRQ_SLAVE_OFFSET 0x48
+#define IRQ_LIMIT 0x10
+
 #include <stddef.h>
 #define print(String) write(String, sizeof(String))
 #define printchar(Char) writechar(Char)

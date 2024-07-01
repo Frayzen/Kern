@@ -1,21 +1,6 @@
+#include "isr_list.h"
+
 .extern interrupt_handler
-.macro isr arg
-    .global isr\arg
-    isr\arg:
-        cli
-        push $0
-        push $\arg
-        jmp isr_common
-.endm
-
-.macro isr_errcode arg
-    .global isr\arg
-    isr\arg:
-        cli
-        push $\arg
-        jmp isr_common
-.endm
-
 retval: .long 0
 isr_common:
     pusha
@@ -46,62 +31,15 @@ isr_common:
     mov retval, %eax
     iret
 
+#define X(id, name, errcode)\
+.global isr##id;\
+isr##id:;\
+    cli;\
+    .if errcode == 0;\
+    push $0;\
+    .endif;\
+    push $id;\
+    jmp isr_common;
 
-// TODO xmacro
-.global isr_default
-isr_default:
-isr 230
-
-isr 0
-isr 1
-isr 2
-isr 3
-isr 4
-isr 5
-isr 6
-isr 7
-isr_errcode 8
-isr 9
-isr_errcode 10
-isr_errcode 11
-isr_errcode 12
-isr_errcode 13
-isr_errcode 14
-isr 15
-isr 16
-isr 17
-isr 18
-isr 19
-isr 20
-isr 21
-isr 22
-isr 23
-isr 24
-isr 25
-isr 26
-isr 27
-isr 28
-isr 29
-isr 30
-isr 31
-
-# IRQs
-isr 64
-isr 65
-isr 66
-isr 67
-isr 68
-isr 69
-isr 70
-isr 71
-isr 72
-isr 73
-isr 74
-isr 75
-isr 76
-isr 77
-isr 78
-isr 79
-
-# syscalls
-isr 128
+ISR_LIST
+#undef X

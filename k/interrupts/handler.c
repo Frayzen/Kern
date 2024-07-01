@@ -1,9 +1,7 @@
 #include "handler.h"
-#include "disk/atapi.h"
 #include "interrupts/ints.h"
 #include "interrupts/keyboard.h"
 #include "interrupts/timer.h"
-#include "k/atapi.h"
 #include "k/kstd.h"
 #include "serial.h"
 #include "stdio.h"
@@ -41,7 +39,7 @@ void handle_irq(unsigned int irq)
 		print("Unhandled IRQ");
 		printf("%d", irq - IRQ_MASTER_OFFSET);
         println();
-		asm volatile("hlt");
+		/* asm volatile("hlt"); */
 		break;
 	}
 	send_eoi(irq);
@@ -66,7 +64,7 @@ unsigned int interrupt_handler(stack *s)
 		print("Unknown interrupt (");
 		printf("%d", s->int_no);
 		println(")");
-		asm volatile("hlt");
+		/* asm volatile("hlt"); */
 		break;
 	}
 	return 0;

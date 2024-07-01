@@ -41,7 +41,7 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	asm volatile("cli" :);
     setup_gdt();
     setup_idt();
-    atapi_init();
+    /* atapi_init(); */
 	asm volatile("sti" :);
 
 	for (unsigned i = 0; ; )

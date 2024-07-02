@@ -40,10 +40,10 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 
 	asm volatile("cli" :);
 	setup_gdt();
+	for (int i = 0; i < 10; i++)
+		setup_filesystem();
 	setup_idt();
-	setup_filesystem();
 	asm volatile("sti" :);
-
 
 	for (unsigned i = 0;;) {
 		int c = get_last_key();

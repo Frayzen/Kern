@@ -42,4 +42,5 @@ isr##id:;\
     jmp isr_common;
 
 ISR_LIST
+IRQ_LIST
 #undef X

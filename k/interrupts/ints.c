@@ -21,6 +21,7 @@ struct idt_descriptor {
 
 #define X(id, name, errcode) extern void isr##id(void);
 ISR_LIST
+IRQ_LIST
 #undef X
 
 #define FN_PTR(Fn) (unsigned int)((void (*)(void))(Fn))
@@ -42,7 +43,7 @@ void setup_idt(void)
 		.privilege = 0,                      \
 		.present = 1,                        \
 	},
-		ISR_LIST
+		ISR_LIST IRQ_LIST
 #undef X
 	};
 	struct idt_descriptor idt_holder = { .limit = sizeof(gates) - 1,

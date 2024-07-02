@@ -1,5 +1,5 @@
 #include "handler.h"
-#include "disk/atapi.h"
+#include "isr_list.h"
 #include "interrupts/ints.h"
 #include "interrupts/keyboard.h"
 #include "interrupts/timer.h"
@@ -21,22 +21,12 @@ unsigned int syscall_handler(stack *s)
 
 void handle_irq(unsigned int irq)
 {
-	if (irq != IRQ0)
-		printf("IRQ %d\n", irq);
 	switch (irq) {
 	case IRQ0:
 		timer_interrupt();
 		break;
 	case IRQ1:
 		handle_keyboard();
-		break;
-	case IRQ14:
-		println("Primary ATAPI device requires attention");
-		/* disk_update(PRIMARY_REG); */
-		break;
-	case IRQ15:
-		println("Secondary ATAPI device requires attention");
-		/* disk_update(SECONDARY_REG); */
 		break;
 	default:
 		print("Unhandled IRQ");
@@ -50,22 +40,23 @@ void handle_irq(unsigned int irq)
 
 unsigned int interrupt_handler(stack *s)
 {
-	if (s->int_no != IRQ0)
-        printf("Interrupt %d\n", s->int_no);
 	if (s->int_no >= IRQ_MASTER_OFFSET &&
 	    s->int_no <= IRQ_MASTER_OFFSET + IRQ_LIMIT) {
 		handle_irq(s->int_no);
 		return 0;
 	}
-	switch (s->int_no) {
-	case 0:
-		println("Divide error");
-		break;
-	case 14:
-		println("Page fault");
-		break;
-	case 128: /* Custom Syscall */
+	if (s->int_no == 128) {
+		/* Custom Syscall */
+		println("Custom Syscall");
 		return syscall_handler(s);
+	}
+	switch (s->int_no) {
+#define X(id, name, errcode)   \
+	case id:               \
+		println(name); \
+		break;
+		ISR_LIST
+#undef X
 	default:
 		print("Unknown interrupt (");
 		printf("%d", s->int_no);

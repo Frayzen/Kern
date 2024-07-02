@@ -1,6 +1,5 @@
 #include "fs.h"
 #include "disk/atapi.h"
-#include "k/compiler.h"
 #include "panic.h"
 #include "serial.h"
 #include "stdio.h"
@@ -14,13 +13,6 @@
 #define SUPLEMENTARY_TYPE 2
 #define TERMINATOR_TYPE -1
 
-struct volume_descriptor {
-	char type;
-	char id[5];
-	char version;
-	char data[2041];
-} __packed;
-
 int strncmp(const char *s1, const char *s2, size_t n)
 {
 	for (size_t i = 0; i < n; i++)
@@ -29,25 +21,28 @@ int strncmp(const char *s1, const char *s2, size_t n)
 	return 0;
 }
 
-void print_descriptor(struct volume_descriptor *desc)
-{
-	printf("Type: %x, ID: %5s, Version: %x\n", desc->type, desc->id,
-	       desc->version);
-}
-
+static char buffer[2048] = { 1 };
 void setup_filesystem(void)
 {
-    read();
-	struct volume_descriptor block_buffer = { 0 };
-	char *buffer = (char *)&block_buffer;
 	setup_atapi();
+	for (int i = 0; i < 2048; i++)
+		buffer[i] = 0;
+	for (int i = 0; i < 5; i++)
+		printf("%x ", buffer[i]);
+	println("");
+    printf("Pointer %x\n", buffer);
 	int cur = 0;
 	do {
 		read_block(VOLUME_BLOCK(cur++), 1, buffer);
-		if (strncmp(block_buffer.id, VOL_BLK_ID,
-			    sizeof(VOL_BLK_ID) - 1))
-			panic("Invalid filesystem (ID: 0x%5x)", block_buffer.id);
-		switch (block_buffer.type) {
+		for (int i = 0; i < 5; i++)
+			printf("%x ", buffer[i]);
+		println("");
+		if (strncmp(buffer + 1, VOL_BLK_ID, sizeof(VOL_BLK_ID) - 1)) {
+			for (int i = 0; i < 5; i++)
+				printf("%x ", buffer[i]);
+			panic("Invalid filesystem");
+		}
+		switch (*buffer) {
 		case BOOT_RECORD_TYPE:
 			println("Boot record");
 			break;
@@ -61,9 +56,8 @@ void setup_filesystem(void)
 			println("Terminator descriptor");
 			break;
 		default:
-			panic("Unknown type of descriptor (got %x)",
-			      block_buffer.type);
+			panic("Unknown type of descriptor (got %x)", buffer[0]);
 		}
-	} while (block_buffer.type != TERMINATOR_TYPE);
+	} while (buffer[0] != TERMINATOR_TYPE);
 	println("Filesystem setup");
 }

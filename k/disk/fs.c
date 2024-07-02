@@ -21,39 +21,31 @@ int strncmp(const char *s1, const char *s2, size_t n)
 	return 0;
 }
 
-static char buffer[2048] = { 1 };
+static char buffer[2048];
 void setup_filesystem(void)
 {
 	setup_atapi();
-	for (int i = 0; i < 2048; i++)
-		buffer[i] = 0;
-	for (int i = 0; i < 5; i++)
-		printf("%x ", buffer[i]);
-	println("");
-    printf("Pointer %x\n", buffer);
 	int cur = 0;
 	do {
-		read_block(VOLUME_BLOCK(cur++), 1, buffer);
-		for (int i = 0; i < 5; i++)
-			printf("%x ", buffer[i]);
-		println("");
-		if (strncmp(buffer + 1, VOL_BLK_ID, sizeof(VOL_BLK_ID) - 1)) {
-			for (int i = 0; i < 5; i++)
-				printf("%x ", buffer[i]);
+		if (!read_block(VOLUME_BLOCK(cur++), 1, buffer))
+        {
+            printf("An error occured, retrying...\n", cur);
+            setup_filesystem();
+        }
+		if (strncmp(buffer + 1, VOL_BLK_ID, sizeof(VOL_BLK_ID) - 1))
 			panic("Invalid filesystem");
-		}
 		switch (*buffer) {
 		case BOOT_RECORD_TYPE:
-			println("Boot record");
+			printf("[Block %d] Boot record\n", cur);
 			break;
 		case PRIMARY_TYPE:
-			println("Primary filesystem");
+            printf("[Block %d] Primary filesystem\n", cur);
 			break;
 		case SUPLEMENTARY_TYPE:
-			println("Secondary filesystem");
+            printf("[Block %d] Secondary filesystem\n", cur);
 			break;
 		case TERMINATOR_TYPE:
-			println("Terminator descriptor");
+            printf("[Block %d] Terminator descriptor\n", cur);
 			break;
 		default:
 			panic("Unknown type of descriptor (got %x)", buffer[0]);

@@ -28,11 +28,15 @@ void handle_irq(unsigned int irq)
 	case IRQ1:
 		handle_keyboard();
 		break;
+    case IRQ15:
+    case IRQ14:
+        printf("Disk IRQ received\n");
+        break;
 	default:
 		print("Unhandled IRQ");
 		printf("%d", irq - IRQ_MASTER_OFFSET);
 		println();
-		/* asm volatile("hlt"); */
+		asm volatile("hlt");
 		break;
 	}
 	send_eoi(irq);

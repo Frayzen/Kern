@@ -2,8 +2,6 @@
 #include "io.h"
 #include "k/atapi.h"
 #include "k/types.h"
-#include "serial.h"
-#include "panic.h"
 #include "stdio.h"
 
 static unsigned int port = 0;
@@ -28,14 +26,12 @@ SCSI_packet create_packet(unsigned int block, unsigned int nb_block)
 	return packet;
 }
 
-// Control register defines
-#define CONTROL 0x206
 static void wait_400ns(void)
 {
-	inb(port + CONTROL);
-	inb(port + CONTROL);
-	inb(port + CONTROL);
-	inb(port + CONTROL);
+	inb(0x1);
+	inb(0x1);
+	inb(0x1);
+	inb(0x1);
 }
 
 void wait_long(void)
@@ -44,21 +40,114 @@ void wait_long(void)
 		wait_400ns();
 }
 
-void wait_status(int set, int clear)
+int wait_status(int set, int clear)
 {
 	int cur;
 	do {
 		cur = inb(ATA_REG_STATUS(port));
 		if (cur & ERR)
-			panic("ATA error");
+			return 0;
 	} while ((set && !(cur & set)) || (cur && (cur & clear)));
+	return 1;
 }
+
+void reset(void)
+{
+	// Send reset to the first drive
+	outb(PRIMARY_DCR, SRST);
+	outb(PRIMARY_DCR, INTERRUPT_DISABLE);
+	// Send reset to the second drive
+	outb(SECONDARY_DCR, SRST);
+	outb(SECONDARY_DCR, INTERRUPT_DISABLE);
+	wait_400ns();
+}
+
+int sector_wait(int value)
+{
+	int sector;
+	int status;
+	do {
+		sector = inb(ATA_REG_SECTOR_COUNT(port));
+		status = inb(ATA_REG_STATUS(port));
+		if (status & ERR)
+			return 0;
+		if (sector > value)
+			return 0;
+	} while (sector != value);
+	return 1;
+}
+
+/*
+                             ==============
+                             " Read Block "
+                             ==============
+*/
+
+int send_scsi()
+{
+	if (!wait_status(0, BSY))
+		return 0;
+	outb(ATA_REG_FEATURES(port), 0); // No overlap / no DMA
+	outb(ATA_REG_SECTOR_COUNT(port), 0); // No queuing
+	outb(ATA_REG_LBA_MI(port), CD_BLOCK_SZ & 0xff);
+	outb(ATA_REG_LBA_HI(port), (CD_BLOCK_SZ >> 8) & 0xff);
+	outb(ATA_REG_COMMAND(port), PACKET); /* PACKET */
+	if (!wait_status(DRQ, BSY))
+		return 0;
+	sector_wait(PACKET_AWAIT_COMMAND);
+	return 1;
+}
+
+void read_data(char *buffer, unsigned int size)
+{
+	// Read Data
+	for (unsigned int i = 0; i < size / 2; i++) {
+		u16 data = inw(ATA_REG_DATA(port));
+		buffer[2 * i] = data & 0xff;
+		buffer[2 * i + 1] = data >> 8;
+	}
+	int sector = inb(ATA_REG_SECTOR_COUNT(port));
+	while (sector != PACKET_COMMAND_COMPLETE)
+		sector = inb(ATA_REG_SECTOR_COUNT(port));
+}
+
+int request_block(SCSI_packet *packet)
+{
+	if (!send_scsi())
+		return 0;
+	u16 *words = (u16 *)packet;
+	for (int i = 0; i < PACKET_SZ / 2; i++)
+		outw(ATA_REG_DATA(port), words[i]);
+	return sector_wait(PACKET_DATA_TRANSMIT);
+}
+
+int read_block(unsigned int block, unsigned int nb_block, char *buffer)
+{
+	reset();
+	outb(ATA_REG_DRIVE(port), drive);
+	wait_400ns();
+	wait_status(0, BSY);
+	SCSI_packet read_packet = create_packet(block, nb_block);
+	if (!request_block(&read_packet))
+		return 0;
+	wait_status(RDY, BSY);
+	read_data(buffer, nb_block * CD_BLOCK_SZ);
+	return 1;
+}
+
+/*
+                                    =========
+                                    " Setup "
+                                    =========
+*/
 
 
 int discover_drive(unsigned int disc_port, unsigned int disc_drive)
 {
 	outb(ATA_REG_DRIVE(disc_port), disc_drive);
-    wait_status(0, BSY);
+	if (!wait_status(0, BSY))
+		return 0;
+	wait_400ns();
 	/* Look for ATAPI signature */
 	static unsigned int sig[4] = { 0 };
 	sig[0] = inb(disc_port + ATA_REG_SECTOR_COUNT(disc_drive));
@@ -76,67 +165,10 @@ int discover_drive(unsigned int disc_port, unsigned int disc_drive)
 	return 0;
 }
 
-void sector_wait(int value)
-{
-	int sector;
-	int status;
-	do {
-		sector = inb(ATA_REG_SECTOR_COUNT(port));
-		status = inb(ATA_REG_STATUS(port));
-		if (status & ERR)
-			panic("ATA error");
-	} while (sector != value);
-}
-
-void prepare_request()
-{
-	wait_status(0, BSY);
-	outb(ATA_REG_FEATURES(port), 0); // No overlap / no DMA
-	outb(ATA_REG_SECTOR_COUNT(port), 0); // No queuing
-	outb(ATA_REG_LBA_MI(port), CD_BLOCK_SZ & 0xff);
-	outb(ATA_REG_LBA_HI(port), (CD_BLOCK_SZ >> 8) & 0xff);
-	outb(ATA_REG_COMMAND(port), PACKET); /* PACKET */
-	wait_status(DRQ, BSY);
-	sector_wait(PACKET_AWAIT_COMMAND);
-}
-
-void read_data(char *buffer, unsigned int size)
-{
-	// Read Data
-	println("Reading data");
-	for (unsigned int i = 0; i < size / 2; i++) {
-		u16 data = inw(ATA_REG_DATA(port));
-		buffer[2 * i] = data & 0xff;
-		buffer[2 * i + 1] = data >> 8;
-		if (i < 10)
-			printf("%x ", data);
-	}
-	println("/FINISH");
-	int sector = inb(ATA_REG_SECTOR_COUNT(port));
-	while (sector != PACKET_COMMAND_COMPLETE)
-		sector = inb(ATA_REG_SECTOR_COUNT(port));
-}
-
-void request_scsi(SCSI_packet *packet)
-{
-	prepare_request();
-	// Send Data
-	u16 *words = (u16 *)packet;
-	for (int i = 0; i < PACKET_SZ / 2; i++) {
-		printf("Sending %x\n", words[i]);
-		outw(ATA_REG_DATA(port), words[i]);
-	}
-}
 
 int discover_drives()
 {
-	// Send reset to the first drive
-	outb(PRIMARY_DCR, SRST);
-	outb(PRIMARY_DCR, INTERRUPT_DISABLE);
-	// Send reset to the second drive
-	outb(SECONDARY_DCR, SRST);
-	outb(SECONDARY_DCR, INTERRUPT_DISABLE);
-	wait_400ns();
+	reset();
 	if (discover_drive(PRIMARY_REG, ATA_PORT_MASTER) ||
 	    discover_drive(PRIMARY_REG, ATA_PORT_SLAVE) ||
 	    discover_drive(SECONDARY_REG, ATA_PORT_MASTER) ||
@@ -146,21 +178,13 @@ int discover_drives()
 	return 0;
 }
 
-void read_block(unsigned int block, unsigned int nb_block, char *buffer)
-{
-	SCSI_packet read_packet = create_packet(block, nb_block);
-	request_scsi(&read_packet);
-    wait_status(0, BSY);
-    sector_wait(PACKET_DATA_TRANSMIT);
-	read_data(buffer, nb_block * CD_BLOCK_SZ);
-}
 void setup_atapi(void)
 {
-	printf("Initializing ATAPI\n");
+	printf("Setting up ATAPI\n");
 	if (!discover_drives()) {
 		printf("No drive found, halting\n");
 		asm volatile("hlt");
 	}
-	printf("ATAPI initialized\n");
+	printf("ATAPI set up\n");
 	return;
 }

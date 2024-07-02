@@ -4,7 +4,7 @@
 #include "serial.h"
 #include "isr_list.h"
 
-typedef struct {
+struct gate_descriptor {
 	unsigned int offset_low : 16;
 	unsigned int selector : 16;
 	unsigned int __unused : 8;
@@ -12,12 +12,12 @@ typedef struct {
 	unsigned int privilege : 2; // (ring of privilege)
 	unsigned int present : 1;
 	unsigned int offset_high : 16;
-} __packed gate_descriptor;
+} __packed;
 
-typedef struct {
+struct idt_descriptor {
 	unsigned int limit : 16;
 	unsigned int base : 32;
-} __packed idt_descriptor;
+} __packed;
 
 #define X(id, name, errcode) extern void isr##id(void);
 ISR_LIST
@@ -32,7 +32,7 @@ void setup_idt(void)
 	setup_pic();
 	setup_timer();
 	println("Setting up IDT...");
-	gate_descriptor gates[] = {
+	struct gate_descriptor gates[] = {
 #define X(id, name, errcode)                         \
 	[id] = {                                     \
 		.offset_low = OFFSET_LOW(isr##id),   \
@@ -45,12 +45,8 @@ void setup_idt(void)
 		ISR_LIST
 #undef X
 	};
-	println();
-	print_uint(sizeof(gates), 4);
-	idt_descriptor idt_holder = {
-		.limit = sizeof(gates) - 1,
-		.base = (unsigned int)&gates
-	};
+	struct idt_descriptor idt_holder = { .limit = sizeof(gates) - 1,
+					     .base = (unsigned int)&gates };
 	asm volatile("lidt %0"
 		     : /* no output */
 		     : "m"(idt_holder)

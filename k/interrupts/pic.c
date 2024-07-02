@@ -34,7 +34,7 @@ void setup_pic(void)
 	outb(MASTER_PIC_B, 0x0);
 	outb(SLAVE_PIC_B, 0x0);
 
-	println("PIC setup complete");
+	println("PIC set up");
 }
 
 #define PIC_EOI 0x20 /* End-of-interrupt command code */

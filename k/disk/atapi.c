@@ -8,7 +8,7 @@
 static unsigned int port = 0;
 static unsigned int drive = 0;
 
-SCSI_packet create_packet(unsigned int block, unsigned int sectors)
+SCSI_packet create_packet(unsigned int block, unsigned int nb_block)
 {
 	SCSI_packet packet = {
 		.op_code = READ_12,
@@ -17,10 +17,10 @@ SCSI_packet create_packet(unsigned int block, unsigned int sectors)
 		.lba_mihi = (block >> 0x10) & 0xFF,
 		.lba_milo = (block >> 0x08) & 0xFF,
 		.lba_lo = (block >> 0x00) & 0xFF,
-		.transfer_length_hi = (sectors >> 0x18) & 0xFF,
-		.transfer_length_mihi = (sectors >> 0x10) & 0xFF,
-		.transfer_length_milo = (sectors >> 0x08) & 0xFF,
-		.transfer_length_lo = (sectors >> 0x00) & 0xFF,
+		.transfer_length_hi = (nb_block >> 0x18) & 0xFF,
+		.transfer_length_mihi = (nb_block >> 0x10) & 0xFF,
+		.transfer_length_milo = (nb_block >> 0x08) & 0xFF,
+		.transfer_length_lo = (nb_block >> 0x00) & 0xFF,
 		.flags_hi = 0,
 		.control = 0,
 	};
@@ -63,7 +63,7 @@ int discover_drive(unsigned int disc_port, unsigned int disc_drive)
 	    sig[2] == ATAPI_SIG_LBA_MI && sig[3] == ATAPI_SIG_LBA_HI) {
 		port = disc_port;
 		drive = disc_drive;
-		printf("Drive found at %x:%x\n", disc_drive, disc_port);
+		printf("Drive found !\n");
 		return 1;
 	}
 	return 0;
@@ -92,45 +92,40 @@ void sector_wait(unsigned int value)
 
 void send_scsi(SCSI_packet *packet)
 {
-	outb(ATA_REG_DRIVE(port), drive); // Select drive
-	println("BUSY WAIT");
-	wait_400ns();
 	busy_wait();
-	outb(ATA_REG_FEATURES(port), 0);
+	outb(ATA_REG_FEATURES(port), 0); // No overlap / no DMA
+	outb(ATA_REG_SECTOR_COUNT(port), 0); // No queuing
 	outb(ATA_REG_LBA_MI(port), CD_BLOCK_SZ & 0xff);
 	outb(ATA_REG_LBA_HI(port), (CD_BLOCK_SZ >> 8) & 0xff);
-	outb(ATA_REG_COMMAND(port), PACKET);
-	println("Waiting for packet");
-	wait_packet_req();
-
-	int sector = inb(ATA_REG_COMMAND(port));
-	printf("Before sector: %d\n", sector);
+	outb(ATA_REG_COMMAND(port), PACKET); /* PACKET */
+	printf("Waiting for request\n");
+	/* wait_packet_req(); */
+	sector_wait(PACKET_AWAIT_COMMAND);
 	// Send Data
 	u16 *bytes = (u16 *)packet;
-	for (int i = 0; i < PACKET_SZ / 2; i++) {
-		u16 data = bytes[i];
-		printf("Sending %x\n", data);
-		outw(ATA_REG_DATA(port), data);
-	}
-	sector = inb(ATA_REG_COMMAND(port));
-	printf("Aft sector: %d\n", sector);
+	for (int i = 0; i < PACKET_SZ / 2; i++)
+		outw(ATA_REG_DATA(port), bytes[i]);
 	wait_400ns();
-	sector = inb(ATA_REG_COMMAND(port));
-	printf("Aft sector: %d\n", sector);
-	read();
-	/* sector_wait(PACKET_DATA_TRANSMIT); */
+	/* read(); */
+	printf("Waiting for data\n");
+	int sector = inb(ATA_REG_SECTOR_COUNT(port));
+	printf("Sector aft: %d\n", sector);
+	sector_wait(PACKET_DATA_TRANSMIT);
 }
 
-void read_data(void)
+void read_data(char *buffer, unsigned int nb_block)
 {
 	// Read Data
-	for (int i = 0; i < CD_BLOCK_SZ / 2; i++) {
+	for (unsigned int i = 0; i < nb_block * CD_BLOCK_SZ / 2; i++) {
 		u16 data = inw(ATA_REG_DATA(port));
-		if (i < 10)
-			printf("%x ", data);
+		buffer[2 * i] = data & 0xff;
+		buffer[2 * i + 1] = data >> 8;
 	}
-	println();
-	sector_wait(PACKET_COMMAND_COMPLETE);
+	int sector = inb(ATA_REG_SECTOR_COUNT(port));
+	while (sector != PACKET_COMMAND_COMPLETE) {
+		inb(ATA_REG_DATA(port));
+		sector = inb(ATA_REG_SECTOR_COUNT(port));
+	}
 }
 
 int discover_drives()
@@ -150,7 +145,14 @@ int discover_drives()
 	return 0;
 }
 
-void atapi_init(void)
+void read_block(unsigned int block, unsigned int nb_block, char *buffer)
+{
+	SCSI_packet read_packet = create_packet(block, nb_block);
+	send_scsi(&read_packet);
+	read_data(buffer, nb_block);
+}
+
+void setup_atapi(void)
 {
 	println("Initializing ATAPI");
 	if (!discover_drives()) {
@@ -158,10 +160,5 @@ void atapi_init(void)
 		asm volatile("hlt");
 	}
 	println("ATAPI initialized");
-	SCSI_packet read_packet = create_packet(2, 1);
-	println("Sending packet");
-	send_scsi(&read_packet);
-	println("Reading data");
-	read_data();
 	return;
 }

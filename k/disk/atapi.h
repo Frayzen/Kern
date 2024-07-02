@@ -5,12 +5,7 @@
  * Detect and intialize the first ATAPI devices on the system.
  * This function should be called before any other ATAPI functions.
  */
-void atapi_init(void);
-void disk_update(unsigned int reg);
-
-enum disk_state {
-    DISK_STATE_AVAILABLE,
-    DISK_READING,
-};
+void setup_atapi(void);
+void read_block(unsigned int block, unsigned int nb_block, char *buffer);
 
 #endif /* !ATAPI_H */

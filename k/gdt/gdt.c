@@ -14,7 +14,7 @@
 #define KERNEL_PRVLG 0x0
 #define USER_PRVLG 0x3
 
-typedef struct {
+struct segment_descriptor {
 	unsigned int limit_low : 16;
 	unsigned int base_low : 16;
 	unsigned int base_mid : 8;
@@ -28,12 +28,12 @@ typedef struct {
 	unsigned int operation_size : 1; // (0=16 bits, 1=32bits)
 	unsigned int granularity : 1;
 	unsigned int base_high : 8;
-} __packed segment_descriptor;
+} __packed;
 
-typedef struct {
+struct gdt_descriptor {
 	unsigned int limit : 16;
 	unsigned int base : 32;
-} __packed gdt_descriptor;
+} __packed;
 
 #define NULL_DESC 0
 #define KERNEL_CODE_DESC 1
@@ -41,9 +41,9 @@ typedef struct {
 #define USER_CODE_DESC 3
 #define USER_DATA_DESC 4
 
-#define DESC_NB (sizeof(descriptors) / sizeof(segment_descriptor))
+#define DESC_NB (sizeof(descriptors) / sizeof(struct segment_descriptor))
 
-static segment_descriptor descriptors[] = {
+static struct segment_descriptor descriptors[] = {
     [NULL_DESC] = {
         .limit_low = 0,
         .base_low = 0,
@@ -126,21 +126,21 @@ extern void gdtFlush(void);
 void setup_gdt()
 {
 	println("Setting up GDT...");
-	gdt_descriptor gdt_holder;
-    gdt_holder.limit = sizeof(descriptors) - 1;
+	struct gdt_descriptor gdt_holder;
+	gdt_holder.limit = sizeof(descriptors) - 1;
 	gdt_holder.base = (unsigned int)&descriptors;
 	asm volatile("lgdt %0"
 		     : /* no output */
 		     : "m"(gdt_holder)
 		     : "memory");
 	gdtFlush();
-	println("GDT loaded");
+	println("GDT set up");
 }
 
 void print_gdt(void)
 {
 	print("Size of a segment descriptor: ");
-	print_uint(sizeof(segment_descriptor), 1);
+	print_uint(sizeof(struct segment_descriptor), 1);
 	println("");
 	for (unsigned int i = 0; i < DESC_NB; i++) {
 		println("===========================");

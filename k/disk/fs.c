@@ -37,6 +37,7 @@ void print_descriptor(struct volume_descriptor *desc)
 
 void setup_filesystem(void)
 {
+    read();
 	struct volume_descriptor block_buffer = { 0 };
 	char *buffer = (char *)&block_buffer;
 	setup_atapi();
@@ -45,7 +46,7 @@ void setup_filesystem(void)
 		read_block(VOLUME_BLOCK(cur++), 1, buffer);
 		if (strncmp(block_buffer.id, VOL_BLK_ID,
 			    sizeof(VOL_BLK_ID) - 1))
-			panic("Invalid filesystem (ID: %5x)", block_buffer.id);
+			panic("Invalid filesystem (ID: 0x%5x)", block_buffer.id);
 		switch (block_buffer.type) {
 		case BOOT_RECORD_TYPE:
 			println("Boot record");

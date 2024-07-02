@@ -39,19 +39,19 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	char *fb = (void *)0xb8000;
 
 	asm volatile("cli" :);
-    setup_gdt();
-    setup_idt();
-    setup_filesystem();
+	setup_gdt();
+	setup_idt();
+	setup_filesystem();
 	asm volatile("sti" :);
 
-	for (unsigned i = 0; ; )
-    {
-        int c = get_last_key();
-        if (c != -1)
-            printf("KB %d\n", c);
+
+	for (unsigned i = 0;;) {
+		int c = get_last_key();
+		if (c != -1)
+			printf("KB %d\n", c);
 		*fb = star[i++ % 4];
-    }
+	}
 
 	for (;;)
-		asm volatile ("hlt");
+		asm volatile("hlt");
 }

@@ -3,6 +3,7 @@
 #include "k/atapi.h"
 #include "k/types.h"
 #include "serial.h"
+#include "panic.h"
 #include "stdio.h"
 
 static unsigned int port = 0;
@@ -37,21 +38,11 @@ static void wait_400ns(void)
 	inb(port + CONTROL);
 }
 
-void check_error(unsigned int reg)
-{
-	unsigned int status = inb(ATA_REG_STATUS(reg));
-	if (status & ERR) {
-		printf("Error: %d\n", status);
-		while (1)
-			;
-	}
-}
-
 int discover_drive(unsigned int disc_port, unsigned int disc_drive)
 {
 	outb(ATA_REG_DRIVE(disc_port), disc_drive);
-	wait_400ns();
-	check_error(disc_port);
+	for (int i = 0; i < 10000; i++)
+		wait_400ns();
 	/* Look for ATAPI signature */
 	static unsigned int sig[4] = { 0 };
 	sig[0] = inb(disc_port + ATA_REG_SECTOR_COUNT(disc_drive));
@@ -68,55 +59,46 @@ int discover_drive(unsigned int disc_port, unsigned int disc_drive)
 	}
 	return 0;
 }
-void busy_wait(void)
+
+void wait_status(int set, int clear)
 {
-	while (inb(ATA_REG_STATUS(port)) & BSY)
-		;
+	int cur;
+	do {
+		cur = inb(ATA_REG_STATUS(port));
+		if (cur & ERR)
+			panic("ATA error");
+	} while ((set && !(cur & set)) || (cur && (cur & clear)));
 }
 
-void wait_packet_req(void)
+void sector_wait(int value)
 {
+	int sector;
 	int status;
 	do {
-		status = inb(ATA_REG_COMMAND(port));
-	} while (!(status & DRQ) || status & BSY);
-}
-
-void sector_wait(unsigned int value)
-{
-	unsigned int sector;
-	do {
 		sector = inb(ATA_REG_SECTOR_COUNT(port));
+		status = inb(ATA_REG_STATUS(port));
+		if (status & ERR)
+			panic("ATA error");
 	} while (sector != value);
 }
 
-void send_scsi(SCSI_packet *packet)
+void prepare_request()
 {
-	busy_wait();
+    wait_status(0, BSY);
+	printf("PORT IS %x\n", port);
 	outb(ATA_REG_FEATURES(port), 0); // No overlap / no DMA
 	outb(ATA_REG_SECTOR_COUNT(port), 0); // No queuing
 	outb(ATA_REG_LBA_MI(port), CD_BLOCK_SZ & 0xff);
 	outb(ATA_REG_LBA_HI(port), (CD_BLOCK_SZ >> 8) & 0xff);
 	outb(ATA_REG_COMMAND(port), PACKET); /* PACKET */
-	printf("Waiting for request\n");
-	/* wait_packet_req(); */
+	wait_status(DRQ, BSY);
 	sector_wait(PACKET_AWAIT_COMMAND);
-	// Send Data
-	u16 *bytes = (u16 *)packet;
-	for (int i = 0; i < PACKET_SZ / 2; i++)
-		outw(ATA_REG_DATA(port), bytes[i]);
-	wait_400ns();
-	/* read(); */
-	printf("Waiting for data\n");
-	int sector = inb(ATA_REG_SECTOR_COUNT(port));
-	printf("Sector aft: %d\n", sector);
-	sector_wait(PACKET_DATA_TRANSMIT);
 }
 
-void read_data(char *buffer, unsigned int nb_block)
+void read_data(char *buffer, unsigned int size)
 {
 	// Read Data
-	for (unsigned int i = 0; i < nb_block * CD_BLOCK_SZ / 2; i++) {
+	for (unsigned int i = 0; i < size / 2; i++) {
 		u16 data = inw(ATA_REG_DATA(port));
 		buffer[2 * i] = data & 0xff;
 		buffer[2 * i + 1] = data >> 8;
@@ -128,6 +110,17 @@ void read_data(char *buffer, unsigned int nb_block)
 	}
 }
 
+void request_scsi(SCSI_packet *packet)
+{
+	prepare_request();
+	// Send Data
+	u16 *words = (u16 *)packet;
+	for (int i = 0; i < PACKET_SZ / 2; i++) {
+		printf("Sending %x\n", words[i]);
+		outw(ATA_REG_DATA(port), words[i]);
+	}
+}
+
 int discover_drives()
 {
 	// Send reset to the first drive
@@ -136,6 +129,7 @@ int discover_drives()
 	// Send reset to the second drive
 	outb(SECONDARY_DCR, INTERRUPT_DISABLE);
 	outb(SECONDARY_DCR, SRST);
+	wait_400ns();
 	if (discover_drive(PRIMARY_REG, ATA_PORT_MASTER) ||
 	    discover_drive(PRIMARY_REG, ATA_PORT_SLAVE) ||
 	    discover_drive(SECONDARY_REG, ATA_PORT_MASTER) ||
@@ -147,18 +141,20 @@ int discover_drives()
 
 void read_block(unsigned int block, unsigned int nb_block, char *buffer)
 {
+	println("READING");
 	SCSI_packet read_packet = create_packet(block, nb_block);
-	send_scsi(&read_packet);
-	read_data(buffer, nb_block);
+	request_scsi(&read_packet);
+	for (int i = 0; i < 10000; i++)
+		wait_400ns();
+	read_data(buffer, nb_block * CD_BLOCK_SZ);
 }
-
 void setup_atapi(void)
 {
-	println("Initializing ATAPI");
+	printf("Initializing ATAPI\n");
 	if (!discover_drives()) {
-		println("No drive found, halting");
+		printf("No drive found, halting\n");
 		asm volatile("hlt");
 	}
-	println("ATAPI initialized");
+	printf("ATAPI initialized\n");
 	return;
 }

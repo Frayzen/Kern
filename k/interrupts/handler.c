@@ -1,4 +1,5 @@
 #include "handler.h"
+#include "disk/atapi.h"
 #include "interrupts/ints.h"
 #include "interrupts/keyboard.h"
 #include "interrupts/timer.h"
@@ -20,6 +21,8 @@ unsigned int syscall_handler(stack *s)
 
 void handle_irq(unsigned int irq)
 {
+	if (irq != IRQ0)
+		printf("IRQ %d\n", irq);
 	switch (irq) {
 	case IRQ0:
 		timer_interrupt();
@@ -27,18 +30,18 @@ void handle_irq(unsigned int irq)
 	case IRQ1:
 		handle_keyboard();
 		break;
-    case IRQ14:
-        println("Primary ATAPI device requires attention");
-        /* disk_update(PRIMARY_REG); */
-        break;
-    case IRQ15:
-        println("Secondary ATAPI device requires attention");
-        /* disk_update(SECONDARY_REG); */
-        break;
+	case IRQ14:
+		println("Primary ATAPI device requires attention");
+		/* disk_update(PRIMARY_REG); */
+		break;
+	case IRQ15:
+		println("Secondary ATAPI device requires attention");
+		/* disk_update(SECONDARY_REG); */
+		break;
 	default:
 		print("Unhandled IRQ");
 		printf("%d", irq - IRQ_MASTER_OFFSET);
-        println();
+		println();
 		/* asm volatile("hlt"); */
 		break;
 	}
@@ -47,7 +50,10 @@ void handle_irq(unsigned int irq)
 
 unsigned int interrupt_handler(stack *s)
 {
-	if (s->int_no >= IRQ_MASTER_OFFSET && s->int_no <= IRQ_MASTER_OFFSET + IRQ_LIMIT) {
+	if (s->int_no != IRQ0)
+        printf("Interrupt %d\n", s->int_no);
+	if (s->int_no >= IRQ_MASTER_OFFSET &&
+	    s->int_no <= IRQ_MASTER_OFFSET + IRQ_LIMIT) {
 		handle_irq(s->int_no);
 		return 0;
 	}

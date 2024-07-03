@@ -178,13 +178,13 @@ int discover_drives()
 	return 0;
 }
 
-void setup_atapi(void)
+int setup_atapi(void)
 {
 	printf("Setting up ATAPI\n");
 	if (!discover_drives()) {
-		printf("No drive found, halting\n");
-		asm volatile("hlt");
+		printf("No drive found\n");
+        return 0;
 	}
 	printf("ATAPI set up\n");
-	return;
+	return 1;
 }

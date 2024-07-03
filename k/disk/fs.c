@@ -20,16 +20,24 @@
 #define SUPLEMENTARY_TYPE 2
 #define TERMINATOR_TYPE -1
 
+struct record_attr {
+    u8 __unused0[78]; //1 to 78
+    u8 record_format; // 79
+    u8 __unused1; // 80
+    u32 record_length; // 81 to 84
+    u8 __unused2[166]; // 85 to 250
+};
+
 struct directory_entry {
 	u8 length; // 1
 	u8 ext_attr; // 2
-	u8 loc_ext_attr[8]; // 3 to 10
-	u8 data_length[8]; // 11 to 18
+	u64 loc_ext_attr; // 3 to 10
+	u64 data_length; // 11 to 18
 	u8 time[7]; // 19 to 25
 	u8 file_flag; // 26
 	u8 file_unit_size; // 27
 	u8 interleave_gap_size; // 28
-	u8 vol_seq_num[4]; // 29 to 32
+	u32 vol_seq_num; // 29 to 32
 	u8 len_id; // 33
 	char id[]; // 34 to end (file name)
 } __packed;
@@ -54,10 +62,15 @@ struct primary_volume_desc {
 struct path_table_entry {
 	u8 len_id; // 1
 	u8 len_ext_attr; // 2
-	u8 loc_ext_attr[4]; // 3 to 6
+	u32 loc_ext_attr; // 3 to 6
 	u16 parent_dir_nb; // 7 to 8
 	char id[];
 } __packed;
+
+static char buffer[CD_BLOCK_SZ];
+static struct primary_volume_desc primary;
+static char path_table[CD_BLOCK_SZ];
+static u32 path_table_size;
 
 int strncmp(const char *s1, const char *s2, size_t n)
 {
@@ -67,11 +80,62 @@ int strncmp(const char *s1, const char *s2, size_t n)
 	return 0;
 }
 
-static char buffer[CD_BLOCK_SZ];
-static struct primary_volume_desc primary;
+void read_path_table()
+{
+	char *path_entry = buffer;
+	while (path_entry < buffer + path_table_size) {
+		struct path_table_entry *entry =
+			(struct path_table_entry *)path_entry;
+		for (int j = 0; j < entry->len_id; j++)
+			printf("%c", entry->id[j]);
+		printf(" POSITION: %x LENGTH: %x PARENT: %d\n",
+		       entry->loc_ext_attr, entry->len_ext_attr,
+		       entry->parent_dir_nb);
+		path_entry += sizeof(struct path_table_entry);
+		path_entry += entry->len_id + (entry->len_id % 2);
+	}
+}
+
+void print_children(int table_id)
+{
+	char *path_entry = buffer;
+	struct path_table_entry *entry;
+	int cur = 0;
+	while (path_entry < buffer + path_table_size) {
+		entry = (struct path_table_entry *)path_entry;
+		path_entry += sizeof(struct path_table_entry);
+		path_entry += entry->len_id + (entry->len_id % 2);
+		if (++cur == table_id)
+			break;
+	}
+	if (path_entry > buffer + path_table_size)
+		panic("Not found");
+    printf("Read entry at 0x%x\n", entry->loc_ext_attr);
+	if (!read_block(entry->loc_ext_attr, 1, buffer))
+		panic("Error reading block");
+    struct directory_entry *dir = (struct directory_entry *)buffer;
+    printf("Loc ext attr: 0x%x\n", dir->loc_ext_attr);
+	if (!read_block(dir->loc_ext_attr, 1, buffer))
+		panic("Error reading block");
+
+	struct record_attr *record = (struct record_attr *)buffer;
+    printf("Size of record :%d\n", sizeof(struct record_attr));
+    printf("Record format: %x\n", record->record_format);
+	printf("\n");
+}
+
+void print_primary_volume_desc()
+{
+	printf("Primary volume descriptor:\n");
+	printf("Std ID: %s\n", primary.std_id);
+	printf("Vol ID: %s\n", primary.vol_id);
+	printf("Log block size: %d\n", BOTH_BYTE_VAL16(primary.log_blk_size));
+}
+
 void setup_filesystem(void)
 {
 	char *primary_buffer = (char *)&primary;
+	char *path_table_buffer = (char *)&path_table;
 	while (!setup_atapi())
 		;
 	int cur = 0;
@@ -103,40 +167,18 @@ void setup_filesystem(void)
 		}
 	} while (buffer[0] != TERMINATOR_TYPE);
 
-	printf("Primary volume descriptor:\n");
-	printf("Std ID: %s\n", primary.std_id);
-	printf("Vol ID: %s\n", primary.vol_id);
-	printf("Log block size: %d\n", BOTH_BYTE_VAL16(primary.log_blk_size));
-	printf("LBLKSIZE: ");
-	for (int i = 0; i < 32 / 4; i++)
-		printf("%x", (primary.log_blk_size >> i * 4) & 0xF);
-	printf("\n");
+	print_primary_volume_desc();
 
 	assert(primary.type == PRIMARY_TYPE);
 	assert(BOTH_BYTE_VAL16(primary.log_blk_size) == CD_BLOCK_SZ);
 
-	u32 path_table_size = BOTH_BYTE_VAL32(primary.path_table_bytes);
-	u32 path_table = primary.l_path_table;
-	printf("LPath table: 0x%x\n", path_table);
-	printf("Path table size: 0x%x\n", path_table_size);
-	printf("Path table:\n");
+	if (!read_block(primary.l_path_table, 1, buffer))
+		panic("Error reading block");
+	memcpy(path_table_buffer, buffer, CD_BLOCK_SZ);
+	path_table_size = BOTH_BYTE_VAL32(primary.path_table_bytes);
 
-	read_block(path_table, 1, buffer);
-
-	char *path_entry = buffer;
-	while (path_entry < buffer + path_table_size) {
-		struct path_table_entry *entry =
-			(struct path_table_entry *)path_entry;
-		printf("Size: %d\n", entry->len_id);
-		for (int j = 0; j < entry->len_id; j++)
-			printf("%c", entry->id[j]);
-		printf("\n");
-		path_entry += sizeof(struct path_table_entry);
-		path_entry += entry->len_id;
-        if (entry->len_id % 2 == 1)
-            path_entry++;
-		read();
-	}
+	read_path_table();
+	print_children(1);
 
 	println("Filesystem setup");
 }

@@ -22,6 +22,7 @@
 #ifndef ISO9660_H
 # define ISO9660_H
 
+#include "k/types.h"
 # define __packed __attribute__((__packed__))
 
 /* Structures used for twin values */

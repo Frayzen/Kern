@@ -2,6 +2,7 @@
 #include "assert.h"
 #include "disk/atapi.h"
 #include "k/atapi.h"
+#include "k/iso9660.h"
 #include "k/types.h"
 #include "panic.h"
 #include "serial.h"
@@ -20,55 +21,8 @@
 #define SUPLEMENTARY_TYPE 2
 #define TERMINATOR_TYPE -1
 
-struct record_attr {
-    u8 __unused0[78]; //1 to 78
-    u8 record_format; // 79
-    u8 __unused1; // 80
-    u32 record_length; // 81 to 84
-    u8 __unused2[166]; // 85 to 250
-};
-
-struct directory_entry {
-	u8 length; // 1
-	u8 ext_attr; // 2
-	u64 loc_ext_attr; // 3 to 10
-	u64 data_length; // 11 to 18
-	u8 time[7]; // 19 to 25
-	u8 file_flag; // 26
-	u8 file_unit_size; // 27
-	u8 interleave_gap_size; // 28
-	u32 vol_seq_num; // 29 to 32
-	u8 len_id; // 33
-	char id[]; // 34 to end (file name)
-} __packed;
-
-struct primary_volume_desc {
-	u8 type; // 1
-	u8 std_id[5]; // 2 to 6
-	u8 __unused0[34]; // 7 to 40
-	u8 vol_id[32]; // 41 to 72
-	u8 __unused1[8]; // 73 to 80
-	u64 vol_space_size; // 81 to 88
-	u8 __unused2[40]; // 89 to 128
-	u32 log_blk_size; // 129 to 132
-	u64 path_table_bytes; // 133 to 140
-	u32 l_path_table; // 141 to 144
-	u8 __unused3[4]; // 145 to 148
-	u32 m_path_table; // 149 to 152
-	u8 __unused4[4]; // 153 to 156
-	struct directory_entry root; //157 to 189
-} __packed;
-
-struct path_table_entry {
-	u8 len_id; // 1
-	u8 len_ext_attr; // 2
-	u32 loc_ext_attr; // 3 to 6
-	u16 parent_dir_nb; // 7 to 8
-	char id[];
-} __packed;
-
 static char buffer[CD_BLOCK_SZ];
-static struct primary_volume_desc primary;
+static struct iso_prim_voldesc primary;
 static char path_table[CD_BLOCK_SZ];
 static u32 path_table_size;
 
@@ -83,53 +37,103 @@ int strncmp(const char *s1, const char *s2, size_t n)
 void read_path_table()
 {
 	char *path_entry = buffer;
+	int i = 1;
 	while (path_entry < buffer + path_table_size) {
-		struct path_table_entry *entry =
-			(struct path_table_entry *)path_entry;
-		for (int j = 0; j < entry->len_id; j++)
-			printf("%c", entry->id[j]);
-		printf(" POSITION: %x LENGTH: %x PARENT: %d\n",
-		       entry->loc_ext_attr, entry->len_ext_attr,
-		       entry->parent_dir_nb);
-		path_entry += sizeof(struct path_table_entry);
-		path_entry += entry->len_id + (entry->len_id % 2);
+		struct iso_path_table_le *entry =
+			(struct iso_path_table_le *)path_entry;
+		for (int j = 0; j < entry->idf_len; j++)
+			printf("%c", entry->idf[j]);
+		printf(" (%d) POSITION: %d LENGTH: %x PARENT: %d\n", i++,
+		       entry->data_blk, entry->ext_size, entry->parent_dir);
+		path_entry += sizeof(struct iso_path_table_le);
+		path_entry += entry->idf_len + (entry->idf_len % 2);
 	}
 }
 
-void print_children(int table_id)
+int process_entry(int parent, char *name, char **cur_entry)
 {
-	char *path_entry = buffer;
-	struct path_table_entry *entry;
-	int cur = 0;
-	while (path_entry < buffer + path_table_size) {
-		entry = (struct path_table_entry *)path_entry;
-		path_entry += sizeof(struct path_table_entry);
-		path_entry += entry->len_id + (entry->len_id % 2);
-		if (++cur == table_id)
-			break;
+	char *entry_ptr = *cur_entry;
+	struct iso_path_table_le *entry;
+	int id = 1;
+	while (entry_ptr < buffer + path_table_size) {
+		entry = (struct iso_path_table_le *)entry_ptr;
+		if (entry->parent_dir == parent &&
+		    !strncasecmp(entry->idf, name, entry->idf_len)) {
+			*cur_entry = (char *) entry;
+			return id;
+		}
+		entry_ptr += sizeof(struct iso_path_table_le);
+		entry_ptr += entry->idf_len + (entry->idf_len % 2);
+		id++;
 	}
-	if (path_entry > buffer + path_table_size)
-		panic("Not found");
-    printf("Read entry at 0x%x\n", entry->loc_ext_attr);
-	if (!read_block(entry->loc_ext_attr, 1, buffer))
-		panic("Error reading block");
-    struct directory_entry *dir = (struct directory_entry *)buffer;
-    printf("Loc ext attr: 0x%x\n", dir->loc_ext_attr);
-	if (!read_block(dir->loc_ext_attr, 1, buffer))
-		panic("Error reading block");
+	return -1;
+}
 
-	struct record_attr *record = (struct record_attr *)buffer;
-    printf("Size of record :%d\n", sizeof(struct record_attr));
-    printf("Record format: %x\n", record->record_format);
-	printf("\n");
+void load_file(int start, int end)
+{
+	printf("Loading file from %d to %d\n", start, end);
+	int i = 0;
+	int block = start;
+	while (block <= end) {
+		if (i++ == 40)
+			break;
+		if (!read_block(block++, 1, buffer))
+			panic("Error reading block");
+		struct iso_dir *dir = (struct iso_dir *)buffer;
+		printf("%s\n", dir->idf);
+		printf("%d\n", dir->type);
+	}
 }
 
 void print_primary_volume_desc()
 {
 	printf("Primary volume descriptor:\n");
-	printf("Std ID: %s\n", primary.std_id);
-	printf("Vol ID: %s\n", primary.vol_id);
-	printf("Log block size: %d\n", BOTH_BYTE_VAL16(primary.log_blk_size));
+	printf("Std ID: %s\n", primary.std_identifier);
+	printf("Vol ID: %s\n", primary.vol_idf);
+	printf("Log block size: %d\n", primary.vol_blk_size.le);
+}
+
+
+void find(char *name)
+{
+	char *cur_name = name + 1;
+	char *next_name = name + 1;
+	int parent = 1;
+	char *cur_entry = buffer;
+	while (1) {
+		while (*next_name && *next_name != '/')
+			next_name++;
+		if (!*next_name)
+			break;
+		*next_name = '\0';
+		parent = process_entry(parent, cur_name, &cur_entry);
+		if (parent == -1) {
+            printf("Error reading file\n");
+            return;
+		}
+		next_name++;
+		cur_name = next_name;
+	}
+	struct iso_path_table_le *entry = (struct iso_path_table_le *)cur_entry;
+    printf("CUR %x\n", entry->data_blk);
+    u8 size = entry->ext_size;
+    read_block(entry->data_blk, 1, buffer);
+    struct iso_dir *file = (struct iso_dir *)buffer;
+    char *cur_buffer = buffer;
+    while (1)
+    {
+        if (cur_buffer < buffer + size)
+        {
+            printf("Error reading file\n");
+            break;
+        }
+        if (!strncmp(file->idf, cur_name, file->idf_len))
+            break;
+        cur_buffer += file->dir_size;
+        file = (struct iso_dir *)cur_buffer;
+    }
+
+	printf("Found %s at %d\n", cur_name, file->data_blk.le);
 }
 
 void setup_filesystem(void)
@@ -139,8 +143,6 @@ void setup_filesystem(void)
 	while (!setup_atapi())
 		;
 	int cur = 0;
-	printf("SIZE : %d\n", sizeof(struct primary_volume_desc));
-	printf("SIZE DIR : %d\n", sizeof(struct directory_entry));
 	do {
 		if (!read_block(VOLUME_BLOCK(cur++), 1, buffer)) {
 			printf("An error occured, retrying...\n", cur);
@@ -169,16 +171,17 @@ void setup_filesystem(void)
 
 	print_primary_volume_desc();
 
-	assert(primary.type == PRIMARY_TYPE);
-	assert(BOTH_BYTE_VAL16(primary.log_blk_size) == CD_BLOCK_SZ);
+	assert(primary.vol_desc_type == PRIMARY_TYPE);
+	assert(primary.vol_blk_size.le == CD_BLOCK_SZ);
 
-	if (!read_block(primary.l_path_table, 1, buffer))
+	if (!read_block(primary.le_path_table_blk, 1, buffer))
 		panic("Error reading block");
 	memcpy(path_table_buffer, buffer, CD_BLOCK_SZ);
-	path_table_size = BOTH_BYTE_VAL32(primary.path_table_bytes);
+	path_table_size = primary.path_table_size.le;
 
 	read_path_table();
-	print_children(1);
+
+	find("/bin/hunter");
 
 	println("Filesystem setup");
 }

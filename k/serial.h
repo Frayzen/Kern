@@ -29,7 +29,7 @@ int writechar(const char buf);
  * @brief Read a character from the serial property
  * @return the character read
 */
-char read(void);
+char read_serial(void);
 
 /**
  * @brief Initialize the serial port

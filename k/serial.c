@@ -37,7 +37,7 @@ static int received()
     return (inb(COM1 + LSR) & 1);
 }
 
-char read(void)
+char read_serial(void)
 {
     serial_init();
     while(!received())

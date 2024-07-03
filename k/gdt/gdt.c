@@ -75,7 +75,7 @@ static struct segment_descriptor descriptors[] = {
         .base_high = 0,
     },
     [KERNEL_DATA_DESC] = {
-        .base_low = 0,
+        .base_low = 0x0000,
         .base_mid = 0,
         .segment_type = SEG_DATA | SEG_DATA_WR,
         .desc_type = 1,
@@ -90,7 +90,7 @@ static struct segment_descriptor descriptors[] = {
         .base_high = 0,
     },
     [USER_CODE_DESC] = {
-        .base_low = 0,
+        .base_low = 0x0000,
         .base_mid = 0,
         .segment_type = SEG_CODE | SEG_CODE_RD,
         .desc_type = 1,

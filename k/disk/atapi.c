@@ -1,4 +1,5 @@
 #include "atapi.h"
+#include "disk/fs.h"
 #include "io.h"
 #include "k/atapi.h"
 #include "k/types.h"
@@ -186,5 +187,6 @@ int setup_atapi(void)
         return 0;
 	}
 	printf("ATAPI set up\n");
+    setup_fs();
 	return 1;
 }

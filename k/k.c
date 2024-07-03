@@ -22,13 +22,39 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "disk/fs.h"
+#include "disk/iso_driver.h"
 #include "gdt/gdt.h"
 #include "interrupts/ints.h"
 #include "interrupts/keyboard.h"
+#include "panic.h"
 #include "stdio.h"
 #include <k/kstd.h>
 
 #include "multiboot.h"
+
+void test_file(void)
+{
+    int fd = open("/boot/grub/grub.cfg");
+    char buf[2048];
+    // Read 10 bytes
+    int len = read(fd, buf, 10);
+    printf("Read %d bytes\n", len, buf);
+    printf("%s\n", buf);
+
+    // Read 10 bytes
+    len = read(fd, buf, 10);
+    printf("Read %d bytes\n", len, buf);
+    printf("%s\n", buf);
+
+    // Read 10 bytes from the end
+    if (seek(fd, -10, SEEK_END) == -1)
+        panic("Seek failed\n");
+    len = read(fd, buf, 1024);
+    printf("Read %d bytes\n", len, buf);
+    printf("%s\n", buf);
+
+    close(fd);
+}
 
 void k_main(unsigned long magic, multiboot_info_t *info)
 {
@@ -41,8 +67,9 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	asm volatile("cli" :);
 	setup_gdt();
 	setup_idt();
-	setup_filesystem();
 	asm volatile("sti" :);
+	setup_iso();
+    test_file();
 
 	for (unsigned i = 0;;) {
 		int c = get_last_key();

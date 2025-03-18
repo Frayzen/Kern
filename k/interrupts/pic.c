@@ -14,7 +14,7 @@ void setup_pic(void)
 	println("Setting up PIC...");
 
 	// ICW1
-	outb(MASTER_PIC_A, ICW1_INIT | ICW1_ICW4);
+	outb(MASTER_PIC_A, 0x10 | 0x01);
 	outb(SLAVE_PIC_A, ICW1_INIT | ICW1_ICW4);
 
 	// ICW2

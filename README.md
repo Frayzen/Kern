@@ -1,6 +1,10 @@
 # Introduction
 
-This is the student code for the [kernel course at EPITA](https://k.lse.epita.fr/).
+This is the student code for the
+[kernel course at EPITA](https://k.lse.epita.fr/), 
+completed during my 6th semester. I worked independently
+on this project, where I had the opportunity to dive deep
+into kernel development concepts and practices.
 
 ## Table of contents
 
@@ -28,10 +32,13 @@ A readonly git repository given by the LSE can be cloned:
 * libisoburn
 * find
 
+`Please note that qemu is also required to run the kernel`
+
 ### Source tree
 
 Here is the description of some important files:
 
+    launch.sh             # Utilitary tool used to run the kernel using qemu
     Makefile            # top-level Makefile
     config.mk           # build-system configuration
     k                   # kernel source folder
@@ -41,6 +48,8 @@ Here is the description of some important files:
     k/multiboot.h       # Multiboot Specification header
     k/k.lds             # LD script for the kernel binary
     k/memory.c          # kernel memory allocator
+    k/gdt/              # Global Descriptor Table definitions
+    k/interrupts/       # Interruptions definitions
     k/include/k/atapi.h # ATAPI related definitions
     k/include/k/kstd.h  # k standard definitions
     k/include/k/kfs.h   # KFS structures definitions
@@ -82,7 +91,12 @@ Here are make rules you need to know:
 
 ## Booting your kernel in qemu
 
+Please use the `launch.sh` script.
+
+Alternatively, you can launch the kernel by hand:
+
     qemu-system-x86_64 -cdrom k.iso [ -enable-kvm ]
+
 
 ## Debugging your kernel
 

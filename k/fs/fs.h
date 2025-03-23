@@ -5,6 +5,7 @@
  * Setup the filesystem
  */
 void setup_fs();
+
 /**
  * Open a file
  * @param path the path to the file

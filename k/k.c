@@ -21,8 +21,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include "disk/fs.h"
-#include "disk/iso_driver.h"
+#include "fs/fs.h"
 #include "gdt/gdt.h"
 #include "interrupts/ints.h"
 #include "interrupts/keyboard.h"

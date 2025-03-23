@@ -185,6 +185,5 @@ int setup_atapi(void)
 		return 0;
 	}
 	printf("ATAPI set up\n");
-	setup_fs();
 	return 1;
 }

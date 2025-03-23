@@ -34,26 +34,26 @@
 
 void test_file(void)
 {
-    int fd = open("/boot/grub/grub.cfg");
-    char buf[2048];
-    // Read 10 bytes
-    int len = read(fd, buf, 10);
-    printf("Read %d bytes\n", len, buf);
-    printf("%s\n", buf);
+	int fd = open("/boot/grub/grub.cfg");
+	char buf[2048];
+	// Read 10 bytes
+	int len = read(fd, buf, 10);
+	printf("Read %d bytes\n", len, buf);
+	printf("%s\n", buf);
 
-    // Read 10 bytes
-    len = read(fd, buf, 10);
-    printf("Read %d bytes\n", len, buf);
-    printf("%s\n", buf);
+	// Read 10 bytes
+	len = read(fd, buf, 10);
+	printf("Read %d bytes\n", len, buf);
+	printf("%s\n", buf);
 
-    // Read 10 bytes from the end
-    if (seek(fd, -10, SEEK_END) == -1)
-        panic("Seek failed\n");
-    len = read(fd, buf, 1024);
-    printf("Read %d bytes\n", len, buf);
-    printf("%s\n", buf);
+	// Read 10 bytes from the end
+	if (seek(fd, -10, SEEK_END) == -1)
+		panic("Seek failed\n");
+	len = read(fd, buf, 1024);
+	printf("Read %d bytes\n", len, buf);
+	printf("%s\n", buf);
 
-    close(fd);
+	close(fd);
 }
 
 void k_main(unsigned long magic, multiboot_info_t *info)
@@ -69,7 +69,7 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	setup_idt();
 	asm volatile("sti" :);
 	setup_iso();
-    test_file();
+	test_file();
 
 	for (unsigned i = 0;;) {
 		int c = get_last_key();

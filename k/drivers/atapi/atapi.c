@@ -142,7 +142,6 @@ int read_block(unsigned int block, unsigned int nb_block, char *buffer)
                                     =========
 */
 
-
 int discover_drive(unsigned int disc_port, unsigned int disc_drive)
 {
 	outb(ATA_REG_DRIVE(disc_port), disc_drive);
@@ -166,7 +165,6 @@ int discover_drive(unsigned int disc_port, unsigned int disc_drive)
 	return 0;
 }
 
-
 int discover_drives()
 {
 	reset();
@@ -184,9 +182,9 @@ int setup_atapi(void)
 	printf("Setting up ATAPI\n");
 	if (!discover_drives()) {
 		printf("No drive found\n");
-        return 0;
+		return 0;
 	}
 	printf("ATAPI set up\n");
-    setup_fs();
+	setup_fs();
 	return 1;
 }

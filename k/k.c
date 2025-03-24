@@ -25,6 +25,7 @@
 #include "gdt/gdt.h"
 #include "interrupts/ints.h"
 #include "interrupts/keyboard.h"
+#include "memory.h"
 #include "panic.h"
 #include "stdio.h"
 #include <k/kstd.h>
@@ -60,6 +61,8 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	(void)magic;
 	(void)info;
 
+  memory_init(info);
+
 	char star[4] = "|/-\\";
 	char *fb = (void *)0xb8000;
 
@@ -67,7 +70,7 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	setup_gdt();
 	setup_idt();
 	asm volatile("sti" :);
-	setup_iso();
+	setup_fs();
 	test_file();
 
 	for (unsigned i = 0;;) {

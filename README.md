@@ -82,7 +82,7 @@ Here are make rules you need to know:
 
 ## Booting your kernel in qemu
 
-    qemu-system-x86_64 -cdrom k.iso [ -enable-kvm ]
+    qemu-system-i386 -cdrom k.iso [ -enable-kvm ]
 
 ## Debugging your kernel
 
@@ -91,7 +91,7 @@ Build your kernel with debug flags.
 * Run QEMU with a gdb server and stop the CPU at the first instruction:
 
 ```bash
-    qemu-system-x86_64 -cdrom k.iso -s -S
+    qemu-system-i386 -cdrom k.iso -s -S
 ```
 
 * Run gdb with your kernel binary:

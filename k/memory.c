@@ -1,5 +1,6 @@
 #include "memory.h"
 
+#include "panic.h"
 #include <k/types.h>
 #include <stdio.h>
 
@@ -125,7 +126,7 @@ void cache_free(struct cache *cache, void *ptr)
 			return;
 		}
 	}
-	/* FIXME: handle the case when the pointer does not belong to the cache */
+  panic("Free unkown pointer");
 }
 
 static void memory_initialize(struct memory_map *m,

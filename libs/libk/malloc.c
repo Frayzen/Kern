@@ -592,7 +592,7 @@ MAX_RELEASE_CHECK_RATE   default: 4095 unless not HAVE_MMAP
 #if USE_LOCKS /* Spin locks for gcc >= 4.1, older gcc on x86, MSC >= 1310 */
 #if ((defined(__GNUC__) &&                                              \
       ((__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 1)) ||      \
-       defined(__i386__) || defined(__x86_64__))) ||                    \
+       defined(__i386__) || defined(__i386__))) ||                    \
      (defined(_MSC_VER) && _MSC_VER>=1310))
 #ifndef USE_SPIN_LOCKS
 #define USE_SPIN_LOCKS 1
@@ -1826,7 +1826,7 @@ static FORCEINLINE int win32munmap(void* ptr, size_t size) {
 #define CAS_LOCK(sl)     __sync_lock_test_and_set(sl, 1)
 #define CLEAR_LOCK(sl)   __sync_lock_release(sl)
 
-#elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
+#elif (defined(__GNUC__) && (defined(__i386__) || defined(__i386__)))
 /* Custom spin locks for older gcc on x86 */
 static FORCEINLINE int x86_cas_lock(int *sl) {
   int ret;
@@ -2829,7 +2829,7 @@ static size_t traverse_and_check(mstate m);
 #define treebin_at(M,i)     (&((M)->treebins[i]))
 
 /* assign tree index for size S to variable I. Use x86 asm if possible  */
-#if defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
+#if defined(__GNUC__) && (defined(__i386__) || defined(__i386__))
 #define compute_tree_index(S, I)\
 {\
   unsigned int X = S >> TREEBIN_SHIFT;\
@@ -2932,7 +2932,7 @@ static size_t traverse_and_check(mstate m);
 
 /* index corresponding to given bit. Use x86 asm if possible */
 
-#if defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
+#if defined(__GNUC__) && (defined(__i386__) || defined(__i386__))
 #define compute_bit2idx(X, I)\
 {\
   unsigned int J;\

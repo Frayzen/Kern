@@ -3,6 +3,7 @@
 *.a
 *.iso
 *.iso
+*.img
 iso/
 **/.cache
 k/k

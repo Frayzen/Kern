@@ -5,8 +5,8 @@ display_library: x, options="gui_debug"
 clock: sync=realtime
 log: IOR = off
 
-# # start a GDB server
-# gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0
+# start a GDB server
+gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0
 
 # configure the disk drive
 ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14
@@ -18,7 +18,7 @@ com1: enabled=1, mode=term, dev=/dev/stdout
 
 
 # log: out.log
-# #debugger_out: /dev/stdout
+#debugger_out: /dev/stdout
 
 # super userful option here, you can find all modules here http://bochs.sourceforge.net/doc/docbook/user/howto.html#LOGOPTS-BY-DEVICE
 # cpu0 and harddrv are the most useful

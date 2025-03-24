@@ -1,5 +1,4 @@
 #include "atapi.h"
-#include "disk/fs.h"
 #include "io.h"
 #include "k/atapi.h"
 #include "k/types.h"
@@ -154,7 +153,7 @@ int discover_drive(unsigned int disc_port, unsigned int disc_drive)
 	sig[1] = inb(disc_port + ATA_REG_LBA_LO(disc_drive));
 	sig[2] = inb(disc_port + ATA_REG_LBA_MI(disc_drive));
 	sig[3] = inb(disc_port + ATA_REG_LBA_HI(disc_drive));
-	/* printf("Signature: %02x %02x %02x %02x\n", sig[0], sig[1], sig[2], sig[3]); */
+	printf("Signature: %02x %02x %02x %02x\n", sig[0], sig[1], sig[2], sig[3]);
 	if (sig[0] == ATAPI_SIG_SC && sig[1] == ATAPI_SIG_LBA_LO &&
 	    sig[2] == ATAPI_SIG_LBA_MI && sig[3] == ATAPI_SIG_LBA_HI) {
 		port = disc_port;

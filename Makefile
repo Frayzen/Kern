@@ -41,11 +41,14 @@ SUBDIRS	= \
 
 ABS_INSTALL = $(abspath $(INSTALL_ROOT))
 
-all: k.iso
+all: k.iso disk.img
 
 k: libs/libc
 
 $(ROMS): tools/mkkfs libs/libc libs/libk
+
+disk.img: install
+	./tools/create-disk-image.sh disk.img $(INSTALL_ROOT)
 
 k.iso: install
 	./tools/create-iso.sh $@ $(INSTALL_ROOT) $(ROMS)

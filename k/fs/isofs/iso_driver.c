@@ -1,13 +1,12 @@
 #include "iso_driver.h"
-#include "assert.h"
-#include "disk/atapi.h"
+#include "drivers/atapi/atapi.h"
 #include "k/atapi.h"
 #include "k/iso9660.h"
 #include "k/types.h"
-#include "panic.h"
-#include "serial.h"
 #include "stdio.h"
 #include "string.h"
+#include "panic.h"
+#include "assert.h"
 
 #define VOLUME_BLOCK(i) (16 + i)
 #define VOL_BLK_ID "CD001"
@@ -69,3 +68,47 @@ int find(char *name, u32 *size)
 	}
 }
 
+int setup_iso(void)
+{
+	struct iso_prim_voldesc *primary;
+	int cur = 0;
+	do {
+		if (!read_block(VOLUME_BLOCK(cur++), 1, buffer)) {
+			printf("Could not read the first bloc, aborting\n",
+			       cur);
+			return 0;
+		}
+		if (strncmp(buffer + 1, VOL_BLK_ID, sizeof(VOL_BLK_ID) - 1)) {
+			printf("Not an ISO fs\n", cur);
+			return 0;
+		}
+		switch (*buffer) {
+		case BOOT_RECORD_TYPE:
+			printf("[Block %d] Boot record\n", cur);
+			break;
+		case PRIMARY_TYPE:
+			printf("[Block %d] Primary filesystem\n", cur);
+			primary = (struct iso_prim_voldesc *)buffer;
+			assert(primary->vol_desc_type == PRIMARY_TYPE);
+			assert(primary->vol_blk_size.le == CD_BLOCK_SZ);
+			read_block(primary->root_dir.data_blk.le, 1, buffer);
+			struct iso_dir *dir = (struct iso_dir *)buffer;
+			root_dir = dir->data_blk.le;
+			break;
+		case SUPLEMENTARY_TYPE:
+			printf("[Block %d] Secondary filesystem\n", cur);
+			break;
+		case TERMINATOR_TYPE:
+			printf("[Block %d] Terminator descriptor\n", cur);
+			break;
+		default:
+			panic("Unknown type of descriptor (got %x)", buffer[0]);
+		}
+	} while (buffer[0] != TERMINATOR_TYPE);
+	if (root_dir == -1)
+  {
+		panic("No root directory found");
+    return 0;
+  }
+	return 1;
+}

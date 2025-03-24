@@ -32,8 +32,8 @@ isr_common:
     iret
 
 #define X(id, key, name, errcode)\
-.global isr##id;\
-isr##id:;\
+.global isr##key;\
+isr##key:;\
     cli;\
     .if errcode == 0;\
     push $0;\

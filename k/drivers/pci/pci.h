@@ -12,6 +12,7 @@ Offset |Bits 31-24 | Bits 23-16  | Bits 15-8    | Bits 7-0
 
 /!\ The lower addresses contain the least significant portions of the field
 */
+#include "drivers/pci/cap.h"
 #include "k/compiler.h"
 #include "k/types.h"
 #define CONFIG_ADDRESS 0xCF8
@@ -28,14 +29,23 @@ struct pci_device {
   u8 subClass;
   // ... 
   u8 headerType;
+  // ...
+  struct pci_capabilites capabilities;
 } __packed;
+
+#define PCI_STATUS_CAPABILITY_LIST_FLAG (1 << 4)
 
 #define PCI_BAR0 0x10
 #define PCI_BAR1 0x14
 
+void pci_config_write(u8 bus, u8 slot, u8 func, u8 offset, u32 val);
+
 u32 pci_config_read(u8 bus, u8 slot, u8 func, u8 offset);
 u16 pci_config_read_upper(u8 bus, u8 slot, u8 func, u8 offset);
 u16 pci_config_read_lower(u8 bus, u8 slot, u8 func, u8 offset);
+
+u32 get_bar(struct pci_device *dev, u16 bar);
+
 
 // returns non zero if found, updates the out value accordingly
 int look_for_device(u8 classCode, u8 subClass, struct pci_device* out);

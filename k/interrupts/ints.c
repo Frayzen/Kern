@@ -19,15 +19,6 @@ struct idt_descriptor {
 	unsigned int base : 32;
 } __packed;
 
-#define X(id, key, name, errcode) extern void isr##id(void);
-ISR_LIST
-IRQ_LIST
-#undef X
-
-#define FN_PTR(Fn) (unsigned int)((void (*)(void))(Fn))
-#define OFFSET_LOW(Fn) (0xFFFF & (FN_PTR(Fn)))
-#define OFFSET_HIGH(Fn) ((0xFFFF0000 & (FN_PTR(Fn))) >> 16)
-
 void setup_idt(void)
 {
 	setup_pic();
@@ -36,9 +27,9 @@ void setup_idt(void)
 	struct gate_descriptor gates[] = {
 #define X(id, key, name, errcode)                         \
 	[id] = {                                     \
-		.offset_low = OFFSET_LOW(isr##id),   \
+		.offset_low = OFFSET_LOW(isr##key),   \
 		.selector = 0x8,                     \
-		.offset_high = OFFSET_HIGH(isr##id), \
+		.offset_high = OFFSET_HIGH(isr##key), \
 		.type = GATE_TYPE_INT,               \
 		.privilege = 0,                      \
 		.present = 1,                        \

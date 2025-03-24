@@ -1,7 +1,20 @@
 #include "drivers/pci/pci.h"
+#include "drivers/pci/cap.h"
+#include "drivers/pci/command.h"
 #include "io.h"
 #include "k/types.h"
 
+u32 get_bar(struct pci_device *dev, u16 bar)
+{
+	disable_io(dev);
+	u32 ret = pci_config_read(dev->bus, dev->slot, 0, bar);
+	enable_io(dev);
+	if (bar == PCI_BAR0)
+		ret &= 0xFFFFFFF0;
+	return ret;
+}
+
+// reads the 32 bits of the given register
 u32 pci_config_read(u8 bus, u8 slot, u8 func, u8 offset)
 {
 	u32 address;
@@ -21,11 +34,31 @@ u32 pci_config_read(u8 bus, u8 slot, u8 func, u8 offset)
 	return tmp;
 }
 
+// reads the 32 bits of the given register
+void pci_config_write(u8 bus, u8 slot, u8 func, u8 offset, u32 val)
+{
+	u32 address;
+	u32 lbus = (u32)bus;
+	u32 lslot = (u32)slot;
+	u32 lfunc = (u32)func;
+
+	// Create configuration address as per Figure 1
+	address = (u32)((lbus << 16) | (lslot << 11) | (lfunc << 8) |
+			(offset & 0xFC) | ((u32)0x80000000));
+	// Write out the address
+	outl(CONFIG_ADDRESS, address);
+	// Read in the data
+	// (offset & 2) * 8) = 0 will choose the first word of the 32-bit register
+	outl(CONFIG_DATA, val);
+}
+
+// reads the higher 16 bits of the given register
 u16 pci_config_read_upper(u8 bus, u8 slot, u8 func, u8 offset)
 {
 	return (u16)(pci_config_read(bus, slot, func, offset) >> 16);
 }
 
+// reads the lower 16 bits of the given register
 u16 pci_config_read_lower(u8 bus, u8 slot, u8 func, u8 offset)
 {
 	return (u16)(pci_config_read(bus, slot, func, offset) & 0xFFFF);
@@ -47,8 +80,10 @@ int check_device(u8 bus, u8 slot, struct pci_device *out)
 		out->deviceId = device;
 		out->classCode = class >> 8;
 		out->subClass = class & 0xFF;
-    out->headerType = pci_config_read_upper(bus, slot, 0, 0xC) & 0xFF;
-    out->status = pci_config_read_upper(bus, slot, 0, 0x4);
+		out->headerType = pci_config_read_upper(bus, slot, 0, 0xC) &
+				  0xFF;
+		out->status = pci_config_read_upper(bus, slot, 0, 0x4);
+		check_capacities(out);
 		return 1;
 	}
 	return 0;

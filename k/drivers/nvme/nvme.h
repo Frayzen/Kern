@@ -10,6 +10,11 @@ struct nvme_queue {
 } __packed;
 
 struct nvme_device {
+  u16 c_head;
+  u16 s_tail;
+
+  u32 next_command_id;
+
 	struct pci_device pci;
 	u64 base_addr;
 	u64 capability_stride;

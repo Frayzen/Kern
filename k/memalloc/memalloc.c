@@ -2,7 +2,6 @@
 #include "k/types.h"
 #include "panic.h"
 #include "assert.h"
-#include "serial.h"
 #include <stdio.h>
 #include <string.h>
 

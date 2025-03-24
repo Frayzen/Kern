@@ -21,6 +21,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include "drivers/pci/pci.h"
 #include "fs/fs.h"
 #include "gdt/gdt.h"
 #include "interrupts/ints.h"
@@ -72,6 +73,8 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	asm volatile("sti" :);
 	setup_fs();
 	test_file();
+
+  checkAllBuses();
 
 	for (unsigned i = 0;;) {
 		int c = get_last_key();

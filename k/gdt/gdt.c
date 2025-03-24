@@ -18,15 +18,21 @@ struct segment_descriptor {
 	unsigned int limit_low : 16;
 	unsigned int base_low : 16;
 	unsigned int base_mid : 8;
+
+	// ACCESS BYTE
 	unsigned int segment_type : 4; // ONE OF THE SEG_(CODE/DATA)_XXXX
 	unsigned int desc_type : 1; // (0 = system, 1 = code data)
 	unsigned int privilege : 2; // (ring of privilege)
 	unsigned int present : 1;
+
 	unsigned int limit_high : 4;
+
+	// FLAGS
 	unsigned int available : 1; //AVL
 	unsigned int segment_size : 1; // 64 bit code segment
 	unsigned int operation_size : 1; // (0=16 bits, 1=32bits)
 	unsigned int granularity : 1;
+
 	unsigned int base_high : 8;
 } __packed;
 

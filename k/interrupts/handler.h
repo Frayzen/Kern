@@ -2,22 +2,13 @@
 #define HANDLER_H
 
 #include "k/compiler.h"
-#define IRQ0 64
-#define IRQ1 65
-#define IRQ2 66
-#define IRQ3 67
-#define IRQ4 68
-#define IRQ5 69
-#define IRQ6 70
-#define IRQ7 71
-#define IRQ8 72
-#define IRQ9 73
-#define IRQ10 74
-#define IRQ11 75
-#define IRQ12 76
-#define IRQ13 77
-#define IRQ14 78
-#define IRQ15 79
+#include "isr_list.h"
+
+#define X(id, key, name, errcode) \
+  const int IRQ_##key = id;
+IRQ_LIST
+ISR_LIST
+#undef X
 
 typedef struct {
 	unsigned int cr2, ds, edi, esi : 32;

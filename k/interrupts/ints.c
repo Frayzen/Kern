@@ -19,7 +19,7 @@ struct idt_descriptor {
 	unsigned int base : 32;
 } __packed;
 
-#define X(id, name, errcode) extern void isr##id(void);
+#define X(id, key, name, errcode) extern void isr##id(void);
 ISR_LIST
 IRQ_LIST
 #undef X
@@ -34,7 +34,7 @@ void setup_idt(void)
 	setup_timer();
 	println("Setting up IDT...");
 	struct gate_descriptor gates[] = {
-#define X(id, name, errcode)                         \
+#define X(id, key, name, errcode)                         \
 	[id] = {                                     \
 		.offset_low = OFFSET_LOW(isr##id),   \
 		.selector = 0x8,                     \

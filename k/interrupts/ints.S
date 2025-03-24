@@ -31,7 +31,7 @@ isr_common:
     mov retval, %eax
     iret
 
-#define X(id, name, errcode)\
+#define X(id, key, name, errcode)\
 .global isr##id;\
 isr##id:;\
     cli;\

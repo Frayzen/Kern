@@ -31,5 +31,4 @@ qemu-system-i386 -drive id=cdrom,if=ide,media=cdrom,readonly=on,file=k.iso \
   -drive file=disk.img,if=none,id=nvme0,format=raw \
   -device nvme,drive=nvme0,serial=1234 \
   -serial stdio -s -S
-
 wait

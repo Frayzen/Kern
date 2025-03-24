@@ -22,16 +22,16 @@ unsigned int syscall_handler(stack *s)
 void handle_irq(unsigned int irq)
 {
 	switch (irq) {
-	case IRQ0:
+	case IRQ_SYSTEM_CLOCK:
 		timer_interrupt();
 		break;
-	case IRQ1:
+	case IRQ_KEYBOARD:
 		handle_keyboard();
 		break;
-    case IRQ15:
-    case IRQ14:
-        printf("Disk IRQ received\n");
-        break;
+	case IRQ_IDE_CONTROLLER:
+	case IRQ_FLOPPY_DISK_CONTROLLER:
+		printf("Disk IRQ received\n");
+		break;
 	default:
 		print("Unhandled IRQ");
 		printf("%d", irq - IRQ_MASTER_OFFSET);
@@ -55,9 +55,9 @@ unsigned int interrupt_handler(stack *s)
 		return syscall_handler(s);
 	}
 	switch (s->int_no) {
-#define X(id, name, errcode)   \
-	case id:               \
-		println(name); \
+#define X(id, key, name, errcode) \
+	case id:                  \
+		println(name);    \
 		break;
 		ISR_LIST
 #undef X

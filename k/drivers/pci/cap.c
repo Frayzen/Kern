@@ -1,9 +1,6 @@
 #include "cap.h"
-#include "drivers/nvme/nvme.h"
 #include "drivers/pci/pci.h"
 #include "assert.h"
-#include "interrupts/ints.h"
-#include "serial.h"
 #include <stdio.h>
 
 void recurse_check(struct pci_device *device, u8 offset)
@@ -55,10 +52,15 @@ void enable_msix(struct pci_device *device)
 	volatile u32 bar_val = (volatile u32)get_bar(device, bar);
 	volatile struct MSIX_vector_table *table_ptr =
 		(volatile struct MSIX_vector_table *)(bar_val + table_offset);
-	table_ptr[0].masked = 0;
   #define APIC_BASE_MSI_ADDRESS   0xFEE00000
+
+	table_ptr[0].masked = 0;
 	table_ptr[0].msg_addr = APIC_BASE_MSI_ADDRESS & ~0x1;
 	table_ptr[0].msg_data = 74;
+
+	table_ptr[1].masked = 0;
+	table_ptr[1].msg_addr = APIC_BASE_MSI_ADDRESS & ~0x1;
+	table_ptr[1].msg_data = 74;
 
 	printf("Found %d table size\n", cap.table_size);
 	printf("Masked : %x\n", table_ptr[0].masked);

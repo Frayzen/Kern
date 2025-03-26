@@ -76,7 +76,7 @@ void k_main(unsigned long magic, multiboot_info_t *info)
   memory_init(info);
   init_memalloc(info);
 
-	setup_fs();
+	/* setup_fs(); */
 	/* test_file(); */
 
   init_nvme();

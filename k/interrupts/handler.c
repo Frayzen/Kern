@@ -55,9 +55,11 @@ unsigned int interrupt_handler(stack *s)
 		return syscall_handler(s);
 	}
 	switch (s->int_no) {
-#define X(id, key, name, errcode) \
-	case id:                  \
-		println(name);    \
+#define X(id, key, name, errcode)                                        \
+	case id:                                                         \
+		printf("======== HANDLE INT 0x%x========\n", s->int_no); \
+		println(name);                                           \
+		printf("======== HANDLE INT 0x%x========\n", s->int_no); \
 		break;
 		ISR_LIST
 #undef X

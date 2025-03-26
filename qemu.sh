@@ -16,6 +16,7 @@ which i3 2>/dev/null 1>&2
 usei3=$?
 
 echo "CTRL+ALT+G to lose focus"
+echo "CTRL+ALT+2 to open qemu monitor"
 if [ $usei3 ]; then
   i3 split h >/dev/null &
   wait $!
@@ -29,6 +30,7 @@ if [ $usei3 ]; then
 fi
 qemu-system-i386 -drive id=cdrom,if=ide,media=cdrom,readonly=on,file=k.iso \
   -drive file=disk.img,if=none,id=nvme0,format=raw \
-  -device nvme,drive=nvme0,serial=1234 \
+  -device nvme,drive=nvme0,serial=1234,addr=0x5 \
+  -trace enable="nvme_*",file=out \
   -serial stdio -s -S
 wait

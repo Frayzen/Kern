@@ -70,9 +70,9 @@ int check_device(u8 bus, u8 slot, struct pci_device *out)
 	u16 vendor, device;
 	/* Try and read the first configuration register. Since there are no
      * vendors that == 0xFFFF, it must be a non-existent device. */
-	if ((vendor = pci_config_read_lower(bus, slot, 0, 0)) != 0xFFFF) {
-		device = pci_config_read_upper(bus, slot, 0, 2);
-		u16 class = pci_config_read_upper(bus, slot, 0, 0x8);
+	if ((vendor = pci_config_read_lower(bus, slot, 0, PCI_VENDOR_ID)) != 0xFFFF) {
+		device = pci_config_read_upper(bus, slot, 0, PCI_DEV_ID);
+		u16 class = pci_config_read_upper(bus, slot, 0, PCI_CLASSES);
 
 		out->bus = bus;
 		out->slot = slot;
@@ -80,9 +80,9 @@ int check_device(u8 bus, u8 slot, struct pci_device *out)
 		out->deviceId = device;
 		out->classCode = class >> 8;
 		out->subClass = class & 0xFF;
-		out->headerType = pci_config_read_upper(bus, slot, 0, 0xC) &
+		out->headerType = pci_config_read_upper(bus, slot, 0, PCI_HEADER_TYPE) &
 				  0xFF;
-		out->status = pci_config_read_upper(bus, slot, 0, 0x4);
+		out->status = pci_config_read_upper(bus, slot, 0, PCI_STATUS);
 		check_capacities(out);
 		return 1;
 	}
@@ -104,4 +104,40 @@ int look_for_device(u8 classCode, u8 subClass, struct pci_device *out)
 		}
 	}
 	return 0;
+}
+
+/*
+COMMAND REGISTER BITS 
+10 Interrupt Disable
+9 Fast Back-to-Back Enable
+8 SERR# Enable
+7 Reserved 
+6 Parity Error Response
+5 VGA Palette Snoop
+4 Memory Write and Invalidate Enable
+3 Special Cycles
+2 Bus Master
+1 Memory Space
+0 I/O Space
+ */
+
+void enable_mem_space(struct pci_device *dev)
+{
+		u16 cur = pci_config_read(dev->bus, dev->slot, 0, PCI_COMMAND);
+    cur |= (1 << 1); // set the bit
+    pci_config_write(dev->bus, dev->slot, 0, PCI_COMMAND, cur);
+}
+
+void enable_bus_master(struct pci_device *dev)
+{
+		u16 cur = pci_config_read(dev->bus, dev->slot, 0, PCI_COMMAND);
+    cur |= (1 << 2); // set the bit
+    pci_config_write(dev->bus, dev->slot, 0, PCI_COMMAND, cur);
+}
+
+void enable_interrupts(struct pci_device *dev)
+{
+		u16 cur = pci_config_read(dev->bus, dev->slot, 0, PCI_COMMAND);
+    cur &= ~(1 << 10); // reset the bit 
+    pci_config_write(dev->bus, dev->slot, 0, PCI_COMMAND, cur);
 }

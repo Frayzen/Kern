@@ -12,6 +12,17 @@ Offset |Bits 31-24 | Bits 23-16  | Bits 15-8    | Bits 7-0
 
 /!\ The lower addresses contain the least significant portions of the field
 */
+
+#define PCI_DEV_ID 0x0
+#define PCI_VENDOR_ID 0x0
+
+#define PCI_COMMAND 0x4
+#define PCI_STATUS 0x4
+
+#define PCI_CLASSES 0x8
+
+#define PCI_HEADER_TYPE 0xC
+
 #include "drivers/pci/cap.h"
 #include "k/compiler.h"
 #include "k/types.h"
@@ -49,5 +60,10 @@ u32 get_bar(struct pci_device *dev, u16 bar);
 
 // returns non zero if found, updates the out value accordingly
 int look_for_device(u8 classCode, u8 subClass, struct pci_device* out);
+
+
+void enable_mem_space(struct pci_device *dev);
+void enable_bus_master(struct pci_device *dev);
+void enable_interrupts(struct pci_device *dev);
 
 #endif /* !PCI_H */

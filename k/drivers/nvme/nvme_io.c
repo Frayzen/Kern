@@ -1,4 +1,5 @@
 #include "nvme_io.h"
+#include "memalloc/memalloc.h"
 #include "nvme.h"
 #include "k/types.h"
 #include <stdio.h>
@@ -8,22 +9,6 @@ void *get_queue_ptr(struct nvme_queue *q)
 {
 	return (void *)(q->address +
 			sizeof(struct submission_q_entry) * *q->door_bell);
-}
-
-struct submission_q_entry create_io_command(struct nvme_device *dev, u8 opcode,
-					    u8 nsid, void *data, u64 lba,
-					    u16 num_blocks)
-{
-	struct submission_q_entry command_entry = {};
-	command_entry.cmd.opcode = opcode;
-	command_entry.nsid = nsid;
-	command_entry.prp1 = (u32)data;
-	command_entry.prp2 = 0;
-	command_entry.cmd.command_id = dev->next_command_id++;
-	command_entry.command_specific[0] = (u32)lba;
-	command_entry.command_specific[1] = (u32)((u64)lba >> 32);
-	command_entry.command_specific[2] = (u16)(num_blocks - 1);
-	return command_entry;
 }
 
 void nvme_send_command(struct nvme_device *device,
@@ -60,27 +45,27 @@ void nvme_send_command(struct nvme_device *device,
 		*compl_queue->door_bell = 0;
 }
 
-/* // 0 if everything is fine */
-/* int nvme_read(struct nvme_device *device, u64 lba, u32 sector_count, */
-/* 	      void *buffer) */
-/* { */
-/* 	struct nvme_command_entry command = create_io_command( */
-/* 		device, 0x02, nsid, buffer, lba, sector_count); */
-/* 	if (!nvme_send_command(device, &command)) */
-/* 		return 0; */
-/*   CHECK_FATAL_STATUS(device); */
-/*   printf("PTR IS 0x%x\n", get_comp_head(device)); */
-/* 	while (!nvme_rcv_command(device)) { */
-/* 	} // Wait for completion */
-/* 	return 1; */
-/* } */
+int nvme_read(struct nvme_device *dev, u64 lba, u32 sector_count, void *buffer)
+{
+	struct submission_q_entry cmd = {};
 
-/* int nvme_write(struct nvme_device *device, u64 lba, u32 sector_count, */
-/* 	       void *buffer) */
-/* { */
-/* 	struct nvme_command_entry command = create_io_command( */
-/* 		device, 0x01, nsid, buffer, lba, sector_count); */
-/* 	if (!nvme_send_command(device, &command)) */
-/* 		return 0; */
-/* 	return 1; */
-/* } */
+	cmd.cmd.opcode = 0x2;
+	cmd.command_specific[0] = (u32)lba;
+	cmd.command_specific[1] = (u32)(lba >> 32);
+  cmd.command_specific[2] = sector_count;
+  cmd.prp1 = (u32) buffer;
+  cmd.prp2 = (u32) buffer + PAGE_SIZE;
+
+	cmd.cmd.command_id = dev->next_command_id++;
+	nvme_send_command(dev, &cmd, 0);
+	return 1;
+}
+
+int nvme_write(struct nvme_device *device, u64 lba, u32 sector_count,
+	       void *buffer)
+{
+	struct submission_q_entry cmd =
+		create_io_command(device, 0x01, 0, buffer, lba, sector_count);
+	nvme_send_command(device, &cmd, 0);
+	return 1;
+}

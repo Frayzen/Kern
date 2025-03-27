@@ -13,4 +13,9 @@ struct submission_q_entry create_io_command(struct nvme_device *dev, u8 opcode,
 void nvme_send_command(struct nvme_device *device,
 		       struct submission_q_entry *cmd, u8 is_admin);
 
+int nvme_write(struct nvme_device *device, u64 lba, u32 sector_count,
+	       void *buffer);
+int nvme_read(struct nvme_device *device, u64 lba, u32 sector_count,
+	      void *buffer);
+
 #endif /* !NVME_IO_H */

@@ -1,5 +1,6 @@
 #include "nvme.h"
 #include "drivers/nvme/nvme_admin.h"
+#include "drivers/nvme/nvme_io.h"
 #include "drivers/pci/cap.h"
 #include "drivers/pci/pci.h"
 #include "assert.h"
@@ -53,15 +54,6 @@ void get_version(struct nvme_device *device, u16 *major, u16 *minor, u16 *patch)
 	*major = version >> 16;
 	*minor = (version & 0xFFFF) >> 8;
 	*patch = version & 0xFF;
-}
-
-void print_chead(struct nvme_queue *q)
-{
-	char *c = (char *)q->address;
-	printf("START IS %p\n", c);
-	for (u32 i = 0; i < sizeof(struct completion_q_entry); i++) {
-		printf("Byte %d : 0x%x\n", i, c[i]);
-	}
 }
 
 void reset_controller(struct nvme_device* dev)
@@ -129,14 +121,12 @@ void nvme_init(void)
 
 		printf("Creating IO queues !\n");
 		assert(create_io_completion_queue(&device));
-		print_chead(&device.adm_cmpl_q);
 		assert(create_io_submission_queue(&device));
-		print_chead(&device.adm_cmpl_q);
 		printf("IO queues created\n");
 
-		/* char *buffer = mmap(); */
-		/* printf("READING ...\n"); */
-		/* assert(*nvme_reg(&device, 5, 1, buffer)); */
+		char *buffer = mmap();
+		printf("READING ...\n");
+		nvme_read(&device, 5, 1, buffer);
 
 		printf("NVME SETUP DONE\n");
 	} else

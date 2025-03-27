@@ -23,7 +23,6 @@ int create_io_submission_queue(struct nvme_device *dev)
 		return 0;
 	dev->io_subm_q.size = QUEUE_SIZE - 1;
 	dev->io_subm_q.door_bell = nvme_subm_doorbell(dev, 1);
-	*dev->io_subm_q.door_bell = 0;
 
 	// Create command
 	struct submission_q_entry cmd = {};
@@ -41,7 +40,7 @@ int create_io_submission_queue(struct nvme_device *dev)
 	cmd.cmd.command_id = dev->next_command_id++;
 
 	// Send commmand
-	nvme_send_command(dev, &cmd, 1);
+	/* nvme_send_command(dev, &cmd, 1); */
 	return 1;
 }
 
@@ -53,7 +52,6 @@ int create_io_completion_queue(struct nvme_device *dev)
 		return 0;
 	dev->io_cmpl_q.size = QUEUE_SIZE - 1;
 	dev->io_cmpl_q.door_bell = nvme_cmpl_doorbell(dev, 1);
-	*dev->io_cmpl_q.door_bell = 0;
 
 	struct submission_q_entry cmd = {};
 	cmd.cmd.opcode = OPCODE_IO_COMPLETION_QUEUE_CREATE;
@@ -64,16 +62,15 @@ int create_io_completion_queue(struct nvme_device *dev)
 	// dword10
 	u16 queue_id = 1;
 	u16 queue_size = dev->io_cmpl_q.size - 1;
-	cmd.command_specific[0] = (queue_size << 16) + queue_id;
+	cmd.command_specific[0] = (queue_size << 16) | queue_id;
 
 	// dword11
 	u16 flags = FLAG_CONTIGUOUS_QUEUE | FLAG_ENABLE_INTS;
-	u16 interrupt_vector = 1;
-	cmd.command_specific[1] = ((u16)interrupt_vector << 16) + flags;
+	cmd.command_specific[1] = (queue_id << 16) | flags;
 
 	cmd.cmd.command_id = dev->next_command_id++;
 
-	nvme_send_command(dev, &cmd, 1);
+	/* nvme_send_command(dev, &cmd, 1); */
 	return 1;
 }
 

@@ -79,7 +79,7 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	/* setup_fs(); */
 	/* test_file(); */
 
-  init_nvme();
+  nvme_init();
 
 	for (unsigned i = 0;;) {
 		int c = get_last_key();

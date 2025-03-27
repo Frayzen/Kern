@@ -64,6 +64,28 @@ void print_chead(struct nvme_queue *q)
 	}
 }
 
+void reset_controller(struct nvme_device* dev)
+{
+
+		printf("Resetting controller\n");
+    volatile struct nvme_controller_command* cc = (volatile void*) nvme_reg(dev, NVME_CC);
+    cc->enable = 0;
+		while (*nvme_reg(dev, NVME_CST) & 0x1) // check for 1 bit
+			;
+
+		printf("Creating admin queues !\n");
+		assert(create_admin_completion_queue(dev));
+		assert(create_admin_submission_queue(dev));
+		printf("Admin queue creaed\n");
+
+		printf("Enabling controller\n");
+
+    cc->io_subm_q_entry_size = QUEUE_SIZE_POW & 0xF;
+    cc->io_compl_q_entry_size = QUEUE_SIZE_POW & 0xF;
+    cc->enable = 1;
+		CHECK_FATAL_STATUS(dev);
+}
+
 void nvme_init(void)
 {
 	struct nvme_device device = {};
@@ -103,23 +125,7 @@ void nvme_init(void)
 		/* printf("Max queue entries supported (MQES): %d\n", */
 		/*        nvme_read_reg(&device, NVME_CAP) & 0xFFFF); */
 
-		printf("Resetting controller\n");
-		*nvme_reg(&device, NVME_CC) &= ~(0x1);
-		while (*nvme_reg(&device, NVME_CST) & 0x1) // check for 1 bit
-			;
-
-		printf("Creating admin queues !\n");
-		assert(create_admin_completion_queue(&device));
-		assert(create_admin_submission_queue(&device));
-		printf("Admin queue creaed\n");
-
-		printf("Enabling controller\n");
-		u32 cc = 0;
-		cc |= 1; // Enable device
-		cc |= ((QUEUE_SIZE_POW) & 0xF) << 20; // IOCQES
-		cc |= ((QUEUE_SIZE_POW) & 0xF) << 16; // IOSQES
-		*nvme_reg(&device, NVME_CC) = cc;
-		CHECK_FATAL_STATUS(&device);
+    reset_controller(&device);
 
 		printf("Creating IO queues !\n");
 		assert(create_io_completion_queue(&device));

@@ -109,7 +109,7 @@ void nvme_init(void)
 
 		char *buffer = (char *)mmap();
 		printf("READING ...\n");
-		nvme_read(&device, 5, 1, buffer);
+		nvme_read(&device, 1, 1, buffer);
 		printf("READ:\n");
 		for (int i = 0; i < 10; i++) {
 			printf("%c ", buffer[i]);

@@ -36,7 +36,8 @@ u32 pci_readl(u8 bus, u8 slot, u8 func, u8 offset)
 
 u16 pci_readw(u8 bus, u8 slot, u8 func, u8 offset)
 {
-  return pci_readl(bus, slot, func, offset) & 0xFFFF;
+  set_addr(bus, slot, func, offset);
+	return (u16)((inl(0xCFC) >> ((offset & 2) * 8)) & 0xFFFF);
 }
 
 void pci_writel(u8 bus, u8 slot, u8 func, u8 offset, u32 val)

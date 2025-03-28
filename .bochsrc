@@ -6,7 +6,7 @@ clock: sync=realtime
 log: IOR = off
 
 # start a GDB server
-gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0
+# gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0
 
 # configure the disk drive
 ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14

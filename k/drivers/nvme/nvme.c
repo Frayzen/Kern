@@ -5,6 +5,7 @@
 #include "drivers/pci/pci.h"
 #include "assert.h"
 #include "k/types.h"
+#include "memalloc/memalloc.h"
 #include <stdio.h>
 
 volatile u32 *nvme_reg(struct nvme_device *dev, u32 offset)
@@ -46,8 +47,8 @@ void reset_controller(struct nvme_device *dev)
 
 	printf("Enabling controller\n");
 
-	cc.io_subm_q_entry_size = QUEUE_SIZE_POW & 0xF;
-	cc.io_compl_q_entry_size = QUEUE_SIZE_POW & 0xF;
+	cc.io_subm_q_entry_size = SUBM_Q_SIZE_POW & 0xF;
+	cc.io_compl_q_entry_size = COMPL_Q_SIZE_POW & 0xF;
 	cc.mem_page_size = 0;
 	cc.enable = 1;
 	*nvme_reg(dev, NVME_CC) = *ccptr;
@@ -98,18 +99,21 @@ void nvme_init(void)
 
 		reset_controller(&device);
 
-    printf("Identify...\n");
-    assert(nvme_identify(&device));
-    printf("[DONE]\n");
-
+		printf("Identify...\n");
+		assert(nvme_identify(&device));
+		printf("[DONE]\n");
 
 		printf("Creating IO queues !\n");
 		assert(create_io_completion_queue(&device));
 		assert(create_io_submission_queue(&device));
 
-		/* char *buffer = mmap(); */
-		/* printf("READING ...\n"); */
-		/* nvme_read(&device, 5, 1, buffer); */
+		char *buffer = (char *)mmap();
+		printf("READING ...\n");
+		nvme_read(&device, 5, 1, buffer);
+		printf("READ:\n");
+		for (int i = 0; i < 10; i++) {
+			printf("%c ", buffer[i]);
+		}
 
 		printf("NVME SETUP DONE\n");
 	} else

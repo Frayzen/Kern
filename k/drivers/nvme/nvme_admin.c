@@ -20,7 +20,7 @@ int create_io_submission_queue(struct nvme_device *dev)
 	dev->io_subm_q.address = (u64)mmap();
 	if (dev->io_subm_q.address == 0)
 		return 0;
-	dev->io_subm_q.size = QUEUE_SIZE - 1;
+	dev->io_subm_q.size = SUBM_Q_SIZE - 1;
 	dev->io_subm_q.door_bell = nvme_subm_doorbell(dev, 1);
 
 	// Create command
@@ -29,13 +29,13 @@ int create_io_submission_queue(struct nvme_device *dev)
 	// dword 6-7 = base address
 	cmd.prp1 = dev->io_subm_q.address;
 	// dword10
-	u8 queue_id = 1;
-	u8 queue_size = dev->io_subm_q.size - 1;
-	cmd.command_specific[0] = ((u16)queue_size << 8) + queue_id;
+	u16 queue_id = 1;
+	u32 queue_size = dev->io_subm_q.size;
+	cmd.command_specific[0] = ((u16)queue_size << 16) | queue_id;
 	// dword11
-	u8 flags = FLAG_CONTIGUOUS_QUEUE;
-	u8 completion_id = 1;
-	cmd.command_specific[1] = ((u16)completion_id << 8) + flags;
+	u16 flags = FLAG_CONTIGUOUS_QUEUE;
+	u32 completion_id = 1;
+	cmd.command_specific[1] = ((u16)completion_id << 16) | flags;
 	cmd.cmd.command_id = dev->next_command_id++;
 
 	// Send commmand
@@ -49,7 +49,7 @@ int create_io_completion_queue(struct nvme_device *dev)
 	dev->io_cmpl_q.address = (u64)mmap();
 	if (dev->io_cmpl_q.address == 0)
 		return 0;
-	dev->io_cmpl_q.size = QUEUE_SIZE - 1;
+	dev->io_cmpl_q.size = COMPL_Q_SIZE - 1;
 	dev->io_cmpl_q.door_bell = nvme_cmpl_doorbell(dev, 1);
 
 	struct submission_q_entry cmd = {};
@@ -60,12 +60,13 @@ int create_io_completion_queue(struct nvme_device *dev)
 
 	// dword10
 	u16 queue_id = 1;
-	u16 queue_size = dev->io_cmpl_q.size - 1;
+	u32 queue_size = dev->io_cmpl_q.size;
 	cmd.command_specific[0] = (queue_size << 16) | queue_id;
 
 	// dword11
-	u16 flags = FLAG_CONTIGUOUS_QUEUE | FLAG_ENABLE_INTS;
-	cmd.command_specific[1] = (queue_id << 16) | flags;
+  u16 vector = 0;
+	u32 flags = FLAG_CONTIGUOUS_QUEUE | FLAG_ENABLE_INTS;
+	cmd.command_specific[1] = (vector << 16) | flags;
 
 	cmd.cmd.command_id = dev->next_command_id++;
 
@@ -79,7 +80,7 @@ int create_admin_submission_queue(struct nvme_device *dev)
 	dev->adm_subm_q.address = (u64)mmap();
 	if (dev->adm_subm_q.address == 0)
 		return 0;
-	dev->adm_subm_q.size = QUEUE_SIZE - 1;
+	dev->adm_subm_q.size = SUBM_Q_SIZE - 1;
 	dev->adm_subm_q.door_bell = nvme_subm_doorbell(dev, 0);
 	// Write to the register
 	*nvme_reg(dev, NVME_ASQ) = dev->adm_subm_q.address;
@@ -93,7 +94,7 @@ int create_admin_completion_queue(struct nvme_device *dev)
 	dev->adm_cmpl_q.address = (u64)mmap();
 	if (dev->adm_cmpl_q.address == 0)
 		return 0;
-	dev->adm_cmpl_q.size = QUEUE_SIZE - 1;
+	dev->adm_cmpl_q.size = COMPL_Q_SIZE - 1;
 	dev->adm_cmpl_q.door_bell = nvme_cmpl_doorbell(dev, 0);
 	// Write to the register
 	*nvme_reg(dev, NVME_ACQ) = dev->adm_cmpl_q.address;

@@ -30,15 +30,16 @@ void nvme_send_command(struct nvme_device *device,
 	CHECK_FATAL_STATUS(device);
 
 	printf("Command 0x%x sent correctly\n", cmd->cmd.command_id);
-	printf("Checking 0x%x\n", compl_head);
 	while (!compl_head->phase_bit)
 		continue;
-	printf("Command %d happened correctly\n", cmd->cmd.command_id);
+	if (compl_head->status != 0)
+		printf("Error while processing command\n");
+	else
+		printf("Command %d happened correctly\n", cmd->cmd.command_id);
 
 	// Completion aknowledged, reset the bit
 	compl_head->phase_bit = 0;
-	printf("Got status 0x%x\n", compl_head->status);
-	assert(compl_head->status == 0);
+	/* assert(compl_head->status == 0); */
 
 	*compl_queue->door_bell = ++(compl_queue->ptr);
 	if (compl_queue->ptr == 0)

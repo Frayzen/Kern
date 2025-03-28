@@ -94,8 +94,11 @@ struct completion_q_entry {
 	u16 status : 15; // 0 on sucess
 };
 
-#define QUEUE_SIZE_POW 7
-#define QUEUE_SIZE (1 << QUEUE_SIZE_POW)
+#define COMPL_Q_SIZE_POW 4
+#define COMPL_Q_SIZE (1 << COMPL_Q_SIZE_POW)
+
+#define SUBM_Q_SIZE_POW 6
+#define SUBM_Q_SIZE (1 << SUBM_Q_SIZE_POW)
 
 #define NVME_CLASS_CODE 0x1
 #define NVME_SUBCLASS 0x8

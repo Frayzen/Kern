@@ -15,5 +15,5 @@ gdtFlush:
     pushl $KERN_CODE_SEG /* push the new segment selector */
     pushl $1f /* push %eip on the stack */
     lret /* far return */
-1:       /* After the lret you will get here, with cs set to 0x42 */
+1:       /* After the lret you will get here, with cs set to 0x8 */
     ret

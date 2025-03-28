@@ -2,14 +2,13 @@
 #include "drivers/nvme/nvme.h"
 #include "drivers/nvme/nvme_io.h"
 #include "memalloc/memalloc.h"
-#include <stdio.h>
 
-volatile u32 *nvme_cmpl_doorbell(struct nvme_device *dev, u32 queue_id)
+volatile u32 *nvme_subm_doorbell(struct nvme_device *dev, u32 queue_id)
 {
 	return nvme_reg(
 		dev, 0x1000 + (2 * queue_id * (4 << dev->capability_stride)));
 }
-volatile u32 *nvme_subm_doorbell(struct nvme_device *dev, u32 queue_id)
+volatile u32 *nvme_cmpl_doorbell(struct nvme_device *dev, u32 queue_id)
 {
 	return nvme_reg(dev, 0x1000 + ((2 * queue_id + 1) *
 				       (4 << dev->capability_stride)));
@@ -40,7 +39,7 @@ int create_io_submission_queue(struct nvme_device *dev)
 	cmd.cmd.command_id = dev->next_command_id++;
 
 	// Send commmand
-	/* nvme_send_command(dev, &cmd, 1); */
+	nvme_send_command(dev, &cmd, 1);
 	return 1;
 }
 
@@ -70,7 +69,7 @@ int create_io_completion_queue(struct nvme_device *dev)
 
 	cmd.cmd.command_id = dev->next_command_id++;
 
-	/* nvme_send_command(dev, &cmd, 1); */
+	nvme_send_command(dev, &cmd, 1);
 	return 1;
 }
 
@@ -82,7 +81,6 @@ int create_admin_submission_queue(struct nvme_device *dev)
 		return 0;
 	dev->adm_subm_q.size = QUEUE_SIZE - 1;
 	dev->adm_subm_q.door_bell = nvme_subm_doorbell(dev, 0);
-	*dev->adm_subm_q.door_bell = 0;
 	// Write to the register
 	*nvme_reg(dev, NVME_ASQ) = dev->adm_subm_q.address;
 	CHECK_FATAL_STATUS(dev);
@@ -93,12 +91,10 @@ int create_admin_completion_queue(struct nvme_device *dev)
 {
 	// Create queue
 	dev->adm_cmpl_q.address = (u64)mmap();
-	printf("ADMIN COMP IS %x\n", dev->adm_cmpl_q.address);
 	if (dev->adm_cmpl_q.address == 0)
 		return 0;
 	dev->adm_cmpl_q.size = QUEUE_SIZE - 1;
-	dev->adm_subm_q.door_bell = nvme_cmpl_doorbell(dev, 0);
-	*dev->adm_subm_q.door_bell = 0;
+	dev->adm_cmpl_q.door_bell = nvme_cmpl_doorbell(dev, 0);
 	// Write to the register
 	*nvme_reg(dev, NVME_ACQ) = dev->adm_cmpl_q.address;
 	return 1;

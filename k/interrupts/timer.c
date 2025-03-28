@@ -1,6 +1,7 @@
 #include "timer.h"
 #include "io.h"
 #include "serial.h"
+#include <stdio.h>
 
 #define PIT_REG_COUNTER_0 0x40
 #define PIT_REG_COUNTER_1 0x41
@@ -33,7 +34,7 @@ void set_pit_count(unsigned count)
 
 void setup_timer(void)
 {
-    println("Setting up timer...");
+	println("Setting up timer...");
 	/*
      * Bits         Usage
      * 6 and 7      Select channel :
@@ -59,20 +60,32 @@ void setup_timer(void)
      */
 	outb(PIT_REG_CONTROL, 0b110100);
 	set_pit_count(RELOAD_VALUE);
-    println("Timer set up");
+	println("Timer set up");
 }
 
+static unsigned long ticks = 0;
 static unsigned long timer_counter = 0;
 
 // Should be called every 100 ticks
 void timer_interrupt(void)
 {
-    timer_counter++;
-    if (timer_counter % 100 == 0)
-        println("Tick");
+	timer_counter++;
+	if (timer_counter % 100 == 0) {
+		println("Tick");
+		ticks++;
+	}
 }
 
 unsigned long get_tick(void)
 {
-    return timer_counter;
+	return timer_counter;
+}
+
+void wait(unsigned long tick)
+{
+	unsigned long target = ticks + tick;
+	while (ticks != target) {
+		continue;
+	}
+	return;
 }

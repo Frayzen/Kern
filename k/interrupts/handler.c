@@ -7,7 +7,9 @@
 #include "serial.h"
 #include "stdio.h"
 
-unsigned int syscall_handler(stack *s)
+int int_count = 0;
+
+unsigned int syscall_handler(struct stack *s)
 {
 	switch (s->eax) {
 	case SYSCALL_GETKEY:
@@ -32,6 +34,9 @@ void handle_irq(unsigned int irq)
 	case IRQ_FLOPPY_DISK_CONTROLLER:
 		printf("Disk IRQ received\n");
 		break;
+  case IRQ_GENERIC_HARD_DISK:
+		printf("General hard disk IRQ\n");
+    return;
 	default:
 		print("Unhandled IRQ");
 		printf("%d", irq - IRQ_MASTER_OFFSET);
@@ -42,18 +47,29 @@ void handle_irq(unsigned int irq)
 	send_eoi(irq);
 }
 
-unsigned int interrupt_handler(stack *s)
+unsigned int interrupt_handler(struct stack *s)
 {
+  int_count++;
 	if (s->int_no >= IRQ_MASTER_OFFSET &&
 	    s->int_no <= IRQ_MASTER_OFFSET + IRQ_LIMIT) {
 		handle_irq(s->int_no);
 		return 0;
 	}
-	if (s->int_no == 128) {
+	if (s->int_no == ISR_CUSTOM_SYSCALL) {
 		/* Custom Syscall */
 		println("Custom Syscall");
 		return syscall_handler(s);
 	}
+	if (s->int_no == ISR_GENERAL_PROTECTION_FAULT) {
+		printf("======== KERNEL PANIC ========\n", s->int_no);
+		printf("General protection fault ! (on 0x%x)\n");
+    print_stack(s);
+		printf("System halted.\n");
+		printf("======== KERNEL PANIC ========\n", s->int_no);
+		while (1)
+			continue;
+	}
+
 	switch (s->int_no) {
 #define X(id, key, name, errcode)                                        \
 	case id:                                                         \
@@ -67,7 +83,7 @@ unsigned int interrupt_handler(stack *s)
 		print("Unknown interrupt (");
 		printf("%d", s->int_no);
 		println(")");
-		/* asm volatile("hlt"); */
+		asm volatile("hlt");
 		break;
 	}
 	return 0;

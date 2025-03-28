@@ -5,7 +5,6 @@
 #include "drivers/pci/pci.h"
 #include "assert.h"
 #include "k/types.h"
-#include "memalloc/memalloc.h"
 #include <stdio.h>
 
 volatile u32 *nvme_reg(struct nvme_device *dev, u32 offset)
@@ -20,33 +19,6 @@ void nvme_wait_status_ready(struct nvme_device *dev)
 		;
 }
 
-static u32 nsid = 0;
-
-/* // 0 if everything is fine */
-/* int nvme_read(struct nvme_device *device, u64 lba, u32 sector_count, */
-/* 	      void *buffer) */
-/* { */
-/* 	struct nvme_command_entry command = create_io_command( */
-/* 		device, 0x02, nsid, buffer, lba, sector_count); */
-/* 	if (!nvme_send_command(device, &command)) */
-/* 		return 0; */
-/*   CHECK_FATAL_STATUS(device); */
-/*   printf("PTR IS 0x%x\n", get_comp_head(device)); */
-/* 	while (!nvme_rcv_command(device)) { */
-/* 	} // Wait for completion */
-/* 	return 1; */
-/* } */
-
-/* int nvme_write(struct nvme_device *device, u64 lba, u32 sector_count, */
-/* 	       void *buffer) */
-/* { */
-/* 	struct nvme_command_entry command = create_io_command( */
-/* 		device, 0x01, nsid, buffer, lba, sector_count); */
-/* 	if (!nvme_send_command(device, &command)) */
-/* 		return 0; */
-/* 	return 1; */
-/* } */
-
 void get_version(struct nvme_device *device, u16 *major, u16 *minor, u16 *patch)
 {
 	u32 version = *nvme_reg(device, NVME_VS);
@@ -56,39 +28,44 @@ void get_version(struct nvme_device *device, u16 *major, u16 *minor, u16 *patch)
 	*patch = version & 0xFF;
 }
 
-void reset_controller(struct nvme_device* dev)
+void reset_controller(struct nvme_device *dev)
 {
+	printf("Resetting controller\n");
+	struct nvme_controller_command cc = {};
+	u32 *ccptr = (u32 *)&cc;
+	*ccptr = *nvme_reg(dev, NVME_CC);
 
-		printf("Resetting controller\n");
-    volatile struct nvme_controller_command* cc = (volatile void*) nvme_reg(dev, NVME_CC);
-    cc->enable = 0;
-		while (*nvme_reg(dev, NVME_CST) & 0x1) // check for 1 bit
-			;
+	cc.enable = 0;
+	*nvme_reg(dev, NVME_CC) = *ccptr;
+	while (*nvme_reg(dev, NVME_CST) & 0x1) // check for 1 bit
+		;
+	printf("Creating admin queues !\n");
+	assert(create_admin_completion_queue(dev));
+	assert(create_admin_submission_queue(dev));
+	printf("Admin queue creaed\n");
 
-		printf("Creating admin queues !\n");
-		assert(create_admin_completion_queue(dev));
-		assert(create_admin_submission_queue(dev));
-		printf("Admin queue creaed\n");
+	printf("Enabling controller\n");
 
-		printf("Enabling controller\n");
-
-    cc->io_subm_q_entry_size = QUEUE_SIZE_POW & 0xF;
-    cc->io_compl_q_entry_size = QUEUE_SIZE_POW & 0xF;
-    cc->enable = 1;
-		CHECK_FATAL_STATUS(dev);
+	cc.io_subm_q_entry_size = QUEUE_SIZE_POW & 0xF;
+	cc.io_compl_q_entry_size = QUEUE_SIZE_POW & 0xF;
+	cc.mem_page_size = 0;
+	cc.enable = 1;
+	*nvme_reg(dev, NVME_CC) = *ccptr;
+	nvme_wait_status_ready(dev);
+	CHECK_FATAL_STATUS(dev);
 }
 
 void nvme_init(void)
 {
-	struct nvme_device device = {};
+	static struct nvme_device device = {};
 	if (look_for_device(NVME_CLASS_CODE, NVME_SUBCLASS, &device.pci)) {
 		printf("FOUND NVME AT %d %d with HEADER TYPE %d\n",
 		       device.pci.bus, device.pci.slot, device.pci.headerType);
 		assert(device.pci.headerType == 0x0);
 
-		enable_interrupts(&device.pci);
-		enable_bus_master(&device.pci);
-		enable_mem_space(&device.pci);
+		/* enable_interrupts(&device.pci); */
+		/* enable_bus_master(&device.pci); */
+		/* enable_mem_space(&device.pci); */
 
 		volatile u32 bar1 =
 			(volatile u32)get_bar(&device.pci, PCI_BAR1);
@@ -99,34 +76,40 @@ void nvme_init(void)
 
 		u16 major, minor, patch;
 		get_version(&device, &major, &minor, &patch);
-		printf("Nvme version is %d.%d.%d\n", major, minor, patch);
 
-		if (device.pci.capabilities.msi_cap_offset)
-			enable_msi(&device.pci);
-		if (device.pci.capabilities.msix_cap_offset)
-			enable_msix(&device.pci);
+		/* if (device.pci.capabilities.msi_cap_offset) */
+		/* 	enable_msi(&device.pci); */
+		/* if (device.pci.capabilities.msix_cap_offset) */
+		/* 	enable_msix(&device.pci); */
+
 		// unmask the interrupts for all completion queues
-		*nvme_reg(&device, NVME_INTMC) = 0xFFFFFFFF;
+		/* *nvme_reg(&device, NVME_INTMC) = 0xFFFFFFFF; */
+
+		// mask the interrupts for all completion queues
+		*nvme_reg(&device, NVME_INTMS) = 0xFFFFFFFF;
 
 		device.capability_stride =
 			(*nvme_reg(&device, NVME_CAP + 0x4)) & 0xF;
 		assert(device.capability_stride ==
 		       ((device.base_addr >> 12) & 0xF));
-		printf("Capability stride is %d\n", device.capability_stride);
 
 		/* printf("Max queue entries supported (MQES): %d\n", */
 		/*        nvme_read_reg(&device, NVME_CAP) & 0xFFFF); */
 
-    reset_controller(&device);
+		reset_controller(&device);
+
+    printf("Identify...\n");
+    assert(nvme_identify(&device));
+    printf("[DONE]\n");
+
 
 		printf("Creating IO queues !\n");
 		assert(create_io_completion_queue(&device));
 		assert(create_io_submission_queue(&device));
-		printf("IO queues created\n");
 
-		char *buffer = mmap();
-		printf("READING ...\n");
-		nvme_read(&device, 5, 1, buffer);
+		/* char *buffer = mmap(); */
+		/* printf("READING ...\n"); */
+		/* nvme_read(&device, 5, 1, buffer); */
 
 		printf("NVME SETUP DONE\n");
 	} else

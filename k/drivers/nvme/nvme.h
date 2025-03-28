@@ -9,6 +9,7 @@ struct nvme_queue {
   u32 queue_id;
 	u64 address;
 	u64 size;
+	u64 ptr; // head or tail
 	volatile u32 *door_bell;
 } __packed;
 
@@ -63,6 +64,7 @@ struct command_dword {
 	u16 command_id; // This is put in the completion queue entry
 } __packed;
 
+// 64 bytes ()
 struct submission_q_entry {
 	// DWORD 0
 	struct command_dword cmd;

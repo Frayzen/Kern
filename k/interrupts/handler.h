@@ -3,20 +3,27 @@
 
 #include "k/compiler.h"
 #include "isr_list.h"
+#include "k/types.h"
 
-#define X(id, key, name, errcode) \
-  const int IRQ_##key = id;
-IRQ_LIST
-ISR_LIST
+enum interrupts {
+#define X(id, key, name, errcode) IRQ_##key = id,
+	IRQ_LIST
 #undef X
+#define X(id, key, name, errcode) ISR_##key = id,
+		ISR_LIST
+#undef X
+};
 
-typedef struct {
-	unsigned int cr2, ds, edi, esi : 32;
-	unsigned int ebp, esp, ebx, edx, ecx, eax : 32;
-	unsigned int int_no, err_code : 32;
-	unsigned int eip, csm, eflags, useresp, ss : 32;
-} __packed stack;
+struct stack {
+	u32 cr2, ds, edi, esi;
+	u32 ebp, esp, ebx, edx, ecx, eax;
+	u32 int_no, err_code;
+	u32 eip, csm, eflags, useresp, ss;
+} __packed;
 
-unsigned int interrupt_handler(stack *s);
+void print_stack(struct stack* s);
+unsigned int interrupt_handler(struct stack *s);
+
+extern int int_count;
 
 #endif /* !HANDLER_H */

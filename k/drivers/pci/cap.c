@@ -42,8 +42,8 @@ void enable_msix(struct pci_device *device)
 	cap.enable = 1;
 	pci_config_write(device->bus, device->slot, 0, offset, msi_reg_1);
 
-	const u32 msi_reg_2 = pci_config_read_lower(device->bus, device->slot,
-						    0, offset + 0x4);
+	const u32 msi_reg_2 =
+		pci_config_read(device->bus, device->slot, 0, offset + 0x4);
 	u32 table_offset = msi_reg_2 & (~0x7);
 	u8 bir = msi_reg_2 & 0x7;
 	u8 bar = PCI_BAR0 + 8 * bir;
@@ -52,7 +52,7 @@ void enable_msix(struct pci_device *device)
 	volatile u32 bar_val = (volatile u32)get_bar(device, bar);
 	volatile struct MSIX_vector_table *table_ptr =
 		(volatile struct MSIX_vector_table *)(bar_val + table_offset);
-  #define APIC_BASE_MSI_ADDRESS   0xFEE00000
+#define APIC_BASE_MSI_ADDRESS 0xFEE00000
 
 	table_ptr[0].masked = 0;
 	table_ptr[0].msg_addr = APIC_BASE_MSI_ADDRESS & ~0x1;
@@ -74,10 +74,9 @@ void check_capacities(struct pci_device *device)
 {
 	if (device->status & PCI_STATUS_CAPABILITY_LIST_FLAG) {
 		// check MSI capability
-		u8 cap_offset =
-			(pci_config_read_lower(device->bus, device->slot, 0,
-					       CAP_REG) &
-			 0xFF);
+		u8 cap_offset = (pci_config_read(device->bus, device->slot, 0,
+						 CAP_REG) &
+				 0xFF);
 		recurse_check(device, cap_offset);
 	}
 }

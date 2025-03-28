@@ -25,6 +25,7 @@
 #include "drivers/pci/pci.h"
 #include "fs/fs.h"
 #include "gdt/gdt.h"
+#include "interrupts/handler.h"
 #include "interrupts/ints.h"
 #include "interrupts/keyboard.h"
 #include "memalloc/memalloc.h"

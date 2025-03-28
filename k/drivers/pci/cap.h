@@ -5,7 +5,6 @@
 #include "k/types.h"
 
 struct pci_device;
-
 struct pci_capabilites {
 	u8 msi_cap_offset;
 	u8 msix_cap_offset;

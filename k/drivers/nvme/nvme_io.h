@@ -18,4 +18,6 @@ int nvme_write(struct nvme_device *device, u64 lba, u32 sector_count,
 int nvme_read(struct nvme_device *device, u64 lba, u32 sector_count,
 	      void *buffer);
 
+int nvme_identify(struct nvme_device *device);
+
 #endif /* !NVME_IO_H */

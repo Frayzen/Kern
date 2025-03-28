@@ -31,6 +31,8 @@ fi
 qemu-system-i386 -drive id=cdrom,if=ide,media=cdrom,readonly=on,file=k.iso \
   -drive file=disk.img,if=none,id=nvme0,format=raw \
   -device nvme,drive=nvme0,serial=1234,addr=0x5 \
-  -trace enable="nvme_*",file=out \
-  -serial stdio -s -S
+  -serial stdio -s -S \
+  -trace enable="*nvme*",file=out_nvme \
+  # -d int,cpu_reset -D qemu.log \
+
 wait

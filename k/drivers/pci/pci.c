@@ -7,51 +7,48 @@
 u32 get_bar(struct pci_device *dev, u16 bar)
 {
 	disable_io(dev);
-	u32 ret = (pci_config_read(dev->bus, dev->slot, 0, bar + 0x2) << 16) |
-		  pci_config_read(dev->bus, dev->slot, 0, bar);
+	u32 ret = (pcidev_readw(dev, bar + 0x2) << 16) |
+		  pcidev_readw(dev, bar);
 	enable_io(dev);
 	if (bar == PCI_BAR0)
 		ret &= 0xFFFFFFF0;
 	return ret;
 }
 
-// reads the 32 bits of the given register
-u16 pci_config_read(u8 bus, u8 slot, u8 func, u8 offset)
+static void set_addr(u8 bus, u8 slot, u8 func, u8 offset)
 {
 	u32 address = 0;
 	u32 lbus = (u32)bus;
 	u32 lslot = (u32)slot;
 	u32 lfunc = (u32)func;
-	u16 tmp = 0;
-
 	// Create configuration address as per Figure 1
 	address = (u32)((lbus << 16) | (lslot << 11) | (lfunc << 8) |
 			(offset & 0xFC) | ((u32)0x80000000));
-
 	// Write out the address
 	outl(0xCF8, address);
-	// Read in the data
-	// (offset & 2) * 8) = 0 will choose the first word of the 32-bit register
-	tmp = (u16)((inl(0xCFC) >> ((offset & 2) * 8)) & 0xFFFF);
-	return tmp;
 }
 
-// reads the 32 bits of the given register
-void pci_config_write(u8 bus, u8 slot, u8 func, u8 offset, u32 val)
+u32 pci_readl(u8 bus, u8 slot, u8 func, u8 offset)
 {
-	u32 address;
-	u32 lbus = (u32)bus;
-	u32 lslot = (u32)slot;
-	u32 lfunc = (u32)func;
+	set_addr(bus, slot, func, offset);
+	return inl(CONFIG_DATA);
+}
 
-	// Create configuration address as per Figure 1
-	address = (u32)((lbus << 16) | (lslot << 11) | (lfunc << 8) |
-			(offset & 0xFC) | ((u32)0x80000000));
-	// Write out the address
-	outl(CONFIG_ADDRESS, address);
-	// Read in the data
-	// (offset & 2) * 8) = 0 will choose the first word of the 32-bit register
+u16 pci_readw(u8 bus, u8 slot, u8 func, u8 offset)
+{
+  return pci_readl(bus, slot, func, offset) & 0xFFFF;
+}
+
+void pci_writel(u8 bus, u8 slot, u8 func, u8 offset, u32 val)
+{
+	set_addr(bus, slot, func, offset);
 	outl(CONFIG_DATA, val);
+}
+
+void pci_writew(u8 bus, u8 slot, u8 func, u8 offset, u16 val)
+{
+	set_addr(bus, slot, func, offset);
+	outw(CONFIG_DATA, val);
 }
 
 // returns non zero if updates the out value
@@ -60,9 +57,9 @@ int check_device(u8 bus, u8 slot, struct pci_device *out)
 	u16 vendor, device = 0;
 	/* Try and read the first configuration register. Since there are no
      * vendors that == 0xFFFF, it must be a non-existent device. */
-	if ((vendor = pci_config_read(bus, slot, 0, PCI_VENDOR_ID)) != 0xFFFF) {
-		device = pci_config_read(bus, slot, 0, PCI_DEV_ID);
-		u16 class = pci_config_read(bus, slot, 0, PCI_CLASSES);
+	if ((vendor = pci_readw(bus, slot, 0, PCI_VENDOR_ID))) {
+		device = pci_readw(bus, slot, 0, PCI_DEV_ID);
+		u16 class = pci_readw(bus, slot, 0, 0xA);
 
 		out->bus = bus;
 		out->slot = slot;
@@ -70,9 +67,9 @@ int check_device(u8 bus, u8 slot, struct pci_device *out)
 		out->deviceId = device;
 		out->classCode = class >> 8;
 		out->subClass = class & 0xFF;
-		out->headerType =
-			pci_config_read(bus, slot, 0, PCI_HEADER_TYPE) & 0xFF;
-		out->status = pci_config_read(bus, slot, 0, PCI_STATUS);
+		out->headerType = pci_readw(bus, slot, 0, PCI_HEADER_TYPE) &
+				  0xFF;
+		out->status = pci_readw(bus, slot, 0, PCI_STATUS);
 		check_capacities(out);
 		return 1;
 	}
@@ -114,21 +111,21 @@ COMMAND REGISTER BITS
 
 void enable_mem_space(struct pci_device *dev)
 {
-	u16 cur = pci_config_read(dev->bus, dev->slot, 0, PCI_COMMAND);
+	u16 cur = pcidev_readw(dev, PCI_COMMAND);
 	cur |= (1 << 1); // set the bit
-	pci_config_write(dev->bus, dev->slot, 0, PCI_COMMAND, cur);
+	pcidev_writew(dev, PCI_COMMAND, cur);
 }
 
 void enable_bus_master(struct pci_device *dev)
 {
-	u16 cur = pci_config_read(dev->bus, dev->slot, 0, PCI_COMMAND);
+	u16 cur = pcidev_readw(dev, PCI_COMMAND);
 	cur |= (1 << 2); // set the bit
-	pci_config_write(dev->bus, dev->slot, 0, PCI_COMMAND, cur);
+	pcidev_writew(dev, PCI_COMMAND, cur);
 }
 
 void enable_interrupts(struct pci_device *dev)
 {
-	u16 cur = pci_config_read(dev->bus, dev->slot, 0, PCI_COMMAND);
+	u16 cur = pcidev_readw(dev, PCI_COMMAND);
 	cur &= ~(1 << 10); // reset the bit
-	pci_config_write(dev->bus, dev->slot, 0, PCI_COMMAND, cur);
+	pcidev_writew(dev, PCI_COMMAND, cur);
 }

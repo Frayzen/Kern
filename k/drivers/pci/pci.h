@@ -1,7 +1,6 @@
 #ifndef PCI_H
 #define PCI_H
 
-
 /*
 Offset |Bits 31-24 | Bits 23-16  | Bits 15-8    | Bits 7-0 
 =============================================================
@@ -30,18 +29,18 @@ Offset |Bits 31-24 | Bits 23-16  | Bits 15-8    | Bits 7-0
 #define CONFIG_DATA 0xCFC
 
 struct pci_device {
-  u8 bus;
-  u8 slot;
-  u16 deviceId;
-  u16 vendorId;
-  u16 status;
-  // might add command
-  u8 classCode;
-  u8 subClass;
-  // ... 
-  u8 headerType;
-  // ...
-  struct pci_capabilites capabilities;
+	u8 bus;
+	u8 slot;
+	u16 deviceId;
+	u16 vendorId;
+	u16 status;
+	// might add command
+	u8 classCode;
+	u8 subClass;
+	// ...
+	u8 headerType;
+	// ...
+	struct pci_capabilites capabilities;
 } __packed;
 
 #define PCI_STATUS_CAPABILITY_LIST_FLAG (1 << 4)
@@ -49,16 +48,25 @@ struct pci_device {
 #define PCI_BAR0 0x10
 #define PCI_BAR1 0x14
 
-void pci_config_write(u8 bus, u8 slot, u8 func, u8 offset, u32 val);
+u32 pci_readl(u8 bus, u8 slot, u8 func, u8 offset);
+u16 pci_readw(u8 bus, u8 slot, u8 func, u8 offset);
+void pci_writel(u8 bus, u8 slot, u8 func, u8 offset, u32 val);
+void pci_writew(u8 bus, u8 slot, u8 func, u8 offset, u16 val);
 
-u16 pci_config_read(u8 bus, u8 slot, u8 func, u8 offset);
+#define pcidev_readl(Device, Offset) \
+	pci_readl((Device)->bus, (Device)->slot, 0, (Offset))
+#define pcidev_readw(Device, Offset) \
+	pci_readw((Device)->bus, (Device)->slot, 0, (Offset))
+
+#define pcidev_writel(Device, Offset, Val) \
+	pci_writel((Device)->bus, (Device)->slot, 0, (Offset), (Val))
+#define pcidev_writew(Device, Offset, Val) \
+	pci_writew((Device)->bus, (Device)->slot, 0, (Offset), (Val))
 
 u32 get_bar(struct pci_device *dev, u16 bar);
 
-
 // returns non zero if found, updates the out value accordingly
-int look_for_device(u8 classCode, u8 subClass, struct pci_device* out);
-
+int look_for_device(u8 classCode, u8 subClass, struct pci_device *out);
 
 void enable_mem_space(struct pci_device *dev);
 void enable_bus_master(struct pci_device *dev);

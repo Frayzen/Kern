@@ -35,7 +35,9 @@ void handle_irq(unsigned int irq)
 		printf("Disk IRQ received\n");
 		break;
   case IRQ_GENERIC_HARD_DISK:
+		printf("======================\n");
 		printf("General hard disk IRQ\n");
+		printf("======================\n");
     return;
 	default:
 		print("Unhandled IRQ");

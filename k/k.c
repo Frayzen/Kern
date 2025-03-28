@@ -22,16 +22,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "drivers/nvme/nvme.h"
-#include "drivers/pci/pci.h"
 #include "fs/fs.h"
 #include "gdt/gdt.h"
-#include "interrupts/handler.h"
 #include "interrupts/ints.h"
 #include "interrupts/keyboard.h"
 #include "memalloc/memalloc.h"
 #include "memory.h"
 #include "panic.h"
-#include "serial.h"
 #include "stdio.h"
 #include <k/kstd.h>
 

@@ -64,9 +64,9 @@ void nvme_init(void)
 		       device.pci.bus, device.pci.slot, device.pci.headerType);
 		assert(device.pci.headerType == 0x0);
 
-		/* enable_interrupts(&device.pci); */
-		/* enable_bus_master(&device.pci); */
-		/* enable_mem_space(&device.pci); */
+		enable_interrupts(&device.pci);
+		enable_bus_master(&device.pci);
+		enable_mem_space(&device.pci);
 
 		volatile u32 bar1 =
 			(volatile u32)get_bar(&device.pci, PCI_BAR1);
@@ -78,16 +78,16 @@ void nvme_init(void)
 		u16 major, minor, patch;
 		get_version(&device, &major, &minor, &patch);
 
-		/* if (device.pci.capabilities.msi_cap_offset) */
-		/* 	enable_msi(&device.pci); */
-		/* if (device.pci.capabilities.msix_cap_offset) */
-		/* 	enable_msix(&device.pci); */
+		if (device.pci.capabilities.msi_cap_offset)
+			enable_msi(&device.pci);
+		if (device.pci.capabilities.msix_cap_offset)
+			enable_msix(&device.pci);
 
 		// unmask the interrupts for all completion queues
-		/* *nvme_reg(&device, NVME_INTMC) = 0xFFFFFFFF; */
+		*nvme_reg(&device, NVME_INTMC) = 0xFFFFFFFF;
 
 		// mask the interrupts for all completion queues
-		*nvme_reg(&device, NVME_INTMS) = 0xFFFFFFFF;
+		/* *nvme_reg(&device, NVME_INTMS) = 0xFFFFFFFF; */
 
 		device.capability_stride =
 			(*nvme_reg(&device, NVME_CAP + 0x4)) & 0xF;

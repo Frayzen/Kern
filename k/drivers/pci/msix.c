@@ -41,14 +41,14 @@ void enable_msix(struct pci_device *dev)
 		ref_table.msg_data = 0x41
 	};
 
+	table_ptr[0] = ref_table;
+	table_ptr[1] = ref_table;
+
 	id_edit->enable = 1;
 	id_edit->function_mask = 0;
 	pcidev_writel(dev, offset + MSIX_MXID, id);
 	printf("Enabled MSIX for device\n");
 
-	table_ptr[0] = ref_table;
-	table_ptr[1] = ref_table;
-	table_ptr[2] = ref_table;
 }
 
 void disable_msix(struct pci_device *dev)

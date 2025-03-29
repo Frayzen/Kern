@@ -21,7 +21,7 @@ struct idt_descriptor {
 
 void setup_idt(void)
 {
-	setup_pic();
+	pic_setup();
 	setup_timer();
 	println("Setting up IDT...");
 	struct gate_descriptor gates[] = {

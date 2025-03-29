@@ -34,11 +34,11 @@ void handle_irq(unsigned int irq)
 	case IRQ_FLOPPY_DISK_CONTROLLER:
 		printf("Disk IRQ received\n");
 		break;
-  case IRQ_GENERIC_HARD_DISK:
+	case IRQ_GENERIC_HARD_DISK:
 		printf("======================\n");
 		printf("General hard disk IRQ\n");
 		printf("======================\n");
-    return;
+		return;
 	default:
 		print("Unhandled IRQ");
 		printf("%d", irq - IRQ_MASTER_OFFSET);
@@ -46,32 +46,29 @@ void handle_irq(unsigned int irq)
 		asm volatile("hlt");
 		break;
 	}
-	send_eoi(irq);
+	pic_send_eoi(irq);
 }
 
 unsigned int interrupt_handler(struct stack *s)
 {
-  int_count++;
+	int_count++;
 	if (s->int_no >= IRQ_MASTER_OFFSET &&
 	    s->int_no <= IRQ_MASTER_OFFSET + IRQ_LIMIT) {
 		handle_irq(s->int_no);
 		return 0;
-	}
-	if (s->int_no == ISR_CUSTOM_SYSCALL) {
+	} else if (s->int_no == ISR_CUSTOM_SYSCALL) {
 		/* Custom Syscall */
 		println("Custom Syscall");
 		return syscall_handler(s);
-	}
-	if (s->int_no == ISR_GENERAL_PROTECTION_FAULT) {
+	} else if (s->int_no == ISR_GENERAL_PROTECTION_FAULT) {
 		printf("======== KERNEL PANIC ========\n", s->int_no);
 		printf("General protection fault ! (on 0x%x)\n");
-    print_stack(s);
+		print_stack(s);
 		printf("System halted.\n");
 		printf("======== KERNEL PANIC ========\n", s->int_no);
 		while (1)
 			continue;
-	}
-
+	} 
 	switch (s->int_no) {
 #define X(id, key, name, errcode)                                        \
 	case id:                                                         \

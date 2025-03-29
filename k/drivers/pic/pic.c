@@ -1,4 +1,3 @@
-#include "ints.h"
 #include "io.h"
 #include "serial.h"
 
@@ -9,7 +8,7 @@
 #define ICW1_ICW4 0x01 /* Indicates that ICW4 will be present */
 #define ICW1_INIT 0x10 /* Initialization - required! */
 
-void setup_pic(void)
+void pic_setup(void)
 {
 	println("Setting up PIC...");
 
@@ -38,7 +37,7 @@ void setup_pic(void)
 }
 
 #define PIC_EOI 0x20 /* End-of-interrupt command code */
-void send_eoi(unsigned int irq)
+void pic_send_eoi(unsigned int irq)
 {
 	(void)irq;
 	if (irq >= IRQ_SLAVE_OFFSET)

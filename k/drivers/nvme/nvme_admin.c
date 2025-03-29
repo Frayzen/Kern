@@ -66,7 +66,7 @@ int create_io_completion_queue(struct nvme_device *dev)
 	cmd.command_specific[0] = (queue_size << 16) | queue_id;
 
 	// dword11
-	u32 vector = 2;
+	u32 vector = 1;
 	u32 flags = FLAG_CONTIGUOUS_QUEUE | FLAG_ENABLE_INTS;
 	cmd.command_specific[1] = (vector << 16) | flags;
 

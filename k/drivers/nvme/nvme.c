@@ -66,7 +66,7 @@ void nvme_init(void)
 		       device.pci.bus, device.pci.slot, device.pci.headerType);
 		assert(device.pci.headerType == 0x0);
 
-		set_interrupts(&device.pci, 0);
+		set_interrupts(&device.pci, 1);
 		set_bus_master(&device.pci, 1);
 		set_mem_space(&device.pci, 1);
 
@@ -86,7 +86,7 @@ void nvme_init(void)
 			enable_msi(&device.pci);
 
 		// unmask the interrupts for all completion queues
-		*nvme_reg(&device, NVME_INTMC) = 0xFFFFFFFF;
+		/* *nvme_reg(&device, NVME_INTMC) = 0xFFFFFFFF; */
 
 		// mask the interrupts for all completion queues
 		/* *nvme_reg(&device, NVME_INTMS) = 0xFFFFFFFF; */

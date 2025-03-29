@@ -2,6 +2,8 @@
 #include "drivers/nvme/nvme_admin.h"
 #include "drivers/nvme/nvme_io.h"
 #include "drivers/pci/cap.h"
+#include "drivers/pci/msi.h"
+#include "drivers/pci/msix.h"
 #include "drivers/pci/pci.h"
 #include "assert.h"
 #include "k/types.h"
@@ -64,24 +66,24 @@ void nvme_init(void)
 		       device.pci.bus, device.pci.slot, device.pci.headerType);
 		assert(device.pci.headerType == 0x0);
 
-		enable_interrupts(&device.pci);
-		enable_bus_master(&device.pci);
-		enable_mem_space(&device.pci);
+		set_interrupts(&device.pci, 0);
+		set_bus_master(&device.pci, 1);
+		set_mem_space(&device.pci, 1);
 
-		volatile u32 bar1 =
-			(volatile u32)get_bar(&device.pci, PCI_BAR1);
-		volatile u32 bar0 =
-			(volatile u32)get_bar(&device.pci, PCI_BAR0);
-		device.base_addr = (u64)(((u64)bar1 << 32) | (bar0 & ~(0xF)));
+		u64 bar1 = get_bar(&device.pci, PCI_BAR1);
+		u64 bar0 = get_bar(&device.pci, PCI_BAR0) & 0xFFFFFFF0;
+		device.base_addr = (bar1 << 32) | bar0;
 		// as soon as base addr is set, check status
 
 		u16 major, minor, patch;
 		get_version(&device, &major, &minor, &patch);
 
-		if (device.pci.capabilities.msi_cap_offset)
-			enable_msi(&device.pci);
-		if (device.pci.capabilities.msix_cap_offset)
+		if (device.pci.capabilities.msix_cap_offset) {
+			if (device.pci.capabilities.msi_cap_offset)
+				disable_msi(&device.pci);
 			enable_msix(&device.pci);
+		} else if (device.pci.capabilities.msi_cap_offset)
+			enable_msi(&device.pci);
 
 		// unmask the interrupts for all completion queues
 		*nvme_reg(&device, NVME_INTMC) = 0xFFFFFFFF;

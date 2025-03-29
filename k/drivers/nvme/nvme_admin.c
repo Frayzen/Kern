@@ -1,7 +1,9 @@
 #include "nvme_admin.h"
 #include "drivers/nvme/nvme.h"
 #include "drivers/nvme/nvme_io.h"
+#include "drivers/pci/cap.h"
 #include "memalloc/memalloc.h"
+#include <stdio.h>
 
 volatile u32 *nvme_subm_doorbell(struct nvme_device *dev, u32 queue_id)
 {
@@ -64,7 +66,7 @@ int create_io_completion_queue(struct nvme_device *dev)
 	cmd.command_specific[0] = (queue_size << 16) | queue_id;
 
 	// dword11
-  u16 vector = 1;
+	u32 vector = 1;
 	u32 flags = FLAG_CONTIGUOUS_QUEUE | FLAG_ENABLE_INTS;
 	cmd.command_specific[1] = (vector << 16) | flags;
 

@@ -84,8 +84,10 @@ unsigned long get_tick(void)
 void wait(unsigned long tick)
 {
 	unsigned long target = ticks + tick;
-	while (ticks != target) {
-		continue;
+  unsigned long cur = ticks;
+	while (cur <= target) {
+    cur = ticks;
+
 	}
 	return;
 }

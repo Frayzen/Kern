@@ -68,8 +68,8 @@ u32 get_bar(struct pci_device *dev, u16 bar);
 // returns non zero if found, updates the out value accordingly
 int look_for_device(u8 classCode, u8 subClass, struct pci_device *out);
 
-void enable_mem_space(struct pci_device *dev);
-void enable_bus_master(struct pci_device *dev);
-void enable_interrupts(struct pci_device *dev);
+void set_mem_space(struct pci_device *dev, u8 enable);
+void set_bus_master(struct pci_device *dev, u8 enable);
+void set_interrupts(struct pci_device *dev, u8 enable);
 
 #endif /* !PCI_H */

@@ -29,11 +29,11 @@ void nvme_send_command(struct nvme_device *device,
 		sub_queue->ptr = 0;
 	CHECK_FATAL_STATUS(device);
 
-	printf("Command 0x%x sent correctly\n", cmd->cmd.command_id);
+	printf("Command 0x%x sent...\n", cmd->cmd.command_id);
 	while (!compl_head->phase_bit)
 		continue;
 	if (compl_head->status != 0)
-		printf("Error while processing command\n");
+		printf("[ERROR] /!\\ while processing command\n");
 	else
 		printf("Command %d happened correctly\n", cmd->cmd.command_id);
 

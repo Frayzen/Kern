@@ -9,25 +9,21 @@
 struct MSIX_identifier {
 	u8 capID;
 	u8 nextPtr;
-} __packed;
-
-#define MSIX_MXC 0x2
-struct MSIX_msg_ctl {
 	u16 table_size : 11;
 	u8 __reserved0 : 3;
 	u8 function_mask : 1;
 	u8 enable : 1;
-};
+} __packed;
 
 #define MSIX_MTAB 0x4
 
 struct MSIX_vector_table {
-	u32 __reserved0 : 31;
-	u8 masked : 1;
-	u32 msg_data;
 	u64 msg_addr; // mask the low bits (& 0xFFFFFFF0)
+	u32 msg_data;
+	u32 masked; // either 0 or 1
 } __packed;
 
 void enable_msix(struct pci_device *dev);
+void disable_msix(struct pci_device *dev);
 
 #endif /* !MSIX_H */

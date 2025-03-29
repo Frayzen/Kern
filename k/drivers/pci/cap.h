@@ -18,11 +18,6 @@ struct pci_capabilites {
 #define SMI_CAP_ID 0x05
 #define SMIX_CAP_ID 0x11
 
-
-
 void check_capacities(struct pci_device *device);
-
-void enable_msi(struct pci_device *device);
-void enable_msix(struct pci_device *device);
 
 #endif /* !CAP_H */

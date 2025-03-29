@@ -2,16 +2,14 @@
 #include "drivers/pci/cap.h"
 #include "drivers/pci/command.h"
 #include "io.h"
+#include "assert.h"
 #include "k/types.h"
 
 u32 get_bar(struct pci_device *dev, u16 bar)
 {
 	disable_io(dev);
-	u32 ret = (pcidev_readw(dev, bar + 0x2) << 16) |
-		  pcidev_readw(dev, bar);
+	u32 ret = (pcidev_readw(dev, bar + 0x2) << 16) | pcidev_readw(dev, bar);
 	enable_io(dev);
-	if (bar == PCI_BAR0)
-		ret &= 0xFFFFFFF0;
 	return ret;
 }
 
@@ -21,7 +19,7 @@ static void set_addr(u8 bus, u8 slot, u8 func, u8 offset)
 	u32 lbus = (u32)bus;
 	u32 lslot = (u32)slot;
 	u32 lfunc = (u32)func;
-	// Create configuration address as per Figure 1
+	// Create configuration address
 	address = (u32)((lbus << 16) | (lslot << 11) | (lfunc << 8) |
 			(offset & 0xFC) | ((u32)0x80000000));
 	// Write out the address
@@ -30,14 +28,16 @@ static void set_addr(u8 bus, u8 slot, u8 func, u8 offset)
 
 u32 pci_readl(u8 bus, u8 slot, u8 func, u8 offset)
 {
+	assert(!(offset & 0b11)); // Register offset has to point to DWORDs
 	set_addr(bus, slot, func, offset);
 	return inl(CONFIG_DATA);
 }
 
 u16 pci_readw(u8 bus, u8 slot, u8 func, u8 offset)
 {
-  set_addr(bus, slot, func, offset);
-	return (u16)((inl(0xCFC) >> ((offset & 2) * 8)) & 0xFFFF);
+	/* assert(!(offset & 0b1)); // Register offset has to point to half-DWORDs */
+	set_addr(bus, slot, func, offset);
+	return (u16)((inl(CONFIG_DATA) >> ((offset & 2) * 8)) & 0xFFFF);
 }
 
 void pci_writel(u8 bus, u8 slot, u8 func, u8 offset, u32 val)
@@ -58,9 +58,9 @@ int check_device(u8 bus, u8 slot, struct pci_device *out)
 	u16 vendor, device = 0;
 	/* Try and read the first configuration register. Since there are no
      * vendors that == 0xFFFF, it must be a non-existent device. */
-	if ((vendor = pci_readw(bus, slot, 0, PCI_VENDOR_ID))) {
+	if ((vendor = pci_readw(bus, slot, 0, PCI_VENDOR_ID)) != 0xffff) {
 		device = pci_readw(bus, slot, 0, PCI_DEV_ID);
-		u16 class = pci_readw(bus, slot, 0, 0xA);
+		u16 class = pci_readw(bus, slot, 0, PCI_CLASSES);
 
 		out->bus = bus;
 		out->slot = slot;
@@ -110,23 +110,32 @@ COMMAND REGISTER BITS
 0 I/O Space
  */
 
-void enable_mem_space(struct pci_device *dev)
+void set_mem_space(struct pci_device *dev, u8 enabled)
 {
 	u16 cur = pcidev_readw(dev, PCI_COMMAND);
-	cur |= (1 << 1); // set the bit
+	if (enabled)
+		cur |= (1 << 1); // set the bit
+	else
+		cur &= ~(1 << 1); // set the bit
 	pcidev_writew(dev, PCI_COMMAND, cur);
 }
 
-void enable_bus_master(struct pci_device *dev)
+void set_bus_master(struct pci_device *dev, u8 enabled)
 {
 	u16 cur = pcidev_readw(dev, PCI_COMMAND);
-	cur |= (1 << 2); // set the bit
+	if (enabled)
+		cur |= (1 << 2); // set the bit
+	else
+		cur &= ~(1 << 2); // set the bit
 	pcidev_writew(dev, PCI_COMMAND, cur);
 }
 
-void enable_interrupts(struct pci_device *dev)
+void set_interrupts(struct pci_device *dev, u8 enabled)
 {
 	u16 cur = pcidev_readw(dev, PCI_COMMAND);
-	cur &= ~(1 << 10); // reset the bit
+	if (enabled) // inversed, reset if true, set otherwise
+		cur &= ~(1 << 10); // reset the bit
+	else
+		cur |= 1; // reset the bit
 	pcidev_writew(dev, PCI_COMMAND, cur);
 }

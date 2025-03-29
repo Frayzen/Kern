@@ -66,7 +66,7 @@ int create_io_completion_queue(struct nvme_device *dev)
 	cmd.command_specific[0] = (queue_size << 16) | queue_id;
 
 	// dword11
-	u32 vector = 1;
+	u32 vector = 2;
 	u32 flags = FLAG_CONTIGUOUS_QUEUE | FLAG_ENABLE_INTS;
 	cmd.command_specific[1] = (vector << 16) | flags;
 
@@ -100,5 +100,18 @@ int create_admin_completion_queue(struct nvme_device *dev)
 	dev->adm_cmpl_q.door_bell = nvme_cmpl_doorbell(dev, 0);
 	// Write to the register
 	*nvme_reg(dev, NVME_ACQ) = dev->adm_cmpl_q.address;
+	return 1;
+}
+
+
+int nvme_identify(struct nvme_device *device)
+{
+	u64 buffer = (u64)mmap();
+	struct submission_q_entry cmd = {};
+	cmd.cmd.opcode = 0x06;
+	cmd.prp1 = buffer;
+	cmd.cmd.command_id = device->next_command_id++;
+  cmd.nsid = 1;
+	nvme_send_command(device, &cmd, 1);
 	return 1;
 }

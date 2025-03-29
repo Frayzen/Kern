@@ -19,7 +19,8 @@ void nvme_send_command(struct nvme_device *device,
 						    (&device->io_cmpl_q);
 
 	struct submission_q_entry *subm_tail = get_queue_ptr(sub_queue, 1);
-	volatile struct completion_q_entry *compl_head = get_queue_ptr(compl_queue, 0);
+	volatile struct completion_q_entry *compl_head =
+		get_queue_ptr(compl_queue, 0);
 
 	*subm_tail = *cmd;
 
@@ -33,7 +34,8 @@ void nvme_send_command(struct nvme_device *device,
 	while (!compl_head->phase_bit)
 		continue;
 	if (compl_head->status != 0)
-		printf("[ERROR] /!\\ while processing command\n");
+		printf("[ERROR] /!\\ while processing command status : 0x%x\n",
+		       compl_head->status);
 	else
 		printf("Command %d happened correctly\n", cmd->cmd.command_id);
 
@@ -50,9 +52,9 @@ int nvme_read(struct nvme_device *dev, u64 lba, u32 sector_count, void *buffer)
 {
 	struct submission_q_entry cmd = {};
 
-  u64 buf = (u64) buffer;
+	u64 buf = (u64)buffer;
 	cmd.cmd.opcode = 0x02;
-  cmd.nsid = 1;
+	cmd.nsid = 1;
 	cmd.command_specific[0] = (u32)lba;
 	cmd.command_specific[1] = (u32)(lba >> 32);
 	cmd.command_specific[2] = sector_count & 0xFFFF;
@@ -69,16 +71,5 @@ int nvme_write(struct nvme_device *device, u64 lba, u32 sector_count,
 	struct submission_q_entry cmd =
 		create_io_command(device, 0x01, 0, buffer, lba, sector_count);
 	nvme_send_command(device, &cmd, 0);
-	return 1;
-}
-
-int nvme_identify(struct nvme_device *device)
-{
-	u64 buffer = (u64)mmap();
-	struct submission_q_entry cmd = {};
-	cmd.cmd.opcode = 0x06;
-	cmd.prp1 = buffer;
-	cmd.cmd.command_id = device->next_command_id++;
-	nvme_send_command(device, &cmd, 1);
 	return 1;
 }

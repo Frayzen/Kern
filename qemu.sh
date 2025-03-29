@@ -32,7 +32,7 @@ qemu-system-i386 -drive id=cdrom,if=ide,media=cdrom,readonly=on,file=k.iso \
   -drive file=disk.img,if=none,id=nvme0,format=raw \
   -device nvme,drive=nvme0,serial=1234,addr=0x5 \
   -serial stdio -s -S \
-  -trace enable="*nvme*",file=out_nvme \
+  -trace enable="*apic*",file=out_nvme \
   # -d trace:*msix*,trace:*nvme* -D qemu.log \
   # -d trace:msix_write_config,int,cpu_reset -D qemu.log \
 

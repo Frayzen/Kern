@@ -21,7 +21,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include "drivers/apic/apic.h"
+#include "drivers/acpi/acpi.h"
 #include "drivers/nvme/nvme.h"
 #include "fs/fs.h"
 #include "gdt/gdt.h"
@@ -72,14 +72,14 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	setup_idt();
 	asm volatile("sti" :);
 
-  memory_init(info);
-  init_memalloc(info);
+	/* memory_init(info); */
+	/* init_memalloc(info); */
 
 	/* setup_fs(); */
 	/* test_file(); */
 
-  apic_setup();
-  nvme_init();
+	acpi_setup();
+	/* nvme_init(); */
 
 	for (unsigned i = 0;;) {
 		int c = get_last_key();

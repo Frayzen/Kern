@@ -1,4 +1,5 @@
 #include "ints.h"
+#include "drivers/acpi/acpi.h"
 #include "interrupts/timer.h"
 #include "k/compiler.h"
 #include "serial.h"
@@ -19,20 +20,25 @@ struct idt_descriptor {
 	unsigned int base : 32;
 } __packed;
 
+#define USE_APIC 1
+
 void setup_idt(void)
 {
-	pic_setup();
+	if (USE_APIC)
+		acpi_setup();
+	else
+		pic_setup();
 	setup_timer();
 	println("Setting up IDT...");
 	struct gate_descriptor gates[] = {
-#define X(id, key, name, errcode)                         \
-	[id] = {                                     \
+#define X(id, key, name, errcode)                     \
+	[id] = {                                      \
 		.offset_low = OFFSET_LOW(isr##key),   \
-		.selector = 0x8,                     \
+		.selector = 0x8,                      \
 		.offset_high = OFFSET_HIGH(isr##key), \
-		.type = GATE_TYPE_INT,               \
-		.privilege = 0,                      \
-		.present = 1,                        \
+		.type = GATE_TYPE_INT,                \
+		.privilege = 0,                       \
+		.present = 1,                         \
 	},
 		ISR_LIST IRQ_LIST
 #undef X

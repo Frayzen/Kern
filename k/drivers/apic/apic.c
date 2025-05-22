@@ -93,14 +93,14 @@ void apic_setup(void)
 	io_apic_setup(madt);
 
 	// Set spurious vector and software enable apic
-	*LAPIC_SIV_REG = APIC_SW_ENABLE | 0x41;
+	*LAPIC_SIV_REG = APIC_SW_ENABLE | 0x40;
 
 	// Setup APIC timer
-	*LAPIC_LVT_TIMER_REG |= LAPIC_LVT_TIMER_PERIODIC;
+	*LAPIC_LVT_TIMER_REG = LAPIC_LVT_TIMER_PERIODIC | 0x40;
 	*LAPIC_LVT_TIMER_REG &= ~LAPIC_LVT_MASKED;
 
 	*LAPIC_TIMER_DIV_REG = 3;
-	*LAPIC_TIMER_INIT_COUNT = 0xffff;
+	*LAPIC_TIMER_INIT_COUNT = 0x8ffff;
 
 	return;
 }

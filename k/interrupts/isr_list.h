@@ -5,7 +5,6 @@
 #define GATE_TYPE_TRAP 0xF
 
 #define IRQ_LIST                                                         \
-	X(32, SPURIOUS_INTERRUPT, "Spurious interrupt", NO_ERCODE)       \
 	X(64, SYSTEM_CLOCK, "System clock", NO_ERCODE) /*Begin IRQs*/    \
 	X(65, KEYBOARD, "Keyboard", NO_ERCODE)                           \
 	X(66, CASCADE, "Cascade", NO_ERCODE)                             \
@@ -49,4 +48,5 @@
 	  NO_ERCODE)                                                           \
 	X(20, VIRTUALIZATION_EXCEPTION, "Virtualization exception", NO_ERCODE) \
 	X(21, CONTROL_PROTECTION_EXCEPTION, "Control protection exception",    \
-	  NO_ERCODE)\
+	  NO_ERCODE)                                                           \
+	X(128, CUSTOM_SYSCALL, "Custom Syscall", NO_ERCODE) /* Syscall */

@@ -61,9 +61,6 @@ unsigned int interrupt_handler(struct stack *s)
 	    s->int_no <= IRQ_MASTER_OFFSET + IRQ_LIMIT) {
 		handle_irq(s->int_no);
 		return 0;
-	} else if (s->int_no == IRQ_SPURIOUS_INTERRUPT) {
-		println("Spurious intterupt");
-		return syscall_handler(s);
 	} else if (s->int_no == ISR_GENERAL_PROTECTION_FAULT) {
 		printf("======== KERNEL PANIC ========\n", s->int_no);
 		printf("General protection fault ! (on 0x%x)\n");

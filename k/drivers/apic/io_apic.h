@@ -1,12 +1,11 @@
-#ifndef CONFIG_H
-#define CONFIG_H
-
+#ifndef IO_APIC_H
+#define IO_APIC_H
 
 #include "drivers/apic/madt.h"
 #include "k/compiler.h"
 #include "k/types.h"
 
-void io_apic_setup(struct MADT *madt);
+void io_apic_setup(struct madt *madt);
 u32 read_io_apic(u32 reg);
 void write_io_apic(u32 reg, u32 value);
 
@@ -25,4 +24,4 @@ struct io_apic_redir {
   u8 dest_field;
 } __packed;
 
-#endif /* !CONFIG_H */
+#endif /* !IO_APIC_H */

@@ -21,17 +21,17 @@ void pic_setup(void)
 	outb(SLAVE_PIC_DATA, IRQ_SLAVE_OFFSET);
 
 	// ICW3
-	outb(0x21, 0x04); // Set the second pin as a slave
-	outb(0xA1, 0x02); // Set the pin of the slave as IRQ2
+	outb(MASTER_PIC_DATA, 0x04); // Set the second pin as a slave
+	outb(SLAVE_PIC_DATA, 0x02); // Set the pin of the slave as IRQ2
 
 	// ICW4
 	// When no special mode of operation is required, the programmer can just clear every configuration bit
-	outb(0x21, 0x01);
-	outb(0xA1, 0x01);
+	outb(MASTER_PIC_DATA, 0x01);
+	outb(SLAVE_PIC_DATA, 0x01);
 
 	// Unmask all interrupts
-	outb(0x21, 0x0);
-	outb(0xA1, 0x0);
+	outb(MASTER_PIC_DATA, 0x0);
+	outb(SLAVE_PIC_DATA, 0x0);
 
 	println("PIC set up");
 }

@@ -26,12 +26,12 @@ struct RSDP {
 } __packed;
 
 struct RSDT {
-  struct SDT_header h;
+  struct sdt_header h;
 	u32 other_sdt[];
 } __attribute__((packed));
 
 struct XSDT {
-  struct SDT_header h;
+  struct sdt_header h;
 	u64 other_sdt[];
 } __attribute__((packed));
 

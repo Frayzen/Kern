@@ -1,11 +1,10 @@
 #include "madt.h"
 #include <stdio.h>
 
-struct madt_entry *madt_find_next_entry(struct MADT *madt,
-					struct madt_entry *cur_entry,
-					enum madt_entry_type type)
+static struct madt_entry *next_entry(struct madt *madt,
+				     struct madt_entry *cur_entry,
+				     enum madt_entry_type type)
 {
-	printf("APIC ADDR %x\n", madt->lapic_addr);
 	u8 *cur_ptr = (u8 *)cur_entry;
 	u8 *end_ptr = (u8 *)madt + madt->h.length;
 
@@ -27,7 +26,16 @@ struct madt_entry *madt_find_next_entry(struct MADT *madt,
 
 	return NULL; // Not found
 }
-struct madt_entry *madt_find_entry(struct MADT *madt, enum madt_entry_type type)
+
+struct madt_entry *madt_find_next_entry(struct madt *madt,
+					struct madt_entry *cur_entry,
+					enum madt_entry_type type)
 {
-	return madt_find_next_entry(madt, &madt->first_entry, type);
+	struct madt_entry *next =
+		(struct madt_entry *)((u8 *)cur_entry + cur_entry->length);
+	return next_entry(madt, next, type);
+}
+struct madt_entry *madt_find_entry(struct madt *madt, enum madt_entry_type type)
+{
+	return next_entry(madt, &madt->first_entry, type);
 }

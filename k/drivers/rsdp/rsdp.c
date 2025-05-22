@@ -55,23 +55,23 @@ void *find_SDT(char sig[4])
 
 	if (extended) {
 		struct XSDT *xsdt = (void *)rsdp->xsdt_address;
-		int entries = ((xsdt->h.length - sizeof(struct SDT_header)) /
+		int entries = ((xsdt->h.length - sizeof(struct sdt_header)) /
 			       sizeof(u64));
 		printf("Entries is %d\n", entries);
 		assert(entries < 100);
 		for (int i = 0; i < entries; i++) {
-			struct SDT_header *h =
-				(struct SDT_header *)(xsdt->other_sdt[i]);
+			struct sdt_header *h =
+				(struct sdt_header *)(xsdt->other_sdt[i]);
 			if (!strncmp(h->signature, sig, 4))
 				return (void *)h;
 		}
 	} else {
 		struct RSDT *rsdt = (void *)rsdp->rsdt_address;
-		int entries = ((rsdt->h.length - sizeof(struct SDT_header)) /
+		int entries = ((rsdt->h.length - sizeof(struct sdt_header)) /
 			       sizeof(u32));
 		for (int i = 0; i < entries; i++) {
-			struct SDT_header *h =
-				(struct SDT_header *)(rsdt->other_sdt[i]);
+			struct sdt_header *h =
+				(struct sdt_header *)(rsdt->other_sdt[i]);
 			if (!strncmp(h->signature, sig, 4))
 				return (void *)h;
 		}

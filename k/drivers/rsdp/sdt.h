@@ -5,7 +5,7 @@
 
 #include "k/types.h"
 
-struct SDT_header {
+struct sdt_header {
 	char signature[4];
 	u32 length;
 	u8 revision;

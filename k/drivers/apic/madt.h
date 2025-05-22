@@ -2,6 +2,7 @@
 #define MADT_H
 
 #include "drivers/rsdp/sdt.h"
+#include "k/compiler.h"
 #include "k/types.h"
 
 enum madt_entry_type : u8 {
@@ -18,27 +19,28 @@ struct madt_entry {
 	enum madt_entry_type type;
 	u8 length;
 	u8 data[];
-};
-struct MADT {
-	struct SDT_header h;
+} __packed;
+
+struct madt {
+	struct sdt_header h;
 	u32 lapic_addr;
 	u32 flag;
 	struct madt_entry first_entry;
-};
+} __packed;
 
-struct MADT_io_apic_data {
+struct madt_io_apic_data {
   u8 id; 
   u8 __reserved; 
   u32 address; 
-  u32 global_sys_int_base; 
-};
+  u32 gsi_base;  // global system interrupt base
+} __packed;
 
 // returns null if not found
-struct madt_entry* madt_find_next_entry(struct MADT* madt, struct madt_entry* cur_entry, enum madt_entry_type type);
+struct madt_entry* madt_find_next_entry(struct madt* madt, struct madt_entry* cur_entry, enum madt_entry_type type);
 
 // equivalent to adt_find_next_entry(madt, &madt.first_entry, type)
-struct madt_entry* madt_find_entry(struct MADT* madt, enum madt_entry_type type);
+struct madt_entry* madt_find_entry(struct madt* madt, enum madt_entry_type type);
 
-#define FIND_MADT (GET_SDT(APIC, struct MADT))
+#define FIND_MADT (GET_SDT(APIC, struct madt))
 
 #endif /* !MADT_H */

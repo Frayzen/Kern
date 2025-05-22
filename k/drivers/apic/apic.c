@@ -1,5 +1,6 @@
-#include "apic.h"
-#include "drivers/apic/config.h"
+#include "drivers/apic/apic.h"
+#include "drivers/config.h"
+#include "drivers/apic/io_apic.h"
 #include "drivers/apic/madt.h"
 #include "drivers/cpu_features.h"
 #include "drivers/msr/msr.h"
@@ -84,7 +85,7 @@ void apic_setup(void)
 	}
 	pic_disable();
 
-	struct MADT *madt = FIND_MADT;
+	struct madt *madt = FIND_MADT;
 
 	/* Hardware enable the Local APIC if it wasn't enabled */
 	set_apic_base(madt->lapic_addr);
@@ -96,7 +97,7 @@ void apic_setup(void)
 	*LAPIC_SIV_REG = APIC_SW_ENABLE | 0x40;
 
 	// Setup APIC timer
-	*LAPIC_LVT_TIMER_REG = LAPIC_LVT_TIMER_PERIODIC | 0x40;
+	*LAPIC_LVT_TIMER_REG = LAPIC_LVT_TIMER_PERIODIC | IRQ_SYSTEM_CLOCK;
 	*LAPIC_LVT_TIMER_REG &= ~LAPIC_LVT_MASKED;
 
 	*LAPIC_TIMER_DIV_REG = 3;

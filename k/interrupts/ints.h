@@ -4,7 +4,6 @@
 #include "isr_list.h"
 
 void setup_idt(void);
-void pic_setup(void);
 void pic_send_eoi(unsigned int irq);
 
 #define X(id, key, name, errcode) extern void isr##key(void);

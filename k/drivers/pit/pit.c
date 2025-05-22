@@ -1,0 +1,110 @@
+#include "pit.h"
+#include "drivers/config.h"
+#include "drivers/cpu_features.h"
+#include "io.h"
+#include "serial.h"
+#include <stdio.h>
+
+#define PIT_REG_COUNTER_0 0x40
+#define PIT_REG_COUNTER_1 0x41
+#define PIT_REG_COUNTER_2 0x42
+#define PIT_REG_CONTROL 0x43
+
+#define INTERNAL_FREQUENCY 1193182
+#define DESIRED_FREQUENCY 100
+#define RELOAD_VALUE (INTERNAL_FREQUENCY / DESIRED_FREQUENCY)
+
+unsigned int get_frequency(void)
+{
+	if (USE_APIC) {
+		u32 __reserved;
+		u32 denominator, numerator, crystal_freq_hz;
+		get_cpuid(CPUID_Request_Timer_Freq1, &denominator, &numerator,
+			  &crystal_freq_hz, &__reserved);
+		if (crystal_freq_hz != 0)
+			return crystal_freq_hz;
+		u32 core_freq_mhz, core_max_mhz, bus_ref_freq;
+		get_cpuid(CPUID_Request_Timer_Freq2, &core_freq_mhz,
+			  &core_max_mhz, &bus_ref_freq, &__reserved);
+		core_freq_mhz &= 0xffff;
+		core_max_mhz &= 0xffff;
+		bus_ref_freq &= 0xffff;
+		return core_freq_mhz * 1000000 * numerator / denominator;
+
+	} else {
+		// al = channel in bits 6 and 7, remaining bits clear
+		outb(PIT_REG_CONTROL, 0x0);
+		unsigned int count = 0;
+		count = inb(PIT_REG_COUNTER_0); // Low byte
+		count |= inb(PIT_REG_COUNTER_0) << 8; // High byte
+		return count;
+	}
+}
+
+void set_pit_count(unsigned count)
+{
+	// Disable interrupts
+	asm volatile("cli");
+
+	// Set low byte
+	outb(PIT_REG_COUNTER_0, count & 0xFF); // Low byte
+	outb(PIT_REG_COUNTER_0, (count & 0xFF00) >> 8); // High byte
+}
+
+void pit_setup(void)
+{
+	println("Setting up pit timer...");
+	/*
+       * Bits         Usage
+       * 6 and 7      Select channel :
+       *                 0 0 = Channel 0
+       *                 0 1 = Channel 1
+       *                 1 0 = Channel 2
+       *                 1 1 = Read-back command (8254 only)
+       * 4 and 5      Access mode :
+       *                 0 0 = Latch count value command
+       *                 0 1 = Access mode: lobyte only
+       *                 1 0 = Access mode: hibyte only
+       *                 1 1 = Access mode: lobyte/hibyte
+       * 1 to 3       Operating mode :
+       *                 0 0 0 = Mode 0 (interrupt on terminal count)
+       *                 0 0 1 = Mode 1 (hardware re-triggerable one-shot)
+       *                 0 1 0 = Mode 2 (rate generator)
+       *                 0 1 1 = Mode 3 (square wave generator)
+       *                 1 0 0 = Mode 4 (software triggered strobe)
+       *                 1 0 1 = Mode 5 (hardware triggered strobe)
+       *                 1 1 0 = Mode 2 (rate generator, same as 010b)
+       *                 1 1 1 = Mode 3 (square wave generator, same as 011b)
+       * 0            BCD/Binary mode: 0 = 16-bit binary, 1 = four-digit BCD
+       */
+	outb(PIT_REG_CONTROL, 0b110100);
+	set_pit_count(RELOAD_VALUE);
+	println("Timer set up");
+}
+
+static unsigned long ticks = 0;
+static unsigned long timer_counter = 0;
+
+void pit_interrupt(void)
+{
+	timer_counter++;
+	if (timer_counter % 100 == 0) {
+		println("Tick");
+		ticks++;
+	}
+}
+
+unsigned long get_tick(void)
+{
+	return timer_counter;
+}
+
+void wait(unsigned long tick)
+{
+	unsigned long target = ticks + tick;
+	unsigned long cur = ticks;
+	while (cur <= target) {
+		cur = ticks;
+	}
+	return;
+}

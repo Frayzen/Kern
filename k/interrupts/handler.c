@@ -1,8 +1,10 @@
 #include "handler.h"
+#include "drivers/apic/apic.h"
+#include "drivers/config.h"
 #include "isr_list.h"
 #include "interrupts/ints.h"
 #include "interrupts/keyboard.h"
-#include "interrupts/timer.h"
+#include "drivers/pit/pit.h"
 #include "k/kstd.h"
 #include "serial.h"
 #include "stdio.h"
@@ -25,7 +27,7 @@ void handle_irq(unsigned int irq)
 {
 	switch (irq) {
 	case IRQ_SYSTEM_CLOCK:
-		timer_interrupt();
+		pit_interrupt();
 		break;
 	case IRQ_KEYBOARD:
 		handle_keyboard();
@@ -46,7 +48,10 @@ void handle_irq(unsigned int irq)
 		asm volatile("hlt");
 		break;
 	}
-	pic_send_eoi(irq);
+	if (USE_APIC)
+		apic_send_eoi();
+	else
+		pic_send_eoi(irq);
 }
 
 unsigned int interrupt_handler(struct stack *s)
@@ -56,9 +61,8 @@ unsigned int interrupt_handler(struct stack *s)
 	    s->int_no <= IRQ_MASTER_OFFSET + IRQ_LIMIT) {
 		handle_irq(s->int_no);
 		return 0;
-	} else if (s->int_no == ISR_CUSTOM_SYSCALL) {
-		/* Custom Syscall */
-		println("Custom Syscall");
+	} else if (s->int_no == IRQ_SPURIOUS_INTERRUPT) {
+		println("Spurious intterupt");
 		return syscall_handler(s);
 	} else if (s->int_no == ISR_GENERAL_PROTECTION_FAULT) {
 		printf("======== KERNEL PANIC ========\n", s->int_no);
@@ -68,7 +72,7 @@ unsigned int interrupt_handler(struct stack *s)
 		printf("======== KERNEL PANIC ========\n", s->int_no);
 		while (1)
 			continue;
-	} 
+	}
 	switch (s->int_no) {
 #define X(id, key, name, errcode)                                        \
 	case id:                                                         \

@@ -1,6 +1,10 @@
 #ifndef RSDP_H
 #define RSDP_H
 
+// Root System Description Table (XSDT for 64 bits system)
+
+#include "drivers/rsdp/sdt.h"
+#include "k/compiler.h"
 #include "k/types.h"
 
 union other_sdt_ptr {
@@ -9,25 +13,25 @@ union other_sdt_ptr {
 };
 
 
-struct RSDT_header {
+struct RSDP {
 	char signature[8];
 	u8 checksum;
 	char OEMID[6];
 	u8 revision;
 	u32 rsdt_address;
 	u32 length;
-	u64 xsdtAddress;
+	u64 xsdt_address;
 	u8 extended_checksum;
 	u8 reserved[3];
-};
+} __packed;
 
 struct RSDT {
-  struct RSDT_header h;
-	u64 other_sdt[];
+  struct SDT_header h;
+	u32 other_sdt[];
 } __attribute__((packed));
 
 struct XSDT {
-  struct RSDT_header h;
+  struct SDT_header h;
 	u64 other_sdt[];
 } __attribute__((packed));
 

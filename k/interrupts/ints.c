@@ -1,6 +1,8 @@
 #include "ints.h"
-#include "drivers/acpi/acpi.h"
-#include "interrupts/timer.h"
+#include "drivers/apic/apic.h"
+#include "drivers/pic/pic.h"
+#include "drivers/config.h"
+#include "drivers/pit/pit.h"
 #include "k/compiler.h"
 #include "serial.h"
 #include "isr_list.h"
@@ -20,15 +22,12 @@ struct idt_descriptor {
 	unsigned int base : 32;
 } __packed;
 
-#define USE_APIC 1
-
 void setup_idt(void)
 {
+	pic_setup();
+	pit_setup();
 	if (USE_APIC)
-		acpi_setup();
-	else
-		pic_setup();
-	setup_timer();
+		apic_setup();
 	println("Setting up IDT...");
 	struct gate_descriptor gates[] = {
 #define X(id, key, name, errcode)                     \

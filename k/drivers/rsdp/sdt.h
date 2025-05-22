@@ -1,6 +1,8 @@
 #ifndef SDT_H
 #define SDT_H
 
+// System Descriptor Table
+
 #include "k/types.h"
 
 struct SDT_header {
@@ -16,12 +18,5 @@ struct SDT_header {
 };
 
 #define GET_SDT(Signature, Type) (Type *)find_SDT(#Signature)
-
-struct MADT {
-	struct SDT_header h;
-	u32 apic_addr;
-	u32 flag;
-};
-#define FIND_MADT (GET_SDT(MADT, struct MADT))
 
 #endif /* !SDT_H */

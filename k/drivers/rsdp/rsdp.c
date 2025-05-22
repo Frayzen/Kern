@@ -6,44 +6,36 @@
 #include <string.h>
 
 static const char rsdp_sig[] = "RSD PTR ";
-// returns 1 if signature found, 0 otherwise
-struct RSDT *find_rsdt(char *from, char *to)
+struct RSDP *find_rsdt(char *from, char *to)
 {
 	assert(from < to);
 	char *ptr = from;
-	int cur = 0;
 	while (ptr < to) {
-		if (*ptr == rsdp_sig[cur])
-			cur++;
-		else
-			cur = 0;
-		ptr++;
-		if (cur == sizeof(rsdp_sig))
-			return (struct RSDT *)(ptr - cur);
+		if (!strncmp(ptr, rsdp_sig, 8))
+			return (void *)ptr;
+		ptr += sizeof(u16);
 	}
 	return NULL;
 }
 
-void do_checksum(struct RSDT *rsdp)
+void do_checksum(struct RSDP *rsdp)
 {
-	assert(!strncmp(rsdp->h.signature, rsdp_sig, 8));
+	assert(!strncmp(rsdp->signature, rsdp_sig, 8));
 	unsigned char sum = 0;
 	u8 *ptr = (void *)rsdp;
-
-	for (u32 i = 0; i < rsdp->h.length; i++) {
+	for (u32 i = 0; i < rsdp->length; i++) {
 		sum += ((u8 *)ptr)[i];
 	}
-
 	assert(sum == 0);
 }
 
-struct RSDT *get_rsdt_address()
+struct RSDP *get_rsdp_address()
 {
 #define EBDA (char *)(0x00080000) // Extended BIOS Data Area
 #define BIOS_AREA_START (char *)(0x000E0000)
 #define BIOS_AREA_END (char *)0x000FFFFF
 
-	static struct RSDT *ptr = NULL;
+	static struct RSDP *ptr = NULL;
 	if (ptr != NULL)
 		return (void *)ptr;
 	ptr = find_rsdt(EBDA, EBDA + 1024);
@@ -56,18 +48,34 @@ struct RSDT *get_rsdt_address()
 
 void *find_SDT(char sig[4])
 {
-	struct RSDT *rsdt = get_rsdt_address();
-	int extended = rsdt->h.revision != 0;
-	int entries = (rsdt->h.length - sizeof(struct RSDT_header)) /
-		      (extended ? sizeof(u64) : sizeof(u32));
+	static struct RSDP *rsdp = 0;
+	if (rsdp == 0)
+		rsdp = get_rsdp_address();
+	int extended = rsdp->revision != 0;
 
-	for (int i = 0; i < entries; i++) {
-		struct SDT_header *h =
-			(struct SDT_header *)(rsdt->other_sdt[i]);
-		if (!strncmp(h->signature, sig, 4))
-			return (void *)h;
+	if (extended) {
+		struct XSDT *xsdt = (void *)rsdp->xsdt_address;
+		int entries = ((xsdt->h.length - sizeof(struct SDT_header)) /
+			       sizeof(u64));
+		printf("Entries is %d\n", entries);
+		assert(entries < 100);
+		for (int i = 0; i < entries; i++) {
+			struct SDT_header *h =
+				(struct SDT_header *)(xsdt->other_sdt[i]);
+			if (!strncmp(h->signature, sig, 4))
+				return (void *)h;
+		}
+	} else {
+		struct RSDT *rsdt = (void *)rsdp->rsdt_address;
+		int entries = ((rsdt->h.length - sizeof(struct SDT_header)) /
+			       sizeof(u32));
+		for (int i = 0; i < entries; i++) {
+			struct SDT_header *h =
+				(struct SDT_header *)(rsdt->other_sdt[i]);
+			if (!strncmp(h->signature, sig, 4))
+				return (void *)h;
+		}
 	}
-
 	// No FACP found
 	return NULL;
 }

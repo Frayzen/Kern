@@ -9,9 +9,9 @@ void recurse_check(struct pci_device *device, u8 offset)
 	u8 capId = cap & 0xFF;
 	u8 nextOffset = (cap >> 4) & 0xFF;
 
-	if (capId == SMI_CAP_ID)
+	if (capId == MSI_CAP_ID)
 		device->capabilities.msi_cap_offset = offset;
-	if (capId == SMIX_CAP_ID)
+	if (capId == MSIX_CAP_ID)
 		device->capabilities.msix_cap_offset = offset;
 	if (capId == POW_CAP_ID)
 		device->capabilities.power_cap_offset = offset;

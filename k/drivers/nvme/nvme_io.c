@@ -13,6 +13,7 @@ void *get_queue_ptr(struct nvme_queue *q, u8 is_submission)
 void nvme_send_command(struct nvme_device *device,
 		       struct submission_q_entry *cmd, u8 is_admin)
 {
+	cmd->cmd.command_id = device->next_command_id++;
 	struct nvme_queue *sub_queue = is_admin ? (&device->adm_subm_q) :
 						  &device->io_subm_q;
 	struct nvme_queue *compl_queue = is_admin ? (&device->adm_cmpl_q) :
@@ -60,7 +61,6 @@ int nvme_read(struct nvme_device *dev, u64 lba, u32 sector_count, void *buffer)
 	cmd.command_specific[2] = sector_count & 0xFFFF;
 	cmd.prp1 = buf;
 
-	cmd.cmd.command_id = dev->next_command_id++;
 	nvme_send_command(dev, &cmd, 0);
 	return 1;
 }

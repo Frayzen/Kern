@@ -15,8 +15,8 @@ struct pci_capabilites {
 #define CAP_REG 0x34
 
 #define POW_CAP_ID 0x1
-#define SMI_CAP_ID 0x05
-#define SMIX_CAP_ID 0x11
+#define MSI_CAP_ID 0x05
+#define MSIX_CAP_ID 0x11
 
 void check_capacities(struct pci_device *device);
 

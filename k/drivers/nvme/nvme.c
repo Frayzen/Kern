@@ -45,7 +45,7 @@ void reset_controller(struct nvme_device *dev)
 	printf("Creating admin queues !\n");
 	assert(create_admin_completion_queue(dev));
 	assert(create_admin_submission_queue(dev));
-	printf("Admin queue creaed\n");
+	printf("Admin queue created\n");
 
 	printf("Enabling controller\n");
 
@@ -86,7 +86,7 @@ void nvme_init(void)
 			enable_msi(&device.pci);
 
 		// unmask the interrupts for all completion queues
-		/* *nvme_reg(&device, NVME_INTMC) = 0xFFFFFFFF; */
+		*nvme_reg(&device, NVME_INTMC) = 0xFFFFFFFF;
 
 		// mask the interrupts for all completion queues
 		/* *nvme_reg(&device, NVME_INTMS) = 0xFFFFFFFF; */

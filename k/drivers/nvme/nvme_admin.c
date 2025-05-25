@@ -38,7 +38,6 @@ int create_io_submission_queue(struct nvme_device *dev)
 	u16 flags = FLAG_CONTIGUOUS_QUEUE;
 	u32 completion_id = 1;
 	cmd.command_specific[1] = ((u16)completion_id << 16) | flags;
-	cmd.cmd.command_id = dev->next_command_id++;
 
 	// Send commmand
 	nvme_send_command(dev, &cmd, 1);
@@ -69,8 +68,6 @@ int create_io_completion_queue(struct nvme_device *dev)
 	u32 vector = 1;
 	u32 flags = FLAG_CONTIGUOUS_QUEUE | FLAG_ENABLE_INTS;
 	cmd.command_specific[1] = (vector << 16) | flags;
-
-	cmd.cmd.command_id = dev->next_command_id++;
 
 	nvme_send_command(dev, &cmd, 1);
 	return 1;
@@ -110,7 +107,6 @@ int nvme_identify(struct nvme_device *device)
 	struct submission_q_entry cmd = {};
 	cmd.cmd.opcode = 0x06;
 	cmd.prp1 = buffer;
-	cmd.cmd.command_id = device->next_command_id++;
   cmd.nsid = 1;
 	nvme_send_command(device, &cmd, 1);
 	return 1;

@@ -11,7 +11,7 @@ void enable_msix(struct pci_device *dev)
 
 	u32 id = pcidev_readl(dev, offset + MSIX_MXID);
 	struct MSIX_identifier *id_edit = ((struct MSIX_identifier *)&id);
-	assert(id_edit->capID == SMIX_CAP_ID);
+	assert(id_edit->capID == MSIX_CAP_ID);
 
 	id_edit->enable = 0;
 	id_edit->function_mask = 1;
@@ -35,11 +35,10 @@ void enable_msix(struct pci_device *dev)
 	printf("Table ptr is : 0x%x\n", table_ptr);
 #define APIC_BASE_MSI_ADDRESS 0xFEE00000
 
-	struct MSIX_vector_table ref_table = {
-		ref_table.masked = 0,
-		ref_table.msg_addr = APIC_BASE_MSI_ADDRESS & ~0xF,
-		ref_table.msg_data = 0x41
-	};
+	struct MSIX_vector_table ref_table = {};
+	ref_table.masked = 0;
+	ref_table.msg_addr = APIC_BASE_MSI_ADDRESS & ~0xF;
+	ref_table.msg_data = 70;
 
 	table_ptr[0] = ref_table;
 	table_ptr[1] = ref_table;
@@ -48,7 +47,6 @@ void enable_msix(struct pci_device *dev)
 	id_edit->function_mask = 0;
 	pcidev_writel(dev, offset + MSIX_MXID, id);
 	printf("Enabled MSIX for device\n");
-
 }
 
 void disable_msix(struct pci_device *dev)

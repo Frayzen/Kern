@@ -72,13 +72,13 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	setup_idt();
 	asm volatile("sti" :);
 
-	// memory_init(info);
-	// init_memalloc(info);
+	memory_init(info);
+	init_memalloc(info);
 
 	// setup_fs();
 	// test_file();
 
-	// nvme_init();
+	nvme_init();
 
 	for (unsigned i = 0;;) {
 		int c = get_last_key();

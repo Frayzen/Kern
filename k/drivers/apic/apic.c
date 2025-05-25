@@ -14,7 +14,7 @@
 #define IA32_APIC_BASE_MSR 0x1b
 #define APIC_SW_ENABLE 0x100
 
-static u32 volatile *lapic = 0; // only 32 bit aligned entries
+u32 volatile *lapic = 0; // only 32 bit aligned entries
 
 // Although each register is 4 bytes, they are all aligned on a 16 byte boundary
 #define APIC_REG(Offset) (lapic + Offset / 4)

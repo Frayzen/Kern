@@ -4,9 +4,10 @@
 #include "drivers/pci/pci.h"
 #include "k/compiler.h"
 #include "k/types.h"
+#include "assert.h"
 
 struct nvme_queue {
-  u32 queue_id;
+	u32 queue_id;
 	u64 address;
 	u64 size;
 	u64 ptr; // head or tail
@@ -37,23 +38,23 @@ struct nvme_controller_status {
 } __packed;
 
 struct nvme_controller_command {
-  u8 enable : 1;
-  u8 reserved1__ : 3;
-  u8 command_set_selected : 3;
-  u8 mem_page_size : 4;
-  u8 arbit_mech_selected : 3;
-  u8 shutdown_notif : 2;
-  u8 io_subm_q_entry_size : 4;
-  u8 io_compl_q_entry_size : 4;
-  u8 ready_independent_of_media_enable : 1;
-  u8 reserved2__ : 7;
+	u8 enable : 1;
+	u8 reserved1__ : 3;
+	u8 command_set_selected : 3;
+	u8 mem_page_size : 4;
+	u8 arbit_mech_selected : 3;
+	u8 shutdown_notif : 2;
+	u8 io_subm_q_entry_size : 4;
+	u8 io_compl_q_entry_size : 4;
+	u8 ready_independent_of_media_enable : 1;
+	u8 reserved2__ : 7;
 } __packed;
 
 struct nvme_aqa {
-  u16 admin_subq_size : 12;
-  u8 reserved1__ : 4;
-  u16 admin_complq_size : 12;
-  u8 reserved2__ : 4;
+	u16 admin_subq_size : 12;
+	u8 reserved1__ : 4;
+	u16 admin_complq_size : 12;
+	u8 reserved2__ : 4;
 } __packed;
 
 struct command_dword {
@@ -124,7 +125,8 @@ void nvme_init(void);
 volatile u32 *nvme_reg(struct nvme_device *dev, u32 offset);
 void nvme_wait_status_ready(struct nvme_device *dev);
 
-#include "assert.h"
 #define CHECK_FATAL_STATUS(Device) assert(!(*nvme_reg(Device, NVME_CST) & 0x2))
+
+extern struct nvme_device* nvme_dev;
 
 #endif /* !NVME_H */

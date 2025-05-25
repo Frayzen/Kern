@@ -38,4 +38,6 @@ enum apic_timer_mode {
 void apic_setup(void);
 void apic_send_eoi(void);
 
+extern u32 volatile *lapic;
+
 #endif /* !APIC_H */

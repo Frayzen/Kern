@@ -1,8 +1,21 @@
 #include "msix.h"
 #include "assert.h"
 #include "drivers/pci/pci.h"
+#include "interrupts/handler.h"
 #include "panic.h"
 #include <stdio.h>
+
+extern u32 volatile *lapic;
+static volatile struct MSIX_vector_table *table_ptr = NULL;
+
+void set_vector(u8 vector, u8 isr)
+{
+	struct MSIX_vector_table ref_table = {};
+	ref_table.masked = 0;
+	ref_table.msg_addr = (u32) lapic; // cast u32 first, important
+	ref_table.msg_data = isr;
+	table_ptr[vector] = ref_table;
+}
 
 void enable_msix(struct pci_device *dev)
 {
@@ -30,18 +43,13 @@ void enable_msix(struct pci_device *dev)
 
 	printf("Bar val is : 0x%x\n", low_bar);
 	printf("Table offset is : 0x%x\n", table_offset);
-	volatile struct MSIX_vector_table *table_ptr =
+	table_ptr =
 		(volatile struct MSIX_vector_table *)(bar_val + table_offset);
 	printf("Table ptr is : 0x%x\n", table_ptr);
 #define APIC_BASE_MSI_ADDRESS 0xFEE00000
 
-	struct MSIX_vector_table ref_table = {};
-	ref_table.masked = 0;
-	ref_table.msg_addr = APIC_BASE_MSI_ADDRESS & ~0xF;
-	ref_table.msg_data = 70;
-
-	table_ptr[0] = ref_table;
-	table_ptr[1] = ref_table;
+	set_vector(0, IRQ_NVME_ADMIN_QUEUE);
+	set_vector(1, IRQ_NVME_IO_QUEUE);
 
 	id_edit->enable = 1;
 	id_edit->function_mask = 0;

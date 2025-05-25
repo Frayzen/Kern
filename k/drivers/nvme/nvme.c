@@ -10,6 +10,9 @@
 #include "memalloc/memalloc.h"
 #include <stdio.h>
 
+struct nvme_device device = {};
+struct nvme_device *nvme_dev = &device;
+
 volatile u32 *nvme_reg(struct nvme_device *dev, u32 offset)
 {
 	assert(dev->base_addr != 0x0);
@@ -60,10 +63,10 @@ void reset_controller(struct nvme_device *dev)
 
 void nvme_init(void)
 {
-	static struct nvme_device device = {};
 	if (look_for_device(NVME_CLASS_CODE, NVME_SUBCLASS, &device.pci)) {
 		printf("FOUND NVME AT %d %d with HEADER TYPE %d\n",
-		       device.pci.bus, device.pci.slot, device.pci.headerType);
+		       device.pci.bus, device.pci.slot,
+		       device.pci.headerType);
 		assert(device.pci.headerType == 0x0);
 
 		set_interrupts(&device.pci, 1);
@@ -85,11 +88,8 @@ void nvme_init(void)
 		} else if (device.pci.capabilities.msi_cap_offset)
 			enable_msi(&device.pci);
 
-		// unmask the interrupts for all completion queues
-		*nvme_reg(&device, NVME_INTMC) = 0xFFFFFFFF;
-
 		// mask the interrupts for all completion queues
-		/* *nvme_reg(&device, NVME_INTMS) = 0xFFFFFFFF; */
+		*nvme_reg(&device, NVME_INTMS) = 0xFFFFFFFF;
 
 		device.capability_stride =
 			(*nvme_reg(&device, NVME_CAP + 0x4)) & 0xF;
@@ -105,17 +105,20 @@ void nvme_init(void)
 		assert(nvme_identify(&device));
 		printf("[DONE]\n");
 
-		printf("Creating IO queues !\n");
-		assert(create_io_completion_queue(&device));
-		assert(create_io_submission_queue(&device));
+		// printf("Creating IO queues !\n");
+		// assert(create_io_completion_queue(&device));
+		// assert(create_io_submission_queue(&device));
 
-		char *buffer = (char *)mmap();
-		printf("READING ...\n");
-		nvme_read(&device, 1, 1, buffer);
-		printf("READ:\n");
-		for (int i = 0; i < 10; i++) {
-			printf("%c ", buffer[i]);
-		}
+		// // unmask the interrupts for all completion queues
+		// *nvme_reg(&device, NVME_INTMC) = 0xFFFFFFFF;
+
+		// char *buffer = (char *)mmap();
+		// printf("READING ...\n");
+		// nvme_read(&device, 1, 1, buffer);
+		// printf("READ:\n");
+		// for (int i = 0; i < 10; i++) {
+		// 	printf("%c ", buffer[i]);
+		// }
 
 		printf("NVME SETUP DONE\n");
 	} else

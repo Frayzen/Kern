@@ -4,23 +4,11 @@
 #define GATE_TYPE_INT 0xE
 #define GATE_TYPE_TRAP 0xF
 
-#define IRQ_LIST                                                         \
-	X(64, SYSTEM_CLOCK, "System clock", NO_ERCODE) /*Begin IRQs*/    \
-	X(65, KEYBOARD, "Keyboard", NO_ERCODE)                           \
-	X(66, CASCADE, "Cascade", NO_ERCODE)                             \
-	X(67, COM2, "COM2", NO_ERCODE)                                   \
-	X(68, COM1, "COM1", NO_ERCODE)                                   \
-	X(69, LPT2, "LPT2", NO_ERCODE)                                   \
-	X(70, FLOPPY_DISK, "Floppy disk", NO_ERCODE)                     \
-	X(71, LPT1, "LPT1", NO_ERCODE)                                   \
-	X(72, PARALLEL_PORT, "Parallel port", NO_ERCODE)                 \
-	X(73, CRT_CONTROLLER, "CRT controller", NO_ERCODE)               \
-	X(74, GENERIC_HARD_DISK, "Generic hard disk", NO_ERCODE)         \
-	X(75, GENERIC_FLOPPY_DISK, "Generic floppy disk", NO_ERCODE)     \
-	X(76, GENERIC_SERIAL_PORT, "Generic serial port", NO_ERCODE)     \
-	X(77, GENERIC_PARALLEL_PORT, "Generic parallel port", NO_ERCODE) \
-	X(78, IDE_CONTROLLER, "IDE controller", NO_ERCODE)               \
-	X(79, FLOPPY_DISK_CONTROLLER, "Floppy disk controller", NO_ERCODE)
+#define IRQ_LIST                                                      \
+	X(64, SYSTEM_CLOCK, "System clock", NO_ERCODE) /*Begin IRQs*/ \
+	X(65, KEYBOARD, "Keyboard", NO_ERCODE)                        \
+	X(66, NVME_ADMIN_QUEUE, "NVMe Admin Queue", NO_ERCODE)        \
+	X(67, NVME_IO_QUEUE, "NVMe IO Queue", NO_ERCODE)
 
 #define ISR_LIST                                                               \
 	X(0, DIVIDE_ERROR, "Divide error", NO_ERCODE)                          \

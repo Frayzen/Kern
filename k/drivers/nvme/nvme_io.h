@@ -2,20 +2,15 @@
 #define NVME_IO_H
 
 // 64 bytes, arranged in 16 DWORDs (1 DWORDS is 4 bytes)
+#include "drivers/nvme/nvme.h"
 #include "k/types.h"
 
-struct nvme_device;
-struct nvme_queue;
+struct nvme_device_t;
+struct nvme_queue_t;
 
-struct submission_q_entry create_io_command(struct nvme_device *dev, u8 opcode,
-					    u8 nsid, void *data, u64 lba,
-					    u16 num_blocks);
-void nvme_send_command(struct nvme_device *device,
-		       struct submission_q_entry *cmd, u8 is_admin);
+int nvme_write(u64 lba, u32 sector_count, void *buffer);
+int nvme_read(u64 lba, u32 sector_count, void *buffer);
 
-int nvme_write(struct nvme_device *device, u64 lba, u32 sector_count,
-	       void *buffer);
-int nvme_read(struct nvme_device *device, u64 lba, u32 sector_count,
-	      void *buffer);
+void nvme_process_io_cq();
 
 #endif /* !NVME_IO_H */

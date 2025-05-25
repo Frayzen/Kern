@@ -1,6 +1,8 @@
 #include "handler.h"
 #include "drivers/apic/apic.h"
 #include "drivers/config.h"
+#include "drivers/nvme/nvme_admin.h"
+#include "drivers/nvme/nvme_io.h"
 #include "isr_list.h"
 #include "interrupts/ints.h"
 #include "interrupts/keyboard.h"
@@ -32,18 +34,17 @@ void handle_irq(unsigned int irq)
 	case IRQ_KEYBOARD:
 		handle_keyboard();
 		break;
-	case IRQ_IDE_CONTROLLER:
-	case IRQ_FLOPPY_DISK_CONTROLLER:
-		printf("Disk IRQ received\n");
+	case IRQ_NVME_ADMIN_QUEUE:
+		println("NVME ADMIN IRQ");
+		nvme_process_admin_cq();
 		break;
-	case IRQ_GENERIC_HARD_DISK:
-		printf("======================\n");
-		printf("General hard disk IRQ\n");
-		printf("======================\n");
-		return;
+	case IRQ_NVME_IO_QUEUE:
+		println("NVME IO IRQ");
+		nvme_process_io_cq();
+		break;
 	default:
 		print("Unhandled IRQ");
-		printf("%d", irq - IRQ_MASTER_OFFSET);
+		printf("%d (ISR %d)", irq - IRQ_MASTER_OFFSET, irq);
 		println();
 		asm volatile("hlt");
 		break;

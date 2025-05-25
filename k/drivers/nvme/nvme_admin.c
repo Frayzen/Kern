@@ -1,21 +1,16 @@
 #include "nvme_admin.h"
 #include "drivers/nvme/nvme.h"
-#include "drivers/nvme/nvme_io.h"
 #include "drivers/nvme/nvme_utils.h"
-#include "drivers/pci/cap.h"
 #include "memalloc/memalloc.h"
-#include <stdio.h>
 
 volatile u32 *nvme_subm_doorbell(u32 queue_id)
 {
-	return nvme_reg(
-		nvme_dev,
-		0x1000 + (2 * queue_id * (4 << nvme_dev->capability_stride)));
+	return nvme_reg(0x1000 +
+			(2 * queue_id * (4 << nvme_dev->capability_stride)));
 }
 volatile u32 *nvme_cmpl_doorbell(u32 queue_id)
 {
-	return nvme_reg(nvme_dev,
-			0x1000 + ((2 * queue_id + 1) *
+	return nvme_reg(0x1000 + ((2 * queue_id + 1) *
 				  (4 << nvme_dev->capability_stride)));
 }
 
@@ -85,8 +80,8 @@ int create_admin_submission_queue()
 	nvme_dev->adm_subm_q.size = SUBM_Q_SIZE - 1;
 	nvme_dev->adm_subm_q.door_bell = nvme_subm_doorbell(0);
 	// Write to the register
-	*nvme_reg(nvme_dev, NVME_ASQ) = nvme_dev->adm_subm_q.address;
-	CHECK_FATAL_STATUS(nvme_dev);
+	*nvme_reg(NVME_ASQ) = nvme_dev->adm_subm_q.address;
+	NVME_CHECK_STATUS;
 	return 1;
 }
 
@@ -99,7 +94,7 @@ int create_admin_completion_queue()
 	nvme_dev->adm_cmpl_q.size = COMPL_Q_SIZE - 1;
 	nvme_dev->adm_cmpl_q.door_bell = nvme_cmpl_doorbell(0);
 	// Write to the register
-	*nvme_reg(nvme_dev, NVME_ACQ) = nvme_dev->adm_cmpl_q.address;
+	*nvme_reg(NVME_ACQ) = nvme_dev->adm_cmpl_q.address;
 	return 1;
 }
 
@@ -116,5 +111,5 @@ int nvme_identify()
 
 void nvme_process_admin_cq()
 {
-  nvme_process_cq(&nvme_dev->adm_cmpl_q);
+	nvme_process_cq(&nvme_dev->adm_cmpl_q);
 }

@@ -35,11 +35,9 @@ void handle_irq(unsigned int irq)
 		handle_keyboard();
 		break;
 	case IRQ_NVME_ADMIN_QUEUE:
-		println("NVME ADMIN IRQ");
 		nvme_process_admin_cq();
 		break;
 	case IRQ_NVME_IO_QUEUE:
-		println("NVME IO IRQ");
 		nvme_process_io_cq();
 		break;
 	default:

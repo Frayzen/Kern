@@ -6,7 +6,7 @@ When the controller has finished processing a command, it appends an entry to a 
 
 ## Admin queues
 
-At reset, only one submission queue and one completion queue exists. These are the admin queues. The admin queues can process admin commands, such as creating IO queues (used to submit IO commands, like read/write sectors), and query information about the controller and drives (called "namespaces") connected to it. The admin queues are unique and have identifiers 0.
+At reset, only one submission queue and one completion queue exists. These are the admin queues. The admin queues can process admin commands, such as creating IO queues (used to submit IO commands, like read/write sectors), and query information about the controller and drives (called "namespaces") connected to it. The admin queues are unique and have identifiers 0. The associated MSI(-X) vector is also always the 0 one.
 The admin commands include:
 * Create IO submission queue
 * Create IO completion queue

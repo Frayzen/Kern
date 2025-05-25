@@ -11,7 +11,9 @@ struct nvme_queue {
 	u64 address;
 	u64 size;
 	u64 ptr; // head or tail
+  u16 last_cmd;
 	volatile u32 *door_bell;
+  u8 pending_op; // used for completion queues
 } __packed;
 
 struct nvme_device {
@@ -122,10 +124,10 @@ struct completion_q_entry {
 #define NVME_ACQ 0x30 // admin completion queue reg
 
 void nvme_init(void);
-volatile u32 *nvme_reg(struct nvme_device *dev, u32 offset);
-void nvme_wait_status_ready(struct nvme_device *dev);
+volatile u32 *nvme_reg(u32 offset);
+void nvme_wait_status_ready();
 
-#define CHECK_FATAL_STATUS(Device) assert(!(*nvme_reg(Device, NVME_CST) & 0x2))
+#define NVME_CHECK_STATUS assert(!(*nvme_reg(NVME_CST) & 0x2))
 
 extern struct nvme_device* nvme_dev;
 

@@ -18,6 +18,7 @@ int nvme_read(u64 lba, u32 sector_count, void *buffer)
 	cmd.prp1 = buf;
 
 	nvme_send_command(&cmd, NVME_IO_QUEUE);
+  nvme_wait_queue(&nvme_dev->io_subm_q);
 	return 1;
 }
 

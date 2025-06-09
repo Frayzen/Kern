@@ -45,16 +45,12 @@ Here is the description of some important files:
     k/include/k/kstd.h  # k standard definitions
     k/include/k/kfs.h   # KFS structures definitions
     k/include/k/types.h # kernel types definitions
-    roms                # rom folder
-    roms/chichepong     # chichepong folder
-    roms/roms.lds       # LD script for rom binaries
     libs                # SDK folder
     libs/libc           # a basic libc available everywhere
     libs/libk           # userland functions
     tools               # Tools folder
-    tools/mkksf         # small program to generate your own sounds
-    tools/mkkfs         # small program to create kfs roms
-    tools/create-iso.sh # small tool to generate the iso image
+    tools/create-iso.sh # small tool to generate the iso image (read only)
+    tools/create-iso.sh # small tool to generate the disk image (read / write)
 
 ### Intel Manuals
 
@@ -75,7 +71,7 @@ file, but your project must work with the original one.
 
 Here are make rules you need to know:
 
-    make | make k.iso  # create an ISO with all the roms
+    make | make k.iso  # create an ISO
     make k             # compile your kernel
     make rom/GAME      # compile the rom in the folder rom/$(GAME)
     make clean         # clean the tree

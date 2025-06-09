@@ -98,7 +98,6 @@ void nvme_init(void)
 
 		printf("Identify...\n");
 		assert(nvme_identify());
-		printf("[DONE]\n");
 
 		printf("Creating IO queues !\n");
 		assert(create_io_completion_queue());

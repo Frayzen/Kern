@@ -77,7 +77,7 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	init_memalloc(info);
 
 	setup_fs();
-	test_file();
+	// test_file();
 
 	for (unsigned i = 0;;) {
 		char c = get_last_key();

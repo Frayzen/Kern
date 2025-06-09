@@ -23,17 +23,7 @@
 #
 include config.mk
 
-ROMS	= \
-	  roms/chichehunter \
-	  roms/chichepong \
-	  roms/chichevaders \
-	  roms/perrodlauncher \
-	  roms/skate \
-	  roms/yakanoid \
-
-
 SUBDIRS	= \
-	  $(ROMS) \
 	  k \
 	  libs/libc \
 	  libs/libk \
@@ -45,23 +35,17 @@ all: k.iso disk.img
 
 k: libs/libc
 
-$(ROMS): tools/mkkfs libs/libc libs/libk
-
 disk.img: install
-	./tools/create-disk-image.sh disk.img $(INSTALL_ROOT)
+	./tools/create-disk-image.sh disk.img $(ABS_INSTALL)
 
 k.iso: install
-	./tools/create-iso.sh $@ $(INSTALL_ROOT) $(ROMS)
+	./tools/create-iso.sh $@ $(INSTALL_ROOT) k
 
 $(SUBDIRS):
 	$(MAKE) -C $@
 
 install: libs/libc libs/libk k
 	mkdir -p $(ABS_INSTALL)
-	for I in $(ROMS);			\
-	do					\
-		$(MAKE) INSTALL_ROOT=$(ABS_INSTALL) -C $$I $@ || exit 1;	\
-	done
 	$(MAKE) INSTALL_ROOT=$(ABS_INSTALL) -C k $@
 
 clean:
@@ -70,6 +54,7 @@ clean:
 		$(MAKE) -C $$I $@ || exit 1;	\
 	done
 	$(RM) k.iso
+	$(RM) disk.img
 	$(RM) -r root
 	$(RM) -r iso
 

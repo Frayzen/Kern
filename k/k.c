@@ -22,7 +22,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "drivers/apic/apic.h"
-#include "drivers/nvme/nvme.h"
+#include "drivers/disk/nvme/nvme.h"
+#include "drivers/disk/nvme/nvme_io.h"
 #include "fs/fs.h"
 #include "gdt/gdt.h"
 #include "interrupts/ints.h"
@@ -75,10 +76,8 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	memory_init(info);
 	init_memalloc(info);
 
-	// setup_fs();
-	// test_file();
-
-	nvme_init();
+	setup_fs();
+	test_file();
 
 	for (unsigned i = 0;;) {
 		char c = get_last_key();

@@ -47,4 +47,13 @@ static inline u32 inl(u32 port)
 	return res;
 }
 
+static inline void wait_400ns(void)
+{
+	inb(0x1);
+	inb(0x1);
+	inb(0x1);
+	inb(0x1);
+}
+
+
 #endif				/* !IO_H_ */

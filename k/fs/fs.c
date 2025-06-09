@@ -1,10 +1,14 @@
 #include "fs.h"
-#include "drivers/atapi/atapi.h"
+#include "drivers/disk/atapi/atapi.h"
+#include "drivers/config.h"
+#include "drivers/disk/disk.h"
+#include "drivers/disk/nvme/nvme.h"
 #include "fs/isofs/iso_driver.h"
 #include "k/atapi.h"
 #include "memory.h"
 #include "panic.h"
 #include "k/kstd.h"
+#include <stdio.h>
 
 static struct cache *cache = NULL;
 
@@ -36,7 +40,7 @@ int open(char *path)
 	if (fd->block == 0)
 		return -1;
 	fd->ptr = cache_alloc(cache);
-	read_block(fd->block, 1, fd->ptr);
+	disk_read_block(fd->block, 1, fd->ptr);
 	fd->used = 1;
 	return id;
 }
@@ -52,7 +56,7 @@ int read(int fd, char *buf, unsigned int len)
 		buf[curlen++] = p->ptr[RLTV_OFFSET(p)];
 		p->offset++;
 		if (!RLTV_OFFSET(p)) // We are at the end of a block
-			read_block(p->block + CUR_BLK(p) + 1, 1, p->ptr);
+			disk_read_block(p->block + CUR_BLK(p) + 1, 1, p->ptr);
 	}
 	buf[curlen] = 0;
 	return curlen;
@@ -95,10 +99,9 @@ void setup_fs(void)
 	cache = cache_new((void *)0xF00000,
 			  MAX_FDS, // Base address of user code
 			  CD_BLOCK_SZ);
-	while (!setup_atapi())
-		;
-	if (!setup_iso())
-  {
-    panic("No root filesystem found");
-  }
+  setup_disk();
+	if (!setup_iso()) {
+		panic("No root filesystem found");
+	}
+	printf("Filesystem setup !\n");
 }

@@ -1,6 +1,7 @@
 #include "iso_driver.h"
-#include "drivers/atapi/atapi.h"
+#include "drivers/config.h"
 #include "k/atapi.h"
+#include "drivers/disk/disk.h"
 #include "k/iso9660.h"
 #include "k/types.h"
 #include "stdio.h"
@@ -34,7 +35,7 @@ struct iso_dir *get_file(int block, char **name)
 	while (*next_name && *next_name != '/')
 		next_name++;
 	int name_len = next_name - *name;
-	read_block(block, 1, buffer);
+	disk_read_block(block, 1, buffer);
 	char *cur_buffer = buffer;
 	struct iso_dir *dir = (struct iso_dir *)cur_buffer;
 	while (1) {
@@ -57,7 +58,7 @@ int find(char *name, u32 *size)
 	while (1) {
 		struct iso_dir *dir = get_file(cur_dir, &name);
 		if (!dir) {
-			printf("No such file or directory\n");
+			printf("No such file or directory (%s not found)\n", name);
 			return 0;
 		}
 		cur_dir = dir->data_blk.le;
@@ -73,7 +74,7 @@ int setup_iso(void)
 	struct iso_prim_voldesc *primary;
 	int cur = 0;
 	do {
-		if (!read_block(VOLUME_BLOCK(cur++), 1, buffer)) {
+		if (!disk_read_block(VOLUME_BLOCK(cur++), 1, buffer)) {
 			printf("Could not read the first bloc, aborting\n",
 			       cur);
 			return 0;
@@ -91,7 +92,7 @@ int setup_iso(void)
 			primary = (struct iso_prim_voldesc *)buffer;
 			assert(primary->vol_desc_type == PRIMARY_TYPE);
 			assert(primary->vol_blk_size.le == CD_BLOCK_SZ);
-			read_block(primary->root_dir.data_blk.le, 1, buffer);
+			disk_read_block(primary->root_dir.data_blk.le, 1, buffer);
 			struct iso_dir *dir = (struct iso_dir *)buffer;
 			root_dir = dir->data_blk.le;
 			break;
@@ -105,10 +106,9 @@ int setup_iso(void)
 			panic("Unknown type of descriptor (got %x)", buffer[0]);
 		}
 	} while (buffer[0] != TERMINATOR_TYPE);
-	if (root_dir == -1)
-  {
+	if (root_dir == -1) {
 		panic("No root directory found");
-    return 0;
-  }
+		return 0;
+	}
 	return 1;
 }

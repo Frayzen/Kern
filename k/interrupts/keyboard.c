@@ -1,5 +1,7 @@
 #include "keyboard.h"
 #include "io.h"
+#include "serial.h"
+#include <stdio.h>
 
 #define IO_KEYBOARD 0x60
 #define KEYBOARD_BUFFER_SIZE 128
@@ -20,8 +22,9 @@ void handle_keyboard(void)
 
 char get_last_key(void)
 {
-	if (keyboard_buffer_used == 0)
-		return -1;
+	if (keyboard_buffer_used == 0) {
+		return 0;
+	}
 	int ret = keyboard_buffer[keyboard_buffer_pos++];
 	keyboard_buffer_pos %= KEYBOARD_BUFFER_SIZE;
 	keyboard_buffer_used--;

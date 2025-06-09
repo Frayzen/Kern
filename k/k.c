@@ -81,9 +81,10 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	nvme_init();
 
 	for (unsigned i = 0;;) {
-		int c = get_last_key();
-		if (c != -1)
+		char c = get_last_key();
+		if (c) {
 			printf("KB %d\n", c);
+		}
 		*fb = star[i++ % 4];
 	}
 

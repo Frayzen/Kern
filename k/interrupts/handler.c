@@ -50,7 +50,7 @@ void handle_irq(unsigned int irq)
 	if (USE_APIC)
 		apic_send_eoi();
 	else
-		pic_send_eoi(irq);
+	  pic_send_eoi(irq);
 }
 
 unsigned int interrupt_handler(struct stack *s)

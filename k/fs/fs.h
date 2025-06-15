@@ -10,7 +10,7 @@ struct filedesc {
 	const struct filesystem *fs;
 	u8 fd_id; // id of the fd associated with database 
 	char path[PATH_LEN]; // path of the file
-	u8 block; // only relevant if on disk
+	u32 block; // only relevant if on disk
 	u32 size; // size of the file
   u32 offset; // current offset (associated with seek)
   u8* cache; // cache data from a read 

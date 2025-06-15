@@ -19,19 +19,22 @@ static int fs_nb = 0;
 
 int open(char *path)
 {
+	static struct filedesc reset_fd = {};
+	static struct filedesc fd;
+  fd = reset_fd;
+	fd.cache = cache_alloc(cache);
 	for (int i = 0; i < fs_nb; i++) {
 		struct filesystem *cur = fs_list + i;
 		printf("Check %s and %s of size %d\n", path, cur->mount_path,
 		       strlen(cur->mount_path));
 		if (!strncmp(path, cur->mount_path, strlen(cur->mount_path))) {
-			static struct filedesc fd;
 			if (cur->impl->open(cur, path, &fd)) {
-				fd.cache = cache_alloc(cache);
 				fd.fd_id = store_fd(&fd);
 				return fd.fd_id;
 			}
 		}
 	}
+	cache_free(cache, fd.cache);
 	return INVALID_FD;
 }
 

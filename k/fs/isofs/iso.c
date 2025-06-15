@@ -113,10 +113,9 @@ int setup_iso(struct filesystem *fs)
 			panic("Unknown type of descriptor (got %x)", buffer[0]);
 		}
 	} while (buffer[0] != TERMINATOR_TYPE);
-	if (root_dir == -1)
-  {
+	if (root_dir == -1) {
 		return 0;
-  }
+	}
 	fs->impl = &fs_iso_impl;
 	fs->data.iso.root_blk = root_dir;
 	return 1;
@@ -130,6 +129,7 @@ int iso_open_handler(struct filesystem *fs, char *path, struct filedesc *fd)
 	strcpy(fd->path, path);
 	fd->block = blk;
 	fd->fs = fs;
+	disk_read_block(fd->block, 1, (char *)fd->cache);
 	return 1;
 }
 
@@ -157,6 +157,7 @@ ssize_t iso_read_handler(struct filedesc *fd, char *buf, size_t len)
 
 int iso_seek_handler(struct filedesc *fd, int offset, int whence)
 {
+	int prev_blk = CUR_BLK(fd);
 	int next_offset;
 	switch (whence) {
 	case SEEK_SET:
@@ -174,7 +175,9 @@ int iso_seek_handler(struct filedesc *fd, int offset, int whence)
 	if (next_offset < 0 || (u32)next_offset > fd->size)
 		return -1;
 	fd->offset = next_offset;
-	disk_read_block(fd->block + CUR_BLK(fd) + 1, 1, (char *)fd->cache);
+	if (CUR_BLK(fd) != prev_blk)
+		disk_read_block(fd->block + CUR_BLK(fd) + 1, 1,
+				(char *)fd->cache);
 	return next_offset;
 }
 

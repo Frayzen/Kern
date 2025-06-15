@@ -4,7 +4,7 @@
 #include "drivers/disk/nvme/nvme.h"
 #include "drivers/disk/nvme/nvme_io.h"
 
-int disk_read_block(unsigned int block, unsigned int nb_block, char *buffer)
+int disk_read_block(u64 block, u64 nb_block, void *buffer)
 {
 	if (USE_NVME)
     // ATAPI BLOCK IS 2kB but NVME is 512B

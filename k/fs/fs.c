@@ -1,5 +1,6 @@
 #include "fs.h"
 #include "drivers/disk/disk.h"
+#include "fs/ext2fs/ext2.h"
 #include "fs/fd_db.h"
 #include "fs/fsdef.h"
 #include "fs/isofs/iso.h"
@@ -76,6 +77,10 @@ const struct filesystem *setup_fs(void)
 	if (setup_iso(&cur_fs)) {
 		fs_list[fs_nb++] = cur_fs;
 		printf("ISOFS is setup !\n");
+	}
+	if (setup_ext2(&cur_fs)) {
+		fs_list[fs_nb++] = cur_fs;
+		printf("EXT2 is setup !\n");
 	}
 	return NULL;
 }

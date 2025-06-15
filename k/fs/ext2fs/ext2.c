@@ -1,11 +1,32 @@
 #include "ext2.h"
+#include "drivers/disk/disk.h"
 #include "fs/fs.h"
 #include "fs/fsdef.h"
+#include "panic.h"
+#include <stdio.h>
 
 #define SUPERBLOCK_LOC 1024 // in byte
 
-int setup_ext2()
+static char buffer[BLOCK_SIZE] __attribute__((aligned(4096)));
+
+#define EXT2_SIG 0xef53
+int setup_ext2(struct filesystem *fs)
 {
+  printf("Buffer is %x\n", buffer);
+	if (!disk_read_block(0, 1, buffer))
+		panic("Could not read disk");
+	struct ext2_base_superblock *superblock =
+		(struct ext2_base_superblock *)(buffer + SUPERBLOCK_LOC);
+	if (superblock->signature != EXT2_SIG) {
+		printf("Not an EXT2\n");
+		return 0;
+	}
+	printf("Found EXT2 !\n");
+	printf("Block size : %d\n", superblock->log_block_size * 1024);
+	fs->impl = &fs_ext2_impl;
+	fs->data.ext2.superblock = *superblock;
+  fs->data.ext2.block_size = superblock->log_block_size * 1024;
+	return 1;
 }
 
 int ext2_open_handler(struct filesystem *fs, char *path, struct filedesc *fd)

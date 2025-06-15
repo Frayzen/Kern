@@ -15,6 +15,6 @@ if [ -z "$root_directory" ]; then
   exit 1;
 fi
 
-# dd if=/dev/null of=$disk_filename bs=1M seek=1024
-# mkfs.ext2 -F "$disk_filename" -d "$root_directory"
-mkisofs -o "$disk_filename" "$root_directory"
+dd if=/dev/null of=$disk_filename bs=1M seek=1024
+mkfs.ext2 -F "$disk_filename" -d "$root_directory"
+# mkisofs -o "$disk_filename" "$root_directory"

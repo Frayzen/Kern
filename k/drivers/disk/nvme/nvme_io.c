@@ -1,9 +1,7 @@
 #include "nvme_io.h"
 #include "drivers/disk/nvme/nvme_utils.h"
-#include "memalloc/memalloc.h"
 #include "nvme.h"
 #include "k/types.h"
-#include <stdio.h>
 
 int nvme_read(u64 lba, u32 sector_count, void *buffer)
 {

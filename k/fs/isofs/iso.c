@@ -26,7 +26,7 @@
 #define RLTV_OFFSET(Fd) ((Fd)->offset % CD_BLOCK_SZ)
 #define CUR_BLK(Fd) ((Fd)->offset / CD_BLOCK_SZ)
 
-static char buffer[ISO_BLOCK_SZ];
+static char buffer[BLOCK_SIZE] __attribute__((aligned(4096)));
 
 /*
  * Get the next file in the directory

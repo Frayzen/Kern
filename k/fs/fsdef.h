@@ -2,10 +2,12 @@
 #define FSDEF_H
 
 #include "drivers/config.h"
+#include "fs/ext2fs/ext2.h"
 #include "fs/isofs/iso.h"
 
 union fs_data {
 	struct fs_iso_data iso;
+	struct fs_ext2_data ext2;
 };
 
 struct filesystem {

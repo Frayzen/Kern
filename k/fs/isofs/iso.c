@@ -1,13 +1,14 @@
-#include "iso_driver.h"
-#include "drivers/config.h"
-#include "k/atapi.h"
+
+#include "iso.h"
 #include "drivers/disk/disk.h"
+#include "fs/fs.h"
+#include "fs/fsdef.h"
+#include "k/atapi.h"
 #include "k/iso9660.h"
-#include "k/types.h"
-#include "stdio.h"
-#include "string.h"
 #include "panic.h"
-#include "assert.h"
+#include <stdio.h>
+#include <assert.h>
+#include <string.h>
 
 #define VOLUME_BLOCK(i) (16 + i)
 #define VOL_BLK_ID "CD001"
@@ -20,16 +21,19 @@
 #define PRIMARY_TYPE 1
 #define SUPLEMENTARY_TYPE 2
 #define TERMINATOR_TYPE -1
+#define ISO_BLOCK_SZ 2048
 
-static char buffer[CD_BLOCK_SZ];
-static int root_dir = -1;
+#define RLTV_OFFSET(Fd) ((Fd)->offset % CD_BLOCK_SZ)
+#define CUR_BLK(Fd) ((Fd)->offset / CD_BLOCK_SZ)
+
+static char buffer[ISO_BLOCK_SZ];
 
 /*
  * Get the next file in the directory
  * name is the relative path to the file
  * returns a pointer to the directory entry
  */
-struct iso_dir *get_file(int block, char **name)
+static struct iso_dir *get_file(int block, char **name)
 {
 	char *next_name = *name;
 	while (*next_name && *next_name != '/')
@@ -50,15 +54,16 @@ struct iso_dir *get_file(int block, char **name)
 	}
 }
 
-int find(char *name, u32 *size)
+static int find(struct filesystem *fs, char *name, u32 *size)
 {
 	while (name[0] == '/' && *name)
 		name++;
-	int cur_dir = root_dir;
+	int cur_dir = fs->data.iso.root_blk;
 	while (1) {
 		struct iso_dir *dir = get_file(cur_dir, &name);
 		if (!dir) {
-			printf("No such file or directory (%s not found)\n", name);
+			printf("No such file or directory (%s not found)\n",
+			       name);
 			return 0;
 		}
 		cur_dir = dir->data_blk.le;
@@ -69,10 +74,11 @@ int find(char *name, u32 *size)
 	}
 }
 
-int setup_iso(void)
+int setup_iso(struct filesystem *fs)
 {
 	struct iso_prim_voldesc *primary;
 	int cur = 0;
+	static int root_dir = -1;
 	do {
 		if (!disk_read_block(VOLUME_BLOCK(cur++), 1, buffer)) {
 			printf("Could not read the first bloc, aborting\n",
@@ -91,8 +97,9 @@ int setup_iso(void)
 			printf("[Block %d] Primary filesystem\n", cur);
 			primary = (struct iso_prim_voldesc *)buffer;
 			assert(primary->vol_desc_type == PRIMARY_TYPE);
-			assert(primary->vol_blk_size.le == CD_BLOCK_SZ);
-			disk_read_block(primary->root_dir.data_blk.le, 1, buffer);
+			assert(primary->vol_blk_size.le == ISO_BLOCK_SZ);
+			disk_read_block(primary->root_dir.data_blk.le, 1,
+					buffer);
 			struct iso_dir *dir = (struct iso_dir *)buffer;
 			root_dir = dir->data_blk.le;
 			break;
@@ -106,9 +113,74 @@ int setup_iso(void)
 			panic("Unknown type of descriptor (got %x)", buffer[0]);
 		}
 	} while (buffer[0] != TERMINATOR_TYPE);
-	if (root_dir == -1) {
-		panic("No root directory found");
+	if (root_dir == -1)
+  {
 		return 0;
-	}
+  }
+	fs->impl = &fs_iso_impl;
+	fs->data.iso.root_blk = root_dir;
 	return 1;
 }
+
+int iso_open_handler(struct filesystem *fs, char *path, struct filedesc *fd)
+{
+	int blk = find(fs, path, &fd->size);
+	if (blk == 0)
+		return 0;
+	strcpy(fd->path, path);
+	fd->block = blk;
+	fd->fs = fs;
+	return 1;
+}
+
+int iso_close_handler(struct filedesc *fd)
+{
+	printf("Closing file %s\n", fd->path);
+	return 1;
+}
+
+ssize_t iso_read_handler(struct filedesc *fd, char *buf, size_t len)
+{
+	unsigned int curlen = 0;
+	while (curlen != len) {
+		if (fd->offset == fd->size)
+			return curlen;
+		buf[curlen++] = fd->cache[RLTV_OFFSET(fd)];
+		fd->offset++;
+		if (!RLTV_OFFSET(fd)) // We are at the end of a block
+			disk_read_block(fd->block + CUR_BLK(fd) + 1, 1,
+					(char *)fd->cache);
+	}
+	buf[curlen] = 0;
+	return curlen;
+}
+
+int iso_seek_handler(struct filedesc *fd, int offset, int whence)
+{
+	int next_offset;
+	switch (whence) {
+	case SEEK_SET:
+		next_offset = offset;
+		break;
+	case SEEK_CUR:
+		next_offset = fd->offset + offset;
+		break;
+	case SEEK_END:
+		next_offset = fd->size + offset;
+		break;
+	default:
+		return -1;
+	}
+	if (next_offset < 0 || (u32)next_offset > fd->size)
+		return -1;
+	fd->offset = next_offset;
+	disk_read_block(fd->block + CUR_BLK(fd) + 1, 1, (char *)fd->cache);
+	return next_offset;
+}
+
+const struct filesystem_impl fs_iso_impl = {
+	.open = iso_open_handler,
+	.close = iso_close_handler,
+	.seek = iso_seek_handler,
+	.read = iso_read_handler,
+};

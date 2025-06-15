@@ -14,7 +14,7 @@ int disk_read_block(unsigned int block, unsigned int nb_block, char *buffer)
 }
 
 
-int setup_disk()
+void setup_disk()
 {
 	if (USE_NVME)
 		nvme_init();

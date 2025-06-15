@@ -1,107 +1,78 @@
 #include "fs.h"
-#include "drivers/disk/atapi/atapi.h"
-#include "drivers/config.h"
 #include "drivers/disk/disk.h"
-#include "drivers/disk/nvme/nvme.h"
-#include "fs/isofs/iso_driver.h"
+#include "fs/fd_db.h"
+#include "fs/fsdef.h"
+#include "fs/isofs/iso.h"
 #include "k/atapi.h"
 #include "memory.h"
-#include "panic.h"
-#include "k/kstd.h"
 #include <stdio.h>
+#include <string.h>
 
 static struct cache *cache = NULL;
 
-struct fd {
-	u8 used;
-	u32 offset;
-	u32 block;
-	u32 size; // nb of total bytes
-	char *ptr;
-};
-
-#define MAX_FDS 1
-static struct fd fds[MAX_FDS];
+#define MAX_FS 10
+static struct filesystem fs_list[MAX_FS]; //tmp
+static int fs_nb = 0;
 
 #define CUR_BLK(Fd) ((Fd)->offset / CD_BLOCK_SZ)
 #define RLTV_OFFSET(Fd) ((Fd)->offset % CD_BLOCK_SZ)
 
 int open(char *path)
 {
-	int id;
-	for (id = 0; id < MAX_FDS; id++) {
-		if (!fds[id].used)
-			break;
+	for (int i = 0; i < fs_nb; i++) {
+		struct filesystem *cur = fs_list + i;
+		printf("Check %s and %s of size %d\n", path, cur->mount_path,
+		       strlen(cur->mount_path));
+		if (!strncmp(path, cur->mount_path, strlen(cur->mount_path))) {
+			static struct filedesc fd;
+			if (cur->impl->open(cur, path, &fd)) {
+				fd.cache = cache_alloc(cache);
+				fd.fd_id = store_fd(&fd);
+				return fd.fd_id;
+			}
+		}
 	}
-	if (id == MAX_FDS)
-		panic("Too many files open");
-	struct fd *fd = &fds[id];
-	fd->block = find(path, &fd->size);
-	if (fd->block == 0)
-		return -1;
-	fd->ptr = cache_alloc(cache);
-	disk_read_block(fd->block, 1, fd->ptr);
-	fd->used = 1;
-	return id;
+	return INVALID_FD;
 }
+
 int read(int fd, char *buf, unsigned int len)
 {
-	if (!fds[fd].used)
+	struct filedesc *fdptr = load_fd(fd);
+	if (fdptr == NULL)
 		return -1;
-	struct fd *p = &fds[fd];
-	unsigned int curlen = 0;
-	while (curlen != len) {
-		if (p->offset == p->size)
-			return curlen;
-		buf[curlen++] = p->ptr[RLTV_OFFSET(p)];
-		p->offset++;
-		if (!RLTV_OFFSET(p)) // We are at the end of a block
-			disk_read_block(p->block + CUR_BLK(p) + 1, 1, p->ptr);
-	}
-	buf[curlen] = 0;
-	return curlen;
+	return fdptr->fs->impl->read(fdptr, buf, len);
 }
 int seek(int fd, int offset, int whence)
 {
-	if (!fds[fd].used)
+	struct filedesc *fdptr = load_fd(fd);
+	if (fdptr == NULL)
 		return -1;
-	int next_offset;
-	struct fd *f = fds + fd;
-	switch (whence) {
-	case SEEK_SET:
-		next_offset = offset;
-		break;
-	case SEEK_CUR:
-		next_offset = f->offset + offset;
-		break;
-	case SEEK_END:
-		next_offset = f->size + offset;
-		break;
-	default:
-		return -1;
-	}
-	if (next_offset < 0 || (u32)next_offset > f->size)
-		return -1;
-	f->offset = next_offset;
-	return next_offset;
+	return fdptr->fs->impl->seek(fdptr, offset, whence);
 }
 int close(int fd)
 {
-	if (!fds[fd].used)
+	struct filedesc *fdptr = load_fd(fd);
+	if (fdptr == NULL)
 		return -1;
-	cache_free(cache, fds[fd].ptr);
-	fds[fd].used = 0;
-	return 0;
+	int res = fdptr->fs->impl->close(fdptr);
+	if (!res)
+		return 0;
+	cache_free(cache, fdptr->cache);
+	return res;
 }
 
-void setup_fs(void)
+const struct filesystem *setup_fs(void)
 {
-	cache = cache_new((void *)0xF00000,
-			  MAX_FDS, // Base address of user code
-			  CD_BLOCK_SZ);
-  setup_disk();
-	if (!setup_iso()) {
-		panic("No root filesystem found");
+	cache = cache_new((void *)0xF00000, MAX_FD, CD_BLOCK_SZ);
+	static struct filesystem cur_fs = {};
+	cur_fs.mount_path[0] = '/';
+	cur_fs.mount_path[1] = '\0';
+	// assert(setup_vfs(fs_list));
+	// fs_nb++;
+	setup_disk(); // prepare disk read
+	if (setup_iso(&cur_fs)) {
+		fs_list[fs_nb++] = cur_fs;
+		printf("ISOFS is setup !\n");
 	}
-	printf("Filesystem setup !\n");
+	return NULL;
 }

@@ -21,9 +21,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include "drivers/apic/apic.h"
-#include "drivers/disk/nvme/nvme.h"
-#include "drivers/disk/nvme/nvme_io.h"
+#include "fs/fd_db.h"
 #include "fs/fs.h"
 #include "gdt/gdt.h"
 #include "interrupts/ints.h"
@@ -31,6 +29,7 @@
 #include "memalloc/memalloc.h"
 #include "memory.h"
 #include "panic.h"
+#include "assert.h"
 #include "stdio.h"
 #include <k/kstd.h>
 
@@ -39,6 +38,7 @@
 void test_file(void)
 {
 	int fd = open("/boot/grub/grub.cfg");
+  assert(fd != INVALID_FD);
 	char buf[2048];
 	// Read 10 bytes
 	int len = read(fd, buf, 10);
@@ -77,7 +77,7 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	init_memalloc(info);
 
 	setup_fs();
-	// test_file();
+	test_file();
 
 	for (unsigned i = 0;;) {
 		char c = get_last_key();

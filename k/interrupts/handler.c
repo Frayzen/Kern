@@ -66,6 +66,12 @@ unsigned int interrupt_handler(struct stack *s)
 		print_stack(s);
 		printf("System halted.\n");
 		printf("======== KERNEL PANIC ========\n", s->int_no);
+    if (s->cr2 == 0)
+    {
+      printf("Panic probably due to NULL pointer dereference\n");
+      printf("Please check in gdb: ('list *0x%x')", s->eip);
+    }
+
 		while (1)
 			continue;
 	}

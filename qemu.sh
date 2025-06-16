@@ -33,6 +33,7 @@ qemu-system-i386 -drive id=cdrom,if=ide,media=cdrom,readonly=on,file=k.iso \
   -device nvme,drive=nvme0,serial=1234,addr=0x5 \
   -serial stdio -s -S \
   -trace enable="*nvme*",file=qemu.log \
+  # -d int,cpu_reset,guest_errors,invalid_mem -D errors.log \
   # -d int -D qemu.log \
   # -trace enable="*int*",file=out_nvme \
   # -d trace:*msix*,trace:*nvme* -D qemu.log \

@@ -1,37 +1,76 @@
 #include "ext2.h"
 #include "drivers/disk/disk.h"
+#include "fs/ext2fs/inode_utils.h"
+#include "fs/ext2fs/utils.h"
 #include "fs/fs.h"
 #include "fs/fsdef.h"
 #include "panic.h"
+#include "string.h"
 #include <stdio.h>
 
 #define SUPERBLOCK_LOC 1024 // in byte
-
-static char buffer[BLOCK_SIZE] __attribute__((aligned(4096)));
+char ext2_buffer[DISK_BLOCK_SIZE] __attribute__((aligned(4096)));
 
 #define EXT2_SIG 0xef53
 int setup_ext2(struct filesystem *fs)
 {
-  printf("Buffer is %x\n", buffer);
-	if (!disk_read_block(0, 1, buffer))
+	printf("Buffer is %x\n", ext2_buffer);
+	if (!disk_read_block(0, 1, ext2_buffer))
 		panic("Could not read disk");
 	struct ext2_base_superblock *superblock =
-		(struct ext2_base_superblock *)(buffer + SUPERBLOCK_LOC);
+		(struct ext2_base_superblock *)(ext2_buffer + SUPERBLOCK_LOC);
 	if (superblock->signature != EXT2_SIG) {
 		printf("Not an EXT2\n");
 		return 0;
 	}
 	printf("Found EXT2 !\n");
-	printf("Block size : %d\n", superblock->log_block_size * 1024);
+	printf("Block size : %d\n", 1024 << superblock->log_block_size);
 	fs->impl = &fs_ext2_impl;
 	fs->data.ext2.superblock = *superblock;
-  fs->data.ext2.block_size = superblock->log_block_size * 1024;
+	fs->data.ext2.nb_block_grp = ROUND_UP(superblock->total_nb_block,
+					      superblock->block_per_blockgrp);
+	struct ext2_base_superblock *sb = &fs->data.ext2.superblock;
+	fs->data.ext2.blk_size = 1024 << sb->log_block_size;
 	return 1;
 }
 
+#define ROOT_INODE 2
+
 int ext2_open_handler(struct filesystem *fs, char *path, struct filedesc *fd)
 {
+	u32 cur_inode_id = ROOT_INODE;
+	char *token = next_path_name(&path);
+	static struct ext2_inode cur_inode;
+	char found = 0;
+	while (!found) {
+    printf("OK1\n");
+		printf("Looking for token %s in inode %d\n", token, cur_inode_id);
+		if (!find_inode(fs, cur_inode_id, &cur_inode))
+			panic("Could not find inode for %s\n", token);
+		printf("Found inode %d of type %d\n", cur_inode_id,
+		       cur_inode.type_perm);
+		if (cur_inode.type_perm != TP_DIR) {
+			printf("%s is not a folder\n", token);
+			return 0;
+		};
+		if (!(cur_inode_id = find_dir_entry(fs, token, &cur_inode))) {
+			printf("Could not find token %s in folder\n", token);
+			return 0;
+		}
+    printf("OK2\n");
+		if (!(token = next_path_name(&path)))
+    {
+      printf("FOUND !\n");
+			found = 1;
+    }
+	}
+	// Got the right inode
+  printf("Inode is %d\n", cur_inode_id);
+	fd->block = cur_inode_id;
+	fd->fs = fs;
+	return 1;
 }
+
 int ext2_close_handler(struct filedesc *fd)
 {
 }

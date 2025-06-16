@@ -6,6 +6,7 @@ static u32 processing_cmd = 0;
 
 void nvme_sync()
 {
+	nvme_wait_status_ready();
 	while (processing_cmd) {
 		printf("\0\0\0\0"); // TOOD replace by proper wait
 		continue;

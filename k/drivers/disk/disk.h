@@ -3,7 +3,7 @@
 
 #include "k/types.h"
 
-#define BLOCK_SIZE 2048
+#define DISK_BLOCK_SIZE 2048
 
 void setup_disk();
 int disk_read_block(u64 block, u64 nb_block, void *buffer);

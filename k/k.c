@@ -77,6 +77,7 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	init_memalloc(info);
 
 	setup_fs();
+	int fd = open("/boot/grub/grub.cfg");
 	// test_file();
 
 	for (unsigned i = 0;;) {

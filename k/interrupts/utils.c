@@ -12,6 +12,15 @@ void print_stack(struct stack *s)
 	printf("int: 0x%.8x | err: 0x%.8x\n", s->int_no, s->err_code);
 	printf("eip: 0x%.8x | csm: 0x%.8x\n", s->eip, s->csm);
 	printf("efg: 0x%.8x | usr: 0x%.8x\n", s->eflags, s->useresp);
-	printf(" ss: 0x%.8x\n", s->ss);
-	printf("           == STACK ==\n");
+	printf("ss: 0x%.8x\n", s->ss);
+	printf("ERROR_CODE: 0x%.8x\n", s->err_code);
+}
+
+void print_selector_errcode(u32 err_code)
+{
+	printf(" |  External: %d\n", err_code & 0b1);
+	char tbl_letter[] = { 'G', 'I', 'L', 'I' };
+	printf(" |  Table: %cDT\n", tbl_letter[(err_code >> 1) & 0b11]);
+  u32 id = (err_code >> 3) & 0b1111111111111;
+	printf(" |  Index: 0x%.1x (%d)\n", id, id);
 }

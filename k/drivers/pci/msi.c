@@ -1,17 +1,20 @@
 #include "msi.h"
 #include "drivers/pci/pci.h"
 #include "assert.h"
+#include <string.h>
 
 void enable_msi(struct pci_device *device)
 {
 	u8 offset = device->capabilities.msi_cap_offset;
 	assert(offset != 0);
 	u32 id = pcidev_readw(device, offset + MSI_MID);
-	struct MSI_identifier id_edit = *((struct MSI_identifier *)&id);
+	struct MSI_identifier id_edit;
+	memcpy(&id_edit, &id, sizeof(id));
 	assert(id_edit.capID == MSI_CAP_ID || id_edit.capID == MSIX_CAP_ID);
 
 	u32 msg_ctl = pcidev_readw(device, offset + MSI_MC);
-	struct MSI_msg_ctl msg_ctl_edit = *((struct MSI_msg_ctl *)&id);
+	struct MSI_msg_ctl msg_ctl_edit;
+	memcpy(&msg_ctl_edit, &id, sizeof(id));
 	msg_ctl_edit.enable = 1;
 	pcidev_writew(device, offset + MSI_MC, msg_ctl);
 
@@ -24,11 +27,13 @@ void disable_msi(struct pci_device *device)
 	u8 offset = device->capabilities.msi_cap_offset;
 	assert(offset != 0);
 	u32 id = pcidev_readw(device, offset + MSI_MID);
-	struct MSI_identifier id_edit = *((struct MSI_identifier *)&id);
+	struct MSI_identifier id_edit;
+	memcpy(&id_edit, &id, sizeof(id));
 	assert(id_edit.capID == MSI_CAP_ID || id_edit.capID == MSIX_CAP_ID);
 
 	u32 msg_ctl = pcidev_readw(device, offset + MSI_MC);
-	struct MSI_msg_ctl msg_ctl_edit = *((struct MSI_msg_ctl *)&id);
+	struct MSI_msg_ctl msg_ctl_edit;
+	memcpy(&msg_ctl_edit, &id, sizeof(id));
 	msg_ctl_edit.enable = 0;
 	pcidev_writew(device, offset + MSI_MC, msg_ctl);
 

@@ -73,12 +73,22 @@ int ext2_open_handler(struct filesystem *fs, char *path, struct filedesc *fd)
 
 int ext2_close_handler(struct filedesc *fd)
 {
+  (void) fd;
+  return -1;
 }
 ssize_t ext2_read_handler(struct filedesc *fd, char *buf, size_t len)
 {
+  (void) fd;
+  (void) buf;
+  (void) len;
+  return -1;
 }
 int ext2_seek_handler(struct filedesc *fd, int offset, int whence)
 {
+  (void) fd;
+  (void) offset;
+  (void) whence;
+  return -1;
 }
 
 const struct filesystem_impl fs_ext2_impl = {

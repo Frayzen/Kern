@@ -157,7 +157,7 @@ ssize_t iso_read_handler(struct filedesc *fd, char *buf, size_t len)
 
 int iso_seek_handler(struct filedesc *fd, int offset, int whence)
 {
-	int prev_blk = CUR_BLK(fd);
+	u32 prev_blk = CUR_BLK(fd);
 	int next_offset;
 	switch (whence) {
 	case SEEK_SET:

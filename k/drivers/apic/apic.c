@@ -7,6 +7,7 @@
 #include "assert.h"
 #include "drivers/rsdp/rsdp.h"
 #include "interrupts/handler.h"
+#include "k/types.h"
 #include "panic.h"
 #include "drivers/pic/pic.h"
 #include <stdio.h>
@@ -49,8 +50,8 @@ void set_apic_base(u32 apic)
 
 	msr_writew(IA32_APIC_BASE_MSR, eax, edx);
 
-	u64 lapic_addr = apic;
-	lapic = (u32 *)lapic_addr;
+	uint_ptr lapic_addr = apic;
+	lapic = (void*)lapic_addr;
 
 	assert((msr_readl(IA32_APIC_BASE_MSR) & 0xfffff0000) == lapic_addr);
 }

@@ -2,6 +2,7 @@
 #include "assert.h"
 #include "drivers/pci/pci.h"
 #include "interrupts/handler.h"
+#include "k/types.h"
 #include "panic.h"
 #include <stdio.h>
 
@@ -12,7 +13,7 @@ void set_vector(u8 vector, u8 isr)
 {
 	struct MSIX_vector_table ref_table = {};
 	ref_table.masked = 0;
-	ref_table.msg_addr = (u32) lapic; // cast u32 first, important
+	ref_table.msg_addr = (u32)lapic; // cast u32 first, important
 	ref_table.msg_data = isr;
 	table_ptr[vector] = ref_table;
 }
@@ -39,12 +40,11 @@ void enable_msix(struct pci_device *dev)
 
 	u32 low_bar = get_bar(dev, bar) & 0xFFFFFFF0;
 	u64 high_bar = get_bar(dev, bar + 0x4);
-	u64 bar_val = (high_bar << 32) + low_bar;
+	uint_ptr bar_val = (high_bar << 32) + low_bar;
 
 	printf("Bar val is : 0x%x\n", low_bar);
 	printf("Table offset is : 0x%x\n", table_offset);
-	table_ptr =
-		(volatile struct MSIX_vector_table *)(bar_val + table_offset);
+	table_ptr = (void *)(bar_val + table_offset);
 	printf("Table ptr is : 0x%x\n", table_ptr);
 #define APIC_BASE_MSI_ADDRESS 0xFEE00000
 
@@ -59,5 +59,6 @@ void enable_msix(struct pci_device *dev)
 
 void disable_msix(struct pci_device *dev)
 {
+	(void)dev;
 	panic("NOT IMPLEMENTED");
 }

@@ -1,5 +1,5 @@
 #include "nvme_utils.h"
-#include "io.h"
+#include "k/types.h"
 #include <stdio.h>
 
 static u32 processing_cmd = 0;
@@ -17,7 +17,8 @@ static void *get_queue_ptr(struct nvme_queue *q, u8 is_submission)
 {
 	u32 offset = is_submission ? sizeof(struct submission_q_entry) :
 				     sizeof(struct completion_q_entry);
-	return (void *)(q->address + offset * q->ptr);
+  uint_ptr queue_ptr = q->address + offset * q->ptr;
+	return (void *)(queue_ptr);
 }
 
 void nvme_send_command(struct submission_q_entry *cmd, u8 is_admin)

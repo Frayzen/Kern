@@ -40,6 +40,10 @@ void handle_irq(unsigned int irq)
 	case IRQ_NVME_IO_QUEUE:
 		nvme_process_io_cq();
 		break;
+		// Unhandled yet
+	case IRQ_PRIM_IDE_CONT:
+	case IRQ_SEC_IDE_CONT:
+		break;
 	default:
 		print("Unhandled IRQ");
 		printf("%d (ISR %d)", irq - IRQ_MASTER_OFFSET, irq);
@@ -50,7 +54,7 @@ void handle_irq(unsigned int irq)
 	if (USE_APIC)
 		apic_send_eoi();
 	else
-	  pic_send_eoi(irq);
+		pic_send_eoi(irq);
 }
 
 unsigned int interrupt_handler(struct stack *s)
@@ -64,14 +68,21 @@ unsigned int interrupt_handler(struct stack *s)
 		printf("======== KERNEL PANIC ========\n", s->int_no);
 		printf("General protection fault ! (on 0x%x)\n");
 		print_stack(s);
+		print_selector_errcode(s->err_code);
 		printf("System halted.\n");
 		printf("======== KERNEL PANIC ========\n", s->int_no);
-    if (s->cr2 == 0)
-    {
-      printf("Panic probably due to NULL pointer dereference\n");
-      printf("Please check in gdb: ('list *0x%x')", s->eip);
-    }
-
+		// if (s->cr2 == 0) {
+		// 	printf("Panic probably due to NULL pointer dereference\n");
+		// 	printf("Please check in gdb: ('list *0x%x')", s->eip);
+		// }
+		while (1)
+			continue;
+	} else if (s->int_no == ISR_SEGMENT_NOT_PRESENT) {
+		printf("======== KERNEL PANIC ========\n", s->int_no);
+		printf("Segment not present\n");
+		print_stack(s);
+		print_selector_errcode(s->err_code);
+		printf("======== KERNEL PANIC ========\n", s->int_no);
 		while (1)
 			continue;
 	}

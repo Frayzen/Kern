@@ -6,6 +6,7 @@
 
 int setup_vfs(struct filesystem* fs)
 {
+  (void) fs;
   return 1; 
 }
 

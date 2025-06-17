@@ -54,14 +54,15 @@ void *find_SDT(char sig[4])
 	int extended = rsdp->revision != 0;
 
 	if (extended) {
-		struct XSDT *xsdt = (void *)rsdp->xsdt_address;
+		uint_ptr xsdt_addr = rsdp->xsdt_address;
+		struct XSDT *xsdt = (void *)xsdt_addr;
 		int entries = ((xsdt->h.length - sizeof(struct sdt_header)) /
 			       sizeof(u64));
 		printf("Entries is %d\n", entries);
 		assert(entries < 100);
 		for (int i = 0; i < entries; i++) {
-			struct sdt_header *h =
-				(struct sdt_header *)(xsdt->other_sdt[i]);
+			uint_ptr h_addr = xsdt->other_sdt[i];
+			struct sdt_header *h = (void *)h_addr;
 			if (!strncmp(h->signature, sig, 4))
 				return (void *)h;
 		}

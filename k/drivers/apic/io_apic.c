@@ -43,23 +43,23 @@ static void write_reg(const u8 sel_apic, const u8 offset, const u32 val)
 	*IOWIN(sel_apic) = val;
 }
 
-static u32 read_reg(const u8 sel_apic, const u8 offset)
-{
-	/* tell IOREGSEL where we want to read from */
-	*IOSEL(sel_apic) = offset;
-	/* read the value from IOWIN */
-	return *IOWIN(sel_apic);
-}
+// static u32 read_reg(const u8 sel_apic, const u8 offset)
+// {
+// 	/* tell IOREGSEL where we want to read from */
+// 	*IOSEL(sel_apic) = offset;
+// 	/* read the value from IOWIN */
+// 	return *IOWIN(sel_apic);
+// }
 
-static u8 get_version(const u8 sel_apic)
-{
-	return read_reg(sel_apic, IOAPIC_VER_REG) & 0xFF;
-}
+// static u8 get_version(const u8 sel_apic)
+// {
+// 	return read_reg(sel_apic, IOAPIC_VER_REG) & 0xFF;
+// }
 
-static u8 get_apic_id(const u8 sel_apic)
-{
-	return (read_reg(sel_apic, IOAPIC_ID_REG) << 24) & 0xF;
-}
+// static u8 get_apic_id(const u8 sel_apic)
+// {
+// 	return (read_reg(sel_apic, IOAPIC_ID_REG) << 24) & 0xF;
+// }
 
 void redirect_gsi(const u8 gsi, const u8 vector)
 {

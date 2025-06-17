@@ -8,4 +8,5 @@ if [ $? -ne 0 ]; then
 fi
 
 echo c | bochs -q -rc /dev/stdin
+reset
 exit 0

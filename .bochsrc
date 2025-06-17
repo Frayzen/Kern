@@ -9,12 +9,15 @@ log: IOR = off
 # gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0
 
 # configure the disk drive
-ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14
-ata0-master: type=cdrom, path="k.iso", status=inserted
+ata1-master: type=cdrom, path="k.iso", status=inserted
+
+
+# Add NVMe SSD configuration
+ata0-master: type=disk, path=disk.img, mode=flat
 boot: cdrom
 
 # write serial logs to stdout
-com1: enabled=1, mode=term, dev=/dev/stdout
+com1: enabled=1, mode=term, dev=/dev/stdout, rx=onlcr
 
 
 # log: out.log

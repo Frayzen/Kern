@@ -1,6 +1,7 @@
 #include "nvme_admin.h"
 #include "drivers/disk/nvme/nvme.h"
 #include "drivers/disk/nvme/nvme_utils.h"
+#include "k/types.h"
 #include "memalloc/memalloc.h"
 
 volatile u32 *nvme_subm_doorbell(u32 queue_id)
@@ -17,7 +18,7 @@ volatile u32 *nvme_cmpl_doorbell(u32 queue_id)
 int create_io_submission_queue()
 {
 	// Create queue
-	nvme_dev->io_subm_q.address = (u64)mmap();
+	nvme_dev->io_subm_q.address = (uint_ptr)mmap();
 	if (nvme_dev->io_subm_q.address == 0)
 		return 0;
 	nvme_dev->io_subm_q.size = SUBM_Q_SIZE - 1;
@@ -39,14 +40,14 @@ int create_io_submission_queue()
 
 	// Send commmand
 	nvme_send_command(&cmd, NVME_ADMIN_QUEUE);
-  nvme_sync();
+	nvme_sync();
 	return 1;
 }
 
 int create_io_completion_queue()
 {
 	// Create queue
-	nvme_dev->io_cmpl_q.address = (u64)mmap();
+	nvme_dev->io_cmpl_q.address = (uint_ptr)mmap();
 	if (nvme_dev->io_cmpl_q.address == 0)
 		return 0;
 	nvme_dev->io_cmpl_q.size = COMPL_Q_SIZE - 1;
@@ -69,14 +70,14 @@ int create_io_completion_queue()
 	cmd.command_specific[1] = (vector << 16) | flags;
 
 	nvme_send_command(&cmd, 1);
-  nvme_sync();
+	nvme_sync();
 	return 1;
 }
 
 int create_admin_submission_queue()
 {
 	// Create queue
-	nvme_dev->adm_subm_q.address = (u64)mmap();
+	nvme_dev->adm_subm_q.address = (uint_ptr)mmap();
 	if (nvme_dev->adm_subm_q.address == 0)
 		return 0;
 	nvme_dev->adm_subm_q.size = SUBM_Q_SIZE - 1;
@@ -90,7 +91,7 @@ int create_admin_submission_queue()
 int create_admin_completion_queue()
 {
 	// Create queue
-	nvme_dev->adm_cmpl_q.address = (u64)mmap();
+	nvme_dev->adm_cmpl_q.address = (uint_ptr)mmap();
 	if (nvme_dev->adm_cmpl_q.address == 0)
 		return 0;
 	nvme_dev->adm_cmpl_q.size = COMPL_Q_SIZE - 1;
@@ -102,13 +103,13 @@ int create_admin_completion_queue()
 
 int nvme_identify()
 {
-	u64 buffer = (u64)mmap();
+	u64 buffer = (uint_ptr)mmap();
 	struct submission_q_entry cmd = {};
 	cmd.cmd.opcode = 0x06;
 	cmd.prp1 = buffer;
 	cmd.nsid = 1;
 	nvme_send_command(&cmd, NVME_ADMIN_QUEUE);
-  nvme_sync();
+	nvme_sync();
 	return 1;
 }
 

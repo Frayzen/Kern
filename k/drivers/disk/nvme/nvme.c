@@ -1,13 +1,11 @@
 #include "nvme.h"
 #include "drivers/disk/nvme/nvme_admin.h"
-#include "drivers/disk/nvme/nvme_io.h"
 #include "drivers/pci/cap.h"
 #include "drivers/pci/msi.h"
 #include "drivers/pci/msix.h"
 #include "drivers/pci/pci.h"
 #include "assert.h"
 #include "k/types.h"
-#include "memalloc/memalloc.h"
 #include <stdio.h>
 
 struct nvme_device device = {};
@@ -16,7 +14,8 @@ struct nvme_device *nvme_dev = &device;
 volatile u32 *nvme_reg(u32 offset)
 {
 	assert(nvme_dev->base_addr != 0x0);
-	return (volatile u32 *)(nvme_dev->base_addr + offset);
+	uint_ptr reg_addr = nvme_dev->base_addr + offset;
+	return (volatile u32 *)reg_addr;
 }
 
 void nvme_wait_status_ready()

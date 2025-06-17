@@ -6,13 +6,13 @@
 
 int disk_read_block(u64 block, u64 nb_block, void *buffer)
 {
+	assert(nb_block != 0);
 	if (USE_NVME)
-    // ATAPI BLOCK IS 2kB but NVME is 512B
+		// ATAPI BLOCK IS 2kB but NVME is 512B
 		return nvme_read(block * 4, nb_block * 4, buffer);
 	else
 		return atapi_read_block(block, nb_block, buffer);
 }
-
 
 void setup_disk()
 {

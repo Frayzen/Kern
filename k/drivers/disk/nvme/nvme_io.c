@@ -8,7 +8,7 @@ int nvme_read(u64 lba, u32 sector_count, void *buffer)
 	if (!buffer || sector_count == 0)
 		return 0; // Error
 	struct submission_q_entry cmd = {};
-	u64 buf = (u64)buffer;
+	u64 buf = (uint_ptr)buffer;
 
 	cmd.cmd.opcode = 0x02; // Read opcode
 	cmd.nsid = 1;
@@ -29,6 +29,9 @@ int nvme_read(u64 lba, u32 sector_count, void *buffer)
 }
 int nvme_write(u64 lba, u32 sector_count, void *buffer)
 {
+  (void) lba;
+  (void) sector_count;
+  (void) buffer;
 	return 1;
 }
 

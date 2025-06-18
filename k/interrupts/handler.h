@@ -22,8 +22,10 @@ struct stack {
 } __packed;
 
 void print_stack(struct stack* s);
+void print_backtrace(struct stack* s);
 void print_selector_errcode(u32 err_code);
 unsigned int interrupt_handler(struct stack *s);
+void print_idt(void);
 
 extern int int_count;
 

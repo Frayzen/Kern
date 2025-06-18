@@ -69,6 +69,8 @@ unsigned int interrupt_handler(struct stack *s)
 		printf("General protection fault ! (on 0x%x)\n");
 		print_stack(s);
 		print_selector_errcode(s->err_code);
+		print_backtrace(s);
+		print_idt();
 		printf("System halted.\n");
 		printf("======== KERNEL PANIC ========\n", s->int_no);
 		// if (s->cr2 == 0) {
@@ -82,6 +84,7 @@ unsigned int interrupt_handler(struct stack *s)
 		printf("Segment not present\n");
 		print_stack(s);
 		print_selector_errcode(s->err_code);
+		print_backtrace(s);
 		printf("======== KERNEL PANIC ========\n", s->int_no);
 		while (1)
 			continue;

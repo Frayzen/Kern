@@ -3,24 +3,12 @@
 #include "drivers/pic/pic.h"
 #include "drivers/config.h"
 #include "drivers/pit/pit.h"
-#include "k/compiler.h"
+#include "k/types.h"
 #include "serial.h"
 #include "isr_list.h"
+#include <stdio.h>
 
-struct gate_descriptor {
-	unsigned int offset_low : 16;
-	unsigned int selector : 16;
-	unsigned int __unused : 8;
-	unsigned int type : 5;
-	unsigned int privilege : 2; // (ring of privilege)
-	unsigned int present : 1;
-	unsigned int offset_high : 16;
-} __packed;
-
-struct idt_descriptor {
-	unsigned int limit : 16;
-	unsigned int base : 32;
-} __packed;
+#define MAX_ISR_NB 256
 
 void setup_idt(void)
 {
@@ -29,24 +17,20 @@ void setup_idt(void)
 	if (USE_APIC)
 		apic_setup();
 	println("Setting up IDT...");
-	struct gate_descriptor gates[] = {
-#define X(id, key, name, errcode)                     \
-	[id] = {                                      \
-		.offset_low = OFFSET_LOW(isr##key),   \
-		.selector = 0x8,                      \
-		.offset_high = OFFSET_HIGH(isr##key), \
-		.type = GATE_TYPE_INT,                \
-		.privilege = 0,                       \
-		.present = 1,                         \
-	},
-		ISR_LIST IRQ_LIST
+	static struct gate_descriptor gates[MAX_ISR_NB];
+#define X(id, key, name, errcode)                               \
+	gates[id].offset_low = OFFSET_LOW(isr##key);            \
+	gates[id].segment_selector = 0x8;                       \
+	gates[id].offset_high = OFFSET_HIGH(isr##key);          \
+	gates[id].type = INT_GATE_32B, gates[id].privilege = 0; \
+	gates[id].present = 1;
+	ISR_LIST IRQ_LIST
 #undef X
-	};
-	struct idt_descriptor idt_holder = { .limit = sizeof(gates) - 1,
-					     .base = (unsigned int)&gates };
+		struct idt_descriptor idt_holder = { .limit = sizeof(gates) - 1,
+						     .base = (uint_ptr)&gates };
 	asm volatile("lidt %0"
 		     : /* no output */
 		     : "m"(idt_holder)
 		     : "memory");
-	println("IDT loaded");
+	printf("IDT loaded at %x\n", idt_holder.base);
 }

@@ -27,7 +27,6 @@ SUBDIRS	= \
 	  k \
 	  libs/libc \
 	  libs/libk \
-	  tools/mkkfs \
 
 ABS_INSTALL = $(abspath $(INSTALL_ROOT))
 

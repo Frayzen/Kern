@@ -2,8 +2,8 @@
 #include "fs/fs.h"
 #include "panic.h"
 
-struct filedesc fds[MAX_FD] = {};
-u8 fds_bitmap[MAX_FD / 8] = {}; // 1 if used, 0 if free
+static struct filedesc fds[MAX_FD] = {};
+static u8 fds_bitmap[MAX_FD / 8] = {}; // 1 if used, 0 if free
 
 static u8 find_free_id(void)
 {

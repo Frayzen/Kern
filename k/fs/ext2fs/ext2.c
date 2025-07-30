@@ -6,6 +6,8 @@
 #include "fs/fsdef.h"
 #include "panic.h"
 #include "string.h"
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 
 #define SUPERBLOCK_LOC 1024 // in byte
@@ -43,12 +45,9 @@ int ext2_open_handler(struct filesystem *fs, char *path, struct filedesc *fd)
 	static struct ext2_inode cur_inode;
 	char found = 0;
 	while (!found) {
-    printf("OK1\n");
-		printf("Looking for token %s in inode %d\n", token, cur_inode_id);
+		// printf("Looking for TOKEN %s in inode %d\n", token, cur_inode_id);
 		if (!find_inode(fs, cur_inode_id, &cur_inode))
 			panic("Could not find inode for %s\n", token);
-		printf("Found inode %d of type %d\n", cur_inode_id,
-		       cur_inode.type_perm);
 		if (cur_inode.type_perm != TP_DIR) {
 			printf("%s is not a folder\n", token);
 			return 0;
@@ -57,15 +56,11 @@ int ext2_open_handler(struct filesystem *fs, char *path, struct filedesc *fd)
 			printf("Could not find token %s in folder\n", token);
 			return 0;
 		}
-    printf("OK2\n");
 		if (!(token = next_path_name(&path)))
-    {
-      printf("FOUND !\n");
 			found = 1;
-    }
 	}
 	// Got the right inode
-  printf("Inode is %d\n", cur_inode_id);
+	printf("Inode is %d\n", cur_inode_id);
 	fd->block = cur_inode_id;
 	fd->fs = fs;
 	return 1;
@@ -73,22 +68,51 @@ int ext2_open_handler(struct filesystem *fs, char *path, struct filedesc *fd)
 
 int ext2_close_handler(struct filedesc *fd)
 {
-  (void) fd;
-  return -1;
+	printf("Closing file %s\n", fd->path);
+	return 1;
 }
 ssize_t ext2_read_handler(struct filedesc *fd, char *buf, size_t len)
 {
-  (void) fd;
-  (void) buf;
-  (void) len;
-  return -1;
+	const struct filesystem *fs = fd->fs;
+	struct ext2_inode inode;
+	printf("OK\n");
+	if (!find_inode(fs, fd->block, &inode)) {
+		printf("OK1\n");
+		printf("Error: reading from inode %d\n", fd->block);
+		return -1;
+	}
+  printf("OK2\n");
+	u64 size = inode.low_size + ((u64)inode.upper_size << 32);
+	printf("Size is %d\n", size);
+	if (fd->offset + len > size)
+		len = size - fd->offset;
+	size_t remain = len;
+	printf("Remain is %d\n", remain);
+	while (remain > 0) {
+		size_t blk_nb = fd->offset / DISK_BLOCK_SIZE;
+		size_t blk_offset = fd->offset % DISK_BLOCK_SIZE;
+		if (!(inode.direct_block_ptr[blk_nb]))
+			panic("Inconsistent block %d for fd %s\n", blk_nb,
+			      fd->path);
+		printf("Block is nb %d\n", inode.direct_block_ptr[blk_nb]);
+		uint8_t *blk_buf =
+			load_block(fs, inode.direct_block_ptr[blk_nb]);
+		size_t cur_size =
+			DISK_BLOCK_SIZE - blk_offset; // read till end of BLOCK
+		if (cur_size > remain) // do not overread
+			cur_size = remain;
+		memcpy(buf, blk_buf + blk_offset, cur_size);
+		remain -= cur_size;
+		fd->offset += cur_size;
+	}
+	return len;
 }
 int ext2_seek_handler(struct filedesc *fd, int offset, int whence)
 {
-  (void) fd;
-  (void) offset;
-  (void) whence;
-  return -1;
+	(void)fd;
+	(void)offset;
+	(void)whence;
+	return -1;
 }
 
 const struct filesystem_impl fs_ext2_impl = {

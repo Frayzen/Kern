@@ -22,14 +22,13 @@ int open(char *path)
 {
 	static struct filedesc reset_fd = {};
 	static struct filedesc fd;
-  fd = reset_fd;
+	fd = reset_fd;
 	fd.cache = cache_alloc(cache);
 	for (int i = 0; i < fs_nb; i++) {
 		struct filesystem *cur = fs_list + i;
-		printf("Check %s and %s of size %d\n", path, cur->mount_path,
-		       strlen(cur->mount_path));
 		if (!strncmp(path, cur->mount_path, strlen(cur->mount_path))) {
 			if (cur->impl->open(cur, path, &fd)) {
+				strcpy(fd.path, path);
 				fd.fd_id = store_fd(&fd);
 				return fd.fd_id;
 			}
@@ -41,6 +40,7 @@ int open(char *path)
 
 int read(int fd, char *buf, unsigned int len)
 {
+  printf("Read fd %d\n", fd);
 	struct filedesc *fdptr = load_fd(fd);
 	if (fdptr == NULL)
 		return -1;
@@ -62,6 +62,7 @@ int close(int fd)
 	if (!res)
 		return 0;
 	cache_free(cache, fdptr->cache);
+  free_fd(fd);
 	return res;
 }
 

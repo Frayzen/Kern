@@ -50,12 +50,12 @@ void test_file(void)
 	printf("Read %d bytes\n", len, buf);
 	printf("%s\n", buf);
 
-	// Read 10 bytes from the end
-	if (seek(fd, -10, SEEK_END) == -1)
-		panic("Seek failed\n");
-	len = read(fd, buf, 1024);
-	printf("Read %d bytes\n", len, buf);
-	printf("%s\n", buf);
+// 	// Read 10 bytes from the end
+// 	if (seek(fd, -10, SEEK_END) == -1)
+// 		panic("Seek failed\n");
+// 	len = read(fd, buf, 1024);
+// 	printf("Read %d bytes\n", len, buf);
+// 	printf("%s\n", buf);
 
 	close(fd);
 }
@@ -77,8 +77,8 @@ void k_main(unsigned long magic, multiboot_info_t *info)
 	init_memalloc(info);
 
 	setup_fs();
-	/* int fd = */ open("/boot/grub/grub.cfg");
-	// test_file();
+	// open("/boot/grub/grub.cfg");
+	test_file();
 
 	for (unsigned i = 0;;) {
 		char c = get_last_key();

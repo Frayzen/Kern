@@ -1,17 +1,14 @@
 #include "inode_utils.h"
-#include "drivers/disk/disk.h"
 #include "fs/ext2fs/ext2.h"
 #include "fs/ext2fs/utils.h"
 #include "fs/fsdef.h"
 #include "k/types.h"
-#include "panic.h"
-#include <stdio.h>
 #include <string.h>
 
-int find_inode(struct filesystem *fs, u32 inode,
+int find_inode(const struct filesystem *fs, u32 inode,
 	       struct ext2_inode *res) // inode starts at 1
 {
-	struct ext2_base_superblock *sb = &fs->data.ext2.superblock;
+	const struct ext2_base_superblock *sb = &fs->data.ext2.superblock;
 	if (inode < 2 || inode > sb->total_nb_inode)
 		return 0;
 
@@ -59,11 +56,6 @@ int find_dir_entry(struct filesystem *fs, const char *token,
 		struct ext2_dir_entry *cur =
 			(void *)(ext2_buffer + entry_offset);
 		while (entry_offset < fs->data.ext2.blk_size) {
-      
-      for (int j = 0; cur->name[j] && token[j]; j++)
-      {
-        printf("CMP %x and %x\n", cur->name[j], token[j]);
-      }
 			if (!strncmp(token, cur->name, cur->name_len))
 				return cur->inode;
 			entry_offset += cur->size;
